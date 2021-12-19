@@ -103,9 +103,36 @@ ArrayList linkedList HashSet HashMap lambda表达式 泛型等等
 3. io 字符流  读写	(对象形式不一样)
 ```
 
+#### 13. liuhui.com.高级特性.反射与注解
+
+```
+反射: Person personDemo
+
+注解: 注解小用途, 6个文件
+```
+
+#### 14. liuhui.com.高级特性.线程
+
+```
+Thread 类
+Runable 接口  简单的练习
+```
+
+#### 15. liuhui.com.高级特性.枚举包装类
+
+```
+八大类型的一些方法  random date 等等
+```
+
+#### 16 . liuhui.com.高级特性.Json
+
+```
+json的转换 引入 fastJson工具类 导入
+```
 
 
-### 概念
+
+### 2. 概念
 
 #### 1.面向对象
 
@@ -555,11 +582,467 @@ BufferedWriter bw = new BufferedWriter(new FileWriter(path, isAppend))
 
 ```
 
-### Y纠错集
+##### 3. 反射
 
 ```
-1. create asm serializer error   json转换 检查路径是否有中文
+/**
+ * 反射: 框架设计的灵魂
+ * * 框架: 半成品软件,可以在框架的基础上进行软件开发，简化编码
+ * * 反射: 将类的各个组成部分封装成其他对象,这就是反射机制
+ * * 好处:
+ * 		1. 可以在程序运行的过程中,操作这些对象
+ * 		2. 可以解耦,提高程序的可扩展性
+ *		
+ *	获取Class对象的方式:
+ *		1. source源代码阶段  	Class.forName("全类名");   
+ * 		2. Class类对象阶段	 	类名的.class
+ *		3. Runtime运行时阶段 	对象.class	getClass()方法在Object类上	
+ *		* 结论:同一个字节码文件(*.class)在一次程序运行过程中 只会被加载一次 不论通过哪一种方式获取的Class都是同一个
+ */
+ 
+ * Class 对象功能
+ 	* 获取功能
+ 		1. 获取成员变量们
+        	* Field[] getFields()   获取所有public修饰的成员变量
+        	* Field   getField()    获取指定名称的 public修饰的成员变量
+        	
+        	* Field[] getDeclaredFields()  获取所有成员变量,不考虑修饰符
+ 			* Field getDeclaredField(String name)
+ 			
+ 			
+ 			
+ 		2. 获取构造方法们
+ 			* Constructor<?>[] getConstructors(); 获取所有的public修饰的构造方法
+ 			* Constructor<T> getConstructor(类<?>... parameterTypes); 
+ 			
+ 			* Constructor<?>[] getDeclaredConstructors(); 获取所有的构造方法 不考虑修饰符
+ 			* Constructor<T>getDeclaredConstructor(类<?>... parameterTypes); 
+ 		
+ 		
+ 		
+ 		3. 获取成员方法们
+ 			* Method<?>[] getMethods(); 获取所有的public修饰的成员方法 包括父类的
+ 			* Method<T> getMethod(string name, 类<?>... parameterTypes); 获取特定成员方法
+ 			
+ 			* Method<?>[] getDeclaredMethods(); 获取所有的成员方法 不考虑修饰符
+ 			* Method<T>getDeclaredMethod(类<?>... parameterTypes);
+ 		
+ 		4. 获取类的名字
+ 			 forName()
+ 			
+ 		
+ 		
+ 		* Field :成员变量
+ 			* 操作:
+ 				1. 设置值
+ 					* void set(Object obj,Object value)
+ 				2. 获取值
+ 					* get(Object obj)
+ 				3. 忽略访问权限修饰符的安全检查
+ 					* setAccessible(true): 暴力反射
+ 					
+ 		* Constructor: 构造方法
+ 			* 创建对象
+ 				* T newInstance(Object... initargs)
+ 				* 如果使用空参的方式创建对象 操作可以简化:Class对象的newInstance方法
+ 				* 忽略访问权限修饰符的安全检查 
+ 					* setAccessible(true): 暴力反射
+ 		
+ 		* Method : 方法对象
+ 			* 执行方法
+ 				* Object invoke(Object obj,Object...  args)
+ 			* 获取方法名称
+ 				* String getName: 获取方法名
+ 			* 忽略访问权限修饰符的安全检查
+            	* setAccessible(true): 暴力反射
+                		
 ```
+
+
+
+##### 4. 注解
+
+```
+/**
+ * 注解: 用文字描述对象的,给程序员看的
+ * 定义: (Annotation) 也叫元数据.一种代码级别的说明，与类 接口 枚举在同一个层次,它可以声明在包 类 字段 方法 局部变量 
+ *       方法参数等的前面 用来对这些元素进行说明.注释
+ *	
+ *  * 概念描述
+ 		* JDK1.5版本周的新特性
+ 		* 说明程序的
+ 		* 使用注解: @注解名称
+ 		
+ *  * 作用分类:
+ *		* 编写文档: 通过代码里的元数据生成文档(生成文档doc文档)
+ * 		* 代码分析: 通过代码里标识的元数据对代码进行分析(使用反射)
+ * 		* 编译检查: 通过代码里的元数据让编译器能够实现基本的编译检查
+ *
+ *	* JDK中预定义的一些注解
+ *		* @Override:检测被该注解标注的方法是否继承自父类
+ *		* @Deprecated:该注解标注的内容已经过时
+ *		* @SuppressWarnings:压制警告
+ 
+  
+ 	* 自定义注解
+ 		* 格式:(元注解)
+ 			* public @interface 注解名称{}
+ 		* 本质: 注解本质就是 shi一个接口 该接口默认继承自Annotation接口
+        	* public interface MyAnno extends java.lang.annotation.Annotation {}
+		
+        * 属性: 接口中的抽象方法
+        	* 要求:
+        		1. 属性的返回值有下列取值范围
+        			* 基本数据类性
+        			* String	
+        			* 枚举
+        			* 注解
+        			* 以上类型的数组
+        		2. 定义了属性,在使用是需要给属性赋值的注意事项
+        			1. 如果定义了属性时,可以使用default关键字给属性默认初始化值
+        			2. 如果只有一个属性需要赋值,并且属性的名称是value,则value可以省略,直接定义值即可
+        			3. 数组赋值时,值需要使用{}包裹,如果数组中只有一个值,则{}可以省略
+        * 元注解(用于描述注解的注解)
+        	* Target: 描述注解能够作用的位置
+        		* ElementType 取值
+        			* TYPE:作用于类上
+        			* METHOD: 作用于方法上
+        			* FIELD: 作用域成员变量上
+        	* Retention: 描述注解被保留的阶段
+        		* Retention(RetentionPolicy.RUNTIME) 运行时后生效
+        	* Documented: 描述注解是否被抽取到api文档中
+        	* inherited: 描述注解是否被子类继承
+        
+        			
+        			
+ 	* 在程序使用(解析)注解
+ 		1. 获取注解定义的位置的对象 (Class,Method,Field)
+ 		2. 获取指定的注解
+ 			* getAnnotation(Class)
+ 		3. 调用注解中的抽象方法获取配置的属性值
+ 		
+ 		
+ 		
+ 	* 小结:
+ 		1. 以后大多时候 我们会使用注解 而不是自定义注解
+ 		2. 注解给谁用
+ 			1. 编译器
+ 			2. 给解析程序用
+ 		3. 注解不是程序的一部分，可以理解为一个标签
+ 	
+ */
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 3. Mysql
+
+#### 1. 安装
+
+##### 1. 复制my.ini文件并修改
+
+```ini
+# my.ini配置文件放到各个安装目录下
+[mysql]
+# 设置mysql客户端默认字符集
+default-character-set=utf8 
+
+[mysqld]
+#设置端口  有多个数据库时配置需要不一样
+port = 33061
+
+# 设置mysql的安装目录 =E:\\temp\\mysql1
+basedir=D:\\software\\MySql\\mysql1
+
+# 设置mysql数据库的数据的存放目录 E:\\temp\\mysql1\\data
+datadir=D:\\software\\MySql\\mysql1\\data
+
+# 允许最大连接数
+max_connections=200
+
+# 服务端使用的字符集默认为8比特编码的latin1字符集
+character-set-server=utf8
+
+# 创建新表时将使用的默认存储引擎-用来处理数据的程序INNODB(新)  MYISM（效率很高，功能很少）
+default-storage-engine=INNODB
+
+# 调整加密方式为5.x方式
+default_authentication_plugin=mysql_native_password
+```
+
+##### 2. 初始化并完成安装
+
+```bash
+# 通过管理员启动cmd
+# 进入安装路径-bin
+D:
+cd D:\\software\\MySql\\mysql1\mysql-8.0.23-winx64\bin
+
+# 初始化mysql安装配置
+# --defaults-file默认配置文件路径  --initialize初始化 --console 将信息打印到控制台
+mysqld --defaults-file=D:\Application\MySql\mysql-8.0.23-winx64\my.ini --initialize --console
+
+# 复制密码
+root123
+
+# 安装mysql到服务
+mysqld install mysql1 --defaults-file=D:\Application\MySql\mysql-8.0.23-winx64\my.ini
+
+### 常见命令
+# 启动服务
+sc start mysql1    QysewapB#5NS  QysewapB#5NS
+
+# 停止服务
+sc stop mysql1
+
+# 删除服务
+sc delete mysql1
+```
+
+##### 3 . 简单的操作
+
+**MySQL服务的开启和关闭 以及扩展**
+
+```
+net start mysql (服务的名称)  开启服务
+net stop  mysql (服务的名称)	 关闭服务
+
+// 删除mysql服务名称 
+sc delete 服务名称
+// 修改 mysql服务名
+mysqld --install 新服务名称 
+// mysql服务启动
+	cmd ==> services.msc打开服务的窗口
+
+```
+
+**MySQL的登录与退出**
+
+```
+登录: mysql -u用户名 -p密码
+退出: exit
+```
+
+
+
+
+
+
+
+#### 2. 操作数据库
+
+```
+SQL分类
+	1) DDL数据库定义语 
+		* 用来定义数据库对象: 数据库 表 列 关键字: create drop alter 等
+	2) DML数据操作语言
+		* 对数据库中表的数据进行增删改 关键字: insert delete update 等
+	3) DQL数据查询语言
+		* 用来查询数据库中表的记录 关键字: select where 等
+	4) DCL数据库控制语言
+		* 用来定义数据库的访问权限和安全级别,以及创建用户 关键字: GRANT REVOKE 等
+```
+
+##### 1. DDL 用来定义数据库对象
+
+###### 1. 操作数据库
+
+```
+
+		1.C(Create)创建
+			* 创建数据库:
+				* create database db;
+			* 创建数据库,判断不存在,在创建
+				* create database if not exists db;
+            * 创建数据库,指定字符集
+            	* create database if not exists db character set gbk;
+            	
+            	
+         2.R(Retrieve)查询
+         	* 查询所有的数据库名称
+         		* show databases;
+         	* 查询某个数据库的创建语句
+         		* show create database db;
+         		
+         		
+         3.U(Update)修改
+         	* 修改数据库的字符集
+         		* alter database db character set 字符集名称;
+         		
+         		
+         4.D(Delete)删除
+         	* 删除数据库
+         		* drop database db;
+         	* 判断数据库存在, 存在则删除
+         		* drop database if exists db;
+         		
+         		
+         5.使用数据库
+         	* 使用数据库
+         		* use db;
+         	* 查询当前使用的数据名称
+         		* select database();
+         		
+```
+
+###### 2. 操作表
+
+```
+
+		1.C(Create)创建
+			* 创建表:
+				* create if not exists table tb(
+					列名1 数据类型1,
+					列名2 数据类型2,
+					...
+					列名n 数据类型n  * 注意: 最后一列不需要加,
+				);
+				
+			* 数据类型:
+            	1. int: 整数类型
+            		* age int
+            	2. double: 小数类型
+           			* score double(5,2) 小数点一共有5位 保留两位
+            	3. date: 日期类型,只包含年月日 yyyy-MM-dd
+            	4. datetime: 日期类型,包含年月日时分秒 yyyy-MM-dd HH:mm:ss
+            	5. timestamp: 时间戳类型,包含年月日时分秒 yyyy-MM-dd HH:mm:ss
+            		* 如果将来不给这个字段赋值,或者赋值为null,则默认使用当前的系统时间来自动赋值
+            	6. varchar: 字符串类型
+            		* name varchar(20) 最大20个字符
+			
+			* 复制一份表
+            	create table  stu(复制的表) like student;
+            	
+		
+         2.R(Retrieve)查询
+         	* 查询表结构
+         		* desc tb;
+         	* 查询表的创建语句
+         		* show create table students;
+         		
+         	
+         3.U(Update)修改
+         	* 修改表名称
+         		* alter table tb rename to newdb;
+         	* 修改表字符集
+         		* alter table tb character set 字符集名称;
+         	* 添加一列
+         		* alter table tb add 列名 类型;
+         	* 修改列名称 类型
+         		* alter table tb change 列名 新列名 新类型;
+				* alter table tb modify 列名 新类型;
+         	* 删除列
+         		* alter table tb drop 列名;
+         		
+         		
+         4.D(Delete)删除
+         	* 删除表
+         		* drop table tb;
+         	* 判断表是否存在, 存在则删除
+         		* drop table if exists db;
+         		
+```
+
+##### 2. DML: 增删改数据
+
+```
+1. 添加数据:
+	* insert into tb(列名1,列名2,...列名n)values(值1,值2...值n);
+	* 注意:
+		1. 列名和值要一一对应
+		2.如果表名之后,不定义列名,则默认给所有的列添加
+			* insert into tb values(值1,值2,...值3); 即便是有的列有默认值 也不许把位置占了 
+		3. 除了数字类型 其他类型都必须用引号引起来 
+		
+2. 删除数据:
+	* delete from tb;  // 有多少记录就删除多少次,效率比较慢
+	* delete from tb where(条件);  // 根据条件删除
+	* truncate table tb;  // 一次性删除所有数据 并且生成一个新表的结构(推荐使用 效率更高)
+
+3. 修改数据:
+	* update  tb set 列名1 = 值2,列名2 = 值2,...(where 条件);
+	* 注意: 如果不加 where 则会将表中所有的数据更改
+```
+
+##### 3. DQL: 查询语句 
+
+```
+	1. 排序查询
+		* 语法: order by 子句
+			* order by 排序字段1 排序方式, 排序字段2,排序方式2 ...
+			* 例子: select * from student ORDER BY math DESC,english desc;
+		* 排序方式
+			* asc : 升序 默认的
+			* desc: 降序
+		* 注意:
+			* 如果有多个排序条件,则当前的值一样时, 才会判断第二个条件
+
+	2. 聚合查询: 将一列数据作为一个整体,进行纵向的计算
+		* count: 计算个数
+		* Max/Min: 计算最大值与最小值
+		* sum:	求和
+		* avg:  平局值
+		* 注意: 所有的聚合函数都是排除了null值的
+			* 解决方案:
+				1. 选择不为空的列进行计算
+				2. ifnull函数  ifnull(exp1,exp2) 如果exp1为null则替换成 exp2
+				
+	3. 分组查询
+		* 语法: group by 分组字段;
+		* 注意:
+			* 分组查询之后的字段: 要么是分组字段 要么是聚合函数
+			* where 和 having 的区别 ?
+				* where 在分组之前进行限定,如果不满足条件则不参与分组
+				* having 在分组之后进行限定,如果不满足结果则不会被查询出来
+				
+				* where 之后不可以跟聚合函数 而having可以
+				
+	4. 分页查询 
+		*
+
+2. 约束
+3. 多表之间的练习
+4. 范式
+5. 数据库的备份与还原
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+```
+
+##### 4. DCL数据库控制语言
+
+```
+
+```
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,8 +1,10 @@
-### 1. java基础文件内容
+
+
+### 1 . java基础文件内容
 
 #### 2. liuhui.com.oop.a1 a2 a3 day1
 
-```
+```java
 // 1. a1
 Person  Test  简单实例化类
 
@@ -19,8 +21,7 @@ Student StudentServer Test
 2. 插入一个学员的成绩 并且保持升序
 3. 冒泡排序
 4. Arrays类常用
-
-
+    
 ```
 
 #### 3. liuhui.com.oop.作用域问题
@@ -132,7 +133,17 @@ json的转换 引入 fastJson工具类 导入
 
 
 
-### 2. 概念
+
+
+
+
+
+
+
+
+
+
+### 2. Java概念
 
 #### 1.面向对象
 
@@ -733,9 +744,14 @@ BufferedWriter bw = new BufferedWriter(new FileWriter(path, isAppend))
  */
 ```
 
+##### 5. JDBC
+
+```
+* 概念 : 数据库连接的操作语言
+* JDBC 本质: 官方定义的一套操作所有数据库的规则 即接口 各个数据库厂商去实现这个接口 提供数据库驱动的jar包 ，我们可以使用这套接				口编程,真正执行的是驱动jar中的实现类 
 
 
-
+```
 
 
 
@@ -759,13 +775,13 @@ default-character-set=utf8
 
 [mysqld]
 #设置端口  有多个数据库时配置需要不一样
-port = 33061
+port = 3306
 
-# 设置mysql的安装目录 =E:\\temp\\mysql1
-basedir=D:\\software\\MySql\\mysql1
+# 设置mysql的安装目录 
+basedir=D:\Application\mysql-8.0.23-winx64
 
-# 设置mysql数据库的数据的存放目录 E:\\temp\\mysql1\\data
-datadir=D:\\software\\MySql\\mysql1\\data
+# 设置mysql数据库的数据的存放目录
+datadir=D:\Application\mysql-8.0.23-winx64\data
 
 # 允许最大连接数
 max_connections=200
@@ -785,22 +801,21 @@ default_authentication_plugin=mysql_native_password
 ```bash
 # 通过管理员启动cmd
 # 进入安装路径-bin
-D:
-cd D:\\software\\MySql\\mysql1\mysql-8.0.23-winx64\bin
+
 
 # 初始化mysql安装配置
 # --defaults-file默认配置文件路径  --initialize初始化 --console 将信息打印到控制台
-mysqld --defaults-file=D:\Application\MySql\mysql-8.0.23-winx64\my.ini --initialize --console
+mysqld --defaults-file=D:\Application\mysql-8.0.23-winx64\my.ini --initialize --console
 
 # 复制密码
-root123
+ Yvr)mrENT684
 
 # 安装mysql到服务
-mysqld install mysql1 --defaults-file=D:\Application\MySql\mysql-8.0.23-winx64\my.ini
+mysqld install mysql --defaults-file=D:\Application\mysql-8.0.23-winx64\my.ini
 
 ### 常见命令
 # 启动服务
-sc start mysql1    QysewapB#5NS  QysewapB#5NS
+sc start mysql1    
 
 # 停止服务
 sc stop mysql1
@@ -823,7 +838,8 @@ sc delete 服务名称
 mysqld --install 新服务名称 
 // mysql服务启动
 	cmd ==> services.msc打开服务的窗口
-
+	
+mysqld --remove mysql  //删除服务
 ```
 
 **MySQL的登录与退出**
@@ -833,9 +849,12 @@ mysqld --install 新服务名称
 退出: exit
 ```
 
+**数据库的备份与还原**
 
-
-
+```
+备份: mysqldump -u用户名 -p密码 数据库名> 保存的路径  f://a.sql
+还原: 1.登录 2.创建一个数据库 3.使用数据库 4.执行文件(source 文件路径)   
+```
 
 
 
@@ -908,6 +927,7 @@ SQL分类
 					列名n 数据类型n  * 注意: 最后一列不需要加,
 				);
 				
+				
 			* 数据类型:
             	1. int: 整数类型
             		* age int
@@ -915,8 +935,10 @@ SQL分类
            			* score double(5,2) 小数点一共有5位 保留两位
             	3. date: 日期类型,只包含年月日 yyyy-MM-dd
             	4. datetime: 日期类型,包含年月日时分秒 yyyy-MM-dd HH:mm:ss
-            	5. timestamp: 时间戳类型,包含年月日时分秒 yyyy-MM-dd HH:mm:ss
+            	5. timestamp: 时间戳类型,包含年月日时分秒 yyyy-MM-dd HH:mm:ss  
             		* 如果将来不给这个字段赋值,或者赋值为null,则默认使用当前的系统时间来自动赋值
+            				timestamp DEFAULT(CURRENT_TIMESTAMP)  -- 默认的让获取系统时间
+            				
             	6. varchar: 字符串类型
             		* name varchar(20) 最大20个字符
 			
@@ -958,6 +980,7 @@ SQL分类
 ```
 1. 添加数据:
 	* insert into tb(列名1,列名2,...列名n)values(值1,值2...值n);
+	* insert into tb(列名1,列名2,...列名n)values(值1,值2...值n),(值1,值2...值n)... // 添加多条
 	* 注意:
 		1. 列名和值要一一对应
 		2.如果表名之后,不定义列名,则默认给所有的列添加
@@ -977,6 +1000,7 @@ SQL分类
 ##### 3. DQL: 查询语句 
 
 ```
+
 	1. 排序查询
 		* 语法: order by 子句
 			* order by 排序字段1 排序方式, 排序字段2,排序方式2 ...
@@ -992,11 +1016,13 @@ SQL分类
 		* Max/Min: 计算最大值与最小值
 		* sum:	求和
 		* avg:  平局值
-		* 注意: 所有的聚合函数都是排除了null值的
-			* 解决方案:
-				1. 选择不为空的列进行计算
-				2. ifnull函数  ifnull(exp1,exp2) 如果exp1为null则替换成 exp2
-				
+		* 注意: 
+			1. 所有的聚合函数都是排除了null值的
+				* 解决方案:
+					1. 选择不为空的列进行计算
+					2. ifnull函数  ifnull(exp1,exp2) 如果exp1为null则替换成 exp2
+			2. 聚合查询不能跟普通字段混在一起 报错
+				* 比如 select count(distinct age) ,name from student;	
 	3. 分组查询
 		* 语法: group by 分组字段;
 		* 注意:
@@ -1004,35 +1030,806 @@ SQL分类
 			* where 和 having 的区别 ?
 				* where 在分组之前进行限定,如果不满足条件则不参与分组
 				* having 在分组之后进行限定,如果不满足结果则不会被查询出来
-				
 				* where 之后不可以跟聚合函数 而having可以
 				
 	4. 分页查询 
-		*
+		* 语法: limit 开始的索引,每页查询的条数
+		* 公式: 开始的索引 = (当前页码 - 1 ) * 每页条数
+		* 例子: 每页显示三条
+			* select * from student limit 0,3;
+			* select * from student limit 3,3;
+			* select * from student limit 6,3;
+			
+			
+			
+    5.完整语法:  
+    	*  		select 
+                    字段名称 
+                 from 
+                    表名
+                 where 
+                    条件列表 
+                 group by 
+                    分组字段 
+                 having 
+                    分组之后的条件 
+                 order by
+                    排序
+                 limit
+                    分页		              
+    6. 基础查询:
+    	1. 多个字段的查询
+    		* select 字段名1,字段名2,字段名3... from 表名
+    		* 注意: 查询所有可以使用 * 代替 但是不建议使用
+    	2. 去除重复
+    		* distinct  
+            	* select distinct age from student;        年龄去重
+            	* select count(distinct age) from student; 年龄去重之后计算总人数
+    	3. 计算列
+    		* 一般可以使用四则运算来计算列的值(数值型)
+    		* ifnull(exp1,exp2)  如果exp1为null则替换成 exp2
+    	4. 起别名
+    		* as(也可以省略)
+    7. 条件查询
+    	1. where 子句后面跟条件
+    	2. 运算符: 
+    		* <  >  <=  >=  =  [<> != ](不等于)
+    		* between ?(包含) and ?(包含) 在什么之间  
+    		* in(集合)    (1,2,3) 在 1 2 3 之间的
+    		* like 模糊查询
+    			* 占位符:
+    				* _:单个任意字符
+    				* %:多个任意字符
+    		* [is null]  or [is not null]      // 为null或者不为null
+    		* and 或者 &&
+    		* or 或者 ||
+    		* not 或者 !
 
-2. 约束
-3. 多表之间的练习
-4. 范式
-5. 数据库的备份与还原
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 ```
 
 ##### 4. DCL数据库控制语言
 
 ```
 
+
 ```
+
+##### 5. 约束
+
+```
+    		
+    8. 约束
+    	* 概念: 对表中的数据进行约束,保证数据的正确性,有效性和完成性
+    	* 分类:
+    		1. 主键约束: primary key
+    		2. 非空约束: not null
+    		3. 唯一约束: unique
+    		4. 外键约束: foreign key
+    		
+    	* 非空约束: not null
+    		1. 创建表时添加约束
+    			create table tb(
+    				id int,
+    				name varchar(20) not null 
+    			);
+    		2. 创建完成之后 添加非空约束
+    			alter table tb modify name varchar(20) not null;
+    			
+    		3. 删除name的非空约束 使用修改方式
+    			alter table tb modify name varchar(20);
+    			
+    		* 注意: 如果表中已经有了数据 而且为那一列值为null  那么不能修改为null ,必须把那一列null的数据删除 才能保存
+ 
+    	* 唯一约束: unique (不能重复)
+    	
+    		* 注意:mysql中 唯一约束限定的值可以有多个null /如果表中已经有重复的数据  则不能保存
+    		1. 删除唯一约束 
+    			* alter table tb drop index 列名
+            2. 在创建表后添加唯一约束
+            	* alter table tb modify name varchar(20) unique;
+    	
+    	* 主键约束 : primay key
+    		1. 注意:
+    			1. 含义: 非空不唯一
+    			2. 一张表只能有一个字段为主键
+    			3. 主键就是表中记录的唯一标识
+    			
+    		2. 删除主键 和 添加主键
+    			* ALTER TABLE tb DROP PRIMARY KEY;
+    			* alter table tb modify int primary key;
+    		3. 主键的自动增长
+    			* 如果某一列为数值类型 ,使用auto_increment 可以用来自动增长
+    			* 添加自动增长
+    	  			* alter table stu modify id int auto_increment;
+    			* 删除自动增长
+    	  			* alter table stu modify id int;
+    	  			
+    	  * 外键约束 
+    	  	1.创建表时,可以添加外键
+    	  		* 语法
+    	  			create table tb(
+    	  				dep_id;
+    	  				constraint 外键名称 foreign key(dep_id) references 引用的表(id)
+    	  			)
+    	  	2.删除外键约束
+            	* ALTER TABLE employee DROP FOREIGN KEY emp_dep_fk ;
+            3.添加外键
+            	* ALTER TABLE employee add CONSTRAINT emp_dep_fk FOREIGN KEY(dep_id) REFERENCES 		department(id);
+            	
+            4.级联操作	
+            	*添加外键 设置级联更新 级联删除
+				ALTER TABLE employee add CONSTRAINT emp_dep_fk FOREIGN KEY(dep_id) REFERENCES department(id)
+				ON UPDATE CASCADE ON DELETE CASCADE;
+```
+
+##### 6. 表的设计
+
+```
+	表的对应关系
+			1. 一对一		一个学生对应一个身份证 一个身份证对应一个学生
+			2. 一对多(多对一)	一个员工对应一个部门 一个部门对应多个员工
+			3. 多对多		一个学生可以学多门课程 一个课程可以有多个学生学习
+			
+		2. 实现关系
+			* 一对多(多对一)
+				* 部门和员工
+				* 在多的一方建立外键 指向一的一方的主键
+			* 多对多
+				* 学生和课程
+				* 借助第三方表 至少包含两个字段 这两个字段作为第三张表的外键 分别指向两张表的主键
+		
+```
+
+##### 7. 多表查询
+
+```
+* 多表查询的分类
+	1. 内连接查询
+		1. 隐式内连接	
+			* 使用where条件消除无用数据
+			* select    t1.a,  t2.b    from    t1,t2     where    t1.id = t2.id
+		2. 显式内连接
+			* select    t1.a,  t2.b    from    t1 [inner]可选 join t2   on     t1.id = t2.id
+       	3. 思路:  
+       		* 从那些表中查数据
+       		* 条件式什么
+       		* 查询哪些字段
+	2. 外连接查询
+		1. 左外连接 查询的式左表所有数据以及其交集部分  (左表跟右表换个位置就相当于右外)
+			语法:  select    t1.a,  t2.b    from    t1 left [outer] join t2   on     t1.id = t2.id
+		2. 右外连接
+			语法:  select    t1.a,  t2.b    from    t1 right [outer] join t2   on     t1.id = t2.id
+		
+	3. 子查询 (嵌套 根据结果查询)
+		* 子查询的结果式单行单列的 可以使用 运算符 > >= < <= =
+		* 子查询的结果式多行单列的 可以使用 in
+		* 子查询的结果式多行多列的 可以作为一张虚拟表来参与查询
+	
+```
+
+##### 8. 事务
+
+```
+1. 事务的基本介绍
+	1. 概念
+		* 如果一个包含多个步骤的业务操作 被事务管理 那么这些操作要么同时成功 要么同时失败
+	2. 操作
+		1. 开启事务: start transaction
+		2. 回滚: rollback
+		3. 提交: commit
+2. 事务的四大特征
+3. 事务的隔离级别(了解)
+
+```
+
+
+
+### 4. JavaWeb
+
+#### 1. 基本概念
+
+#### 2. web服务器
+
+#### 3. Tomcat
+##### 3.1.安装Tomcat
+
+```
+
+```
+
+
+
+##### 3.2. Tomcat启动和配置
+
+**启动和关闭**
+
+```
+* bin目录下       startup.bat 			shutdown.bat
+```
+
+**访问测试: localhsot:8080**
+
+**conf -> server.xml 配置文件**
+
+**可以配置默认端口号:**
+
+* tomcat的默认端口号名称: 8080
+* mysql:3306
+* http:80
+* https:443
+
+```
+  <Connector port="8081" protocol="HTTP/1.1"
+               connectionTimeout="20000"
+               redirectPort="8443" />
+```
+
+**可以配置主机名称**
+
+ * 默认主机名称为 localhsot->127.0.0.1
+ * .默认网站应用存放的位置为:webapps
+
+```
+在windows stystem32为中 搜索drivers ==> ets 把hosts修改为www.liuhui.com
+<Host name="www.liuhui.com"  appBase="webapps"
+            unpackWARs="true" autoDeploy="true">
+```
+
+<h2>高难度面试题</h2>
+
+请你谈谈网站是如何进行访问的
+
+1.输入一个域名: 回车
+
+2.检查本机的 C:\Windows\System32\drivers\etc\hosts配置文件下有没有这个域名的映射
+
+  1. **有: 直接返回对应的ip地址 这个地址中 有我们需要的web程序 可以直接访问**
+
+     ```
+     	127.0.0.1       www.liuhui.com
+     ```
+
+  2. **没有： 去DNS服务器找 找的就返回 找不到就返回找不到**
+
+![image-20211222185143136](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211222185143136.png)
+
+  
+
+##### 3.3 发布一个web网站
+
+* 将自己写的网站 放到服务器Tomcat中指定的web应用的文件夹webapps下,
+
+网站应该有的结构
+
+```
+-- webapps : Tomcat服务器的web目录
+ - RooT
+ -liuStudy : 网站的目录名
+ - WEB-INF
+ 	-classes : java程序
+ 	-lib : web应用所依赖的jar包
+ 	-web.xml: 网站的配置文件
+ - index.html 默认的首页
+ -static
+ 	-css
+ 	-js
+ 	-img
+```
+
+#### 4.http
+
+##### 4.1 什么是http
+
+HTTP(超文本传输协议) 是一个简单的请求 -相应协议.它通常运行在TCP之上
+
+* 文本 ：html，字符串
+* 超文本: 图片 音乐 视频 定位 地图 ......
+* 端口:80
+
+HTTPS: 安全的
+
+* 端口:443
+
+##### 4.2 两个时代
+
+* http1.0
+  * HTTP/1.0 客户端可以与web服务器连接后,只能获取一个web资源,断开连接
+* http2.0
+  * http/1.1 客户端可以与web服务器连接后,只能获取多个web资源
+
+##### 4.3  HTTP请求
+
+* 客户端 --发送请求--服务端
+
+<h3> 1. 请求行</h3>
+
+* 请求行中的方式:GET
+* 请求方式: Get post HEAD Delete Put tract
+  * get 请求能够携带的参数比较少 大小有限制 会在浏览器的url地址栏显示数据内容 不安全 但效率高
+  * post 请求能携带的参数没有限制 大小没有限制 不会在浏览器的url地址显示数据内容 安全 但不高校
+
+```java
+1. Request URL: https://www.baidu.com/		// 请求地址
+2. Request Method: GET						// get方法/post方法
+3. Status Code: 200 OK						// 状态码
+4. Remote Address: 36.152.44.95:443			// 远程地址
+5. Referrer Policy: strict-origin-when-cross-origin	// 一个协议
+```
+
+<h3>2. 消息头</h3>
+
+```javascript
+Accept: text/html							// 告诉浏览器 它支持的数据类型
+Accept-Encoding: gzip, deflate, br			// 支持的编码格式 GBK UTF-8 GB2312 ISO8559-1
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8	// 告诉浏览器 他的语言环境
+Cache-Control: max-age=0					// 缓存控制
+Connection: keep-alive						// 告诉浏览器请是否保持连接
+```
+
+
+
+##### 4.4 HTTP响应
+
+* 服务器 -- 相应 -- 客户端-
+
+```
+Cache-Control: private			缓存控制
+Connection: keep-alive			保持连接
+Content-Encoding: gzip			编码
+Content-Type: text/html;charset=utf-8	类型
+X-Ua-Compatible: IE=Edge,chrome=1  浏览器相应兼容性
+```
+
+* 相应体
+
+```
+Accept: text/html							// 告诉浏览器 它支持的数据类型
+Accept-Encoding: gzip, deflate, br			// 支持的编码格式 GBK UTF-8 GB2312 ISO8559-1
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8	// 告诉浏览器 他的语言环境
+Cache-Control: max-age=0					// 缓存控制
+Connection: keep-alive						// 告诉浏览器请是否保持连接
+
+HOST :    主机 
+Reflush : 告诉浏览器多久刷新一次
+Location : 让网页重新定位
+```
+
+相应状态码
+
+200: 成功  
+
+3xx:请求重定向 304
+
+*  重定向: 你重新到我给你的新位置 去
+
+4xx: 找不到资源  404
+
+5xx：服务器代码错误 500 	502网关错误
+
+<h3>常见面试题</h3>
+
+当你的浏览器中地址输入url回车 经历了什么?
+
+
+
+
+
+#### 5. Maven
+
+<hr/>
+
+**我为什么要学习这个技术**
+
+ 	1. 在javaweb开发中 需要使用大量的jar包,我们动手去导入
+ 	2. 如何能够让一个东西自动帮我导入和配置这个jar包 由此MEVEN诞生了
+
+#####  5.1 Meven 项目架构管理工具
+
+我们目前用来就是方便导入Jar包的
+
+Maven的核心思想: **约定大于配置**
+
+ * 有约束 不要去违反
+
+Maven会规定好你应该如何去编写我们的java代码。必须要按照这个规定来:
+
+##### 5.2 下载安装Maven
+
+##### 5.3 Maven环境变量配置
+
+在我们的系统环境变量中
+
+配置如下配置: 		新建
+
+* M2_HOME  			// maven下的bin目录
+* MAVEN_HOME      // maven目录
+* 在系统的path中配置 %MAVEN_HOME %\bin
+
+![image-20211222192452749](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211222192452749.png)
+
+mvn -v 配置环境变量之后 是否配置成功
+
+
+
+##### 5.4 阿里云镜像
+
+* 镜像： mirrors
+  * 作用: 加速我们的下载
+* 国内建议使用阿里云镜像
+* conf文件夹 ==> setting.xml 中配置
+
+```java
+<mirror>  
+       <id>nexus-aliyun</id>  
+       <mirrorOf>central</mirrorOf>    
+       <name>Nexus aliyun</name>  
+       <url>http://maven.aliyun.com/nexus/content/groups/public</url>  
+    </mirror> 
+```
+
+##### 5.5 本地仓库
+
+本地仓库 远程仓库:
+
+**建立一个本次仓库**
+
+```java
+<localRepository>D:\Application\apache-maven-3.8.4\repo_jar</localRepository>
+```
+
+##### 5.6 在IDEA中使用Maven
+
+1. 创建一个maven web项目
+
+![image-20211222195600112](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211222195600112.png)
+
+2. 安装成功
+
+![image-20211222213304814](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211222213304814.png)
+
+3. 查看maven仓库中多了什么东西
+4. IDEA中的Maven设置
+5. IDEA项目创建成功后,最后看一眼Maven的配置
+
+![image-20211222213720667](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211222213720667.png)
+
+
+
+
+
+
+
+
+
+### 5. Spring5框架
+
+```java
+1. spring 框架概述
+
+2. IOC容器  (控制反转)
+   * IOC底层原理
+   * IOC接口（BeanFectory）
+   * IOC操作Bean管理(基于 Xml)
+   * IOC操作bean管理(基于注解)
+3. AOP
+4. JdbcTemplate
+5. 事务管理
+6. Spring5新特性
+ 
+```
+
+#### 5.1 IOC(概念和原理)
+
+##### 1. 什么是IOC
+
+```java
+1. 控制反转 把对象创建和对象之间的调用过程,交给Spring进行管理,
+
+2. 使用IOC目的 为了耦合度降低
+```
+
+##### 2. IOC底层原理
+
+```
+xml解析 、工厂模式  、反射
+```
+
+##### 3. IOC接口
+
+```javascript
+1. IOC思想基于IOC容器完成,IOC容器底层就是对象工厂
+
+2. Spring提供了IOC容器实现的两种方式(2个接口) BeanFactory   ApplicationContext
+```
+
+* BeanFactory： IOC容器基本实现,是Spring内部的使用接口,不提供开发人员使用	
+* ApplicationContext:   接口的子接口,提供更多强大的功能,一般由开发人员进行使用
+
+![image-20211223133232838](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211223133232838.png)
+
+
+
+##### 4. IOC的bean管理
+
+```j
+1. 什么是bean管理
+	* Bean管理指的是两个操作
+		1. 基于xml配置文件方式实现
+			* 创建对象(创建对象的时候默认执行无参构造方法 完成对象的创建)
+				id: 唯一标识
+				class: 类全路径
+			* 注入属性
+				(1) DI: 依赖注入,就是使用属性注入
+			 	set方式:
+			 	构造函数方式:
+			 	
+		2. 基于注解方式实现  从 8开始
+	* spring创建对象
+	* Spring注入属性
+```
+
+###### 1. xml注入普通类型
+
+```xml
+ 
+1. <!--set方式注入属性-->
+    <bean id ="user" class="com.company.User">
+        <property name="name" value="张三"/>
+        <property name="age" value="18"/>
+    </bean>
+
+1.1 set命名空间 简化操作   
+
+	在beans中添加一句
+    xmlns:p="http://www.springframework.org/schema/p"
+    <bean id ="user" class="com.company.User" p:name="张三" p:age="21"/>
+
+2. <!--构造函数的方式注入-->
+    <bean id ="user" class="com.company.User">
+        <constructor-arg name="name" value="李四"/>
+        <constructor-arg name="age" value="18"/>
+    </bean>
+
+
+3. 字面量
+(1) null
+      <property name="name">
+      	<null/>
+      </property>
+(2) 包含特殊字符
+ <property name="name">
+ 	<value><![CDATA[<<南京>>]]></value>
+ </property>
+
+4. 注入属性 外部bean
+(1) 创建两个类service类和dao类
+(2) 在sevice调用dao里面的方法
+
+	<!--server和Dao 对象创建-->
+    <bean id="userService" class="com.company.service.UserService">
+       <constructor-arg name="userDao" ref="userDaoImp"/>
+    </bean>
+    <bean id="userDaoImp" class="com.company.dao.UserDaoImp"/>
+
+4.2 注入属性 内部bean 和级联赋值
+ <bean id="userService" class="com.company.service.UserService">
+     <constructor-arg name="userDao">
+         <bean class="com.company.dao.UserDaoImp"/>
+     </constructor-arg>
+ </bean>
+
+```
+
+###### 2. xml注入集合类型
+
+```xml
+1. 数组类型	
+2. 集合类型
+3. map类型
+4. set类型
+
+* 在集合之中设置对象类型的值
+
+<bean id="stu" class="com.company.bean2.Stu">
+        <property name="score">
+            <array>
+                <value>张三</value>
+                <value>李四</value>
+            </array>
+        </property>
+
+        <property name="list">
+            <list>
+                <value>张三1</value>
+                <value>李四2</value>
+            </list>
+        </property>
+
+        <property name="map">
+            <map>
+               <entry key="JAVA" value="java"/>
+               <entry key="PHP" value="php"/>
+            </map>
+        </property>
+
+        <property name="sets">
+            <set>
+                <value>MySQl</value>
+                <value>Redis</value>
+            </set>
+        </property>
+    
+    	<!-- 注入集合 值是对象-->
+        <property name="listSub">
+            <list>
+                <ref bean="course1"/>
+                <ref bean="course2"/>
+            </list>
+        </property>
+
+  </bean>
+
+<!-- 创建多个Course对象 -->
+<bean id="course1" class="com.company.bean2.Course">
+    <property name="cname" value="Spring5框架"/>
+</bean>
+
+<bean id="course2" class="com.company.bean2.Course">
+    <property name="cname" value="Mybatas框架"/>
+</bean>
+
+
+* 把集合注入部分提取出来
+(1) 在spring配置文件中引入名称空间util
+	* 比p命名空间多了一句
+(2) 使用util标签完成list集合注入提取
+
+
+```
+
+###### 3. IOC操作 Bean管理(FactoryBean)
+
+```
+1. spring 有两种bean，一种是普通bean 另一种是工厂bean（factoryBean）
+	* 普通bean 在配置文件中配置类型就是返回类型
+	* 工厂bean 在配置文件定义bean类型可以和返回类型不一样
+		* 第一步 创建类 让这个类作为工厂bean 实现接口FactoryBean
+		* 第二步 实现接口里面的方法，在实现的方法中定义返回的bean类型
+		
+```
+
+###### 4. IOC操作bean管理 （bean作用域）
+
+```
+1. 在spring中 设置创建bean实例是单实例还是多实例 默认是单实例
+	* scope属性的设置 singleton单实例  prototype 多实例
+	* singleton 记载spring配置文件的时候就创建了对象 而 prototype是调用getbean的时候才创建 所以是多实例
+```
+
+###### 5. Bean的生命周期
+
+```xml
+一个5步 加2步
+1. 通过构造器创建的bean实例
+2. 为bean的属性设置和其他bean的引用 (调用set方法)
+	* 把bean的实例传递给bean后置处理器的方法
+3. 调用bean的初始化的方法 (需要手动配置初始化	的方法)
+	* 把bean的实例传递给bean后置处理器的方法	
+4. bean就可以使用了
+5. 当容器关闭的时候 调用销毁的方法 (需要手动配置销毁的方法)
+
+bean的后置处理器 作用: 全局的bean都会用到
+	初始化之前(第三步) 之前和之后
+```
+
+###### 6. IOC操作bean管理(xml自动装配)
+
+```xml
+1. 什么是自动装配
+	* 根据指定装配规则 (属性名称或者属性类型) spring 自动将匹配的属性值进行注入
+	* autowire:  byType(根据属性) byName(根据名称)
+byName: 注意注入的bean的id和类中属性名称一致
+	<bean id="emp" class="com.company.bean2.autowire.Emp" autowire="byName"/>
+    <bean id="dept" class="com.company.bean2.autowire.Dept">
+        <property name="name" value="开发部"/>
+    </bean>
+byType: 根据属性类型注入
+
+```
+
+###### 7. IOC操作 bean管理 (外部属性文件)
+
+```xml
+1. 直接配置数据库信息
+	(1) 配置德鲁伊连接池
+        <!--配置数据库连接池-->
+        <bean id="dataSource"  class="com.alibaba.druid.pool.DruidDataSource">
+            <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+            <property name="url" value="jdbc:mysql://localhost:3306/db"/>
+            <property name="username" value="root"/>
+            <property name="password" value="root"/>
+        </bean>
+
+	(2) 引入德鲁伊连接池依赖jar包
+
+	
+
+2. 引入外部属性文件配置数据库连接池
+创建 jdbc.properties 文件
+
+prop.driverClassName=com.mysql.jdbc.Driver
+prop.url=jdbc:mysql://localhost:3306/db
+prop.username=root
+prop.password=root
+
+命名空间 也得有 跟p一样
+ <context:property-placeholder location="classpath:jdbc.properties"/>
+    <!--    配置连接池-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${prop.driverClassName}"/>
+        <property name="url" value="${prop.url}"/>
+        <property name="username" value="${prop.username}"/>
+        <property name="password" value="${prop.password}"/>
+    </bean>
+```
+
+###### 8.基于注解方式的bean管理操作
+
+```
+1. 什么是注解
+	* 注解是代码特殊标记 格式: @注解名称(属性名称= 属性值,属性名称= 属性值......)
+	* 使用注解的目的，简化xml配置
+2. Spring 针对 bean管理创建对象提供注解
+	* @Component	
+	* @Service	
+	* @Controller
+	* @Repository
+上面四个注解功能是一样的 都是用来创建bean实例
+
+3. 基于注解方式实现bean操作
+	第一步: 引入aop依赖
+	第二步: 开启组件扫描
+```
+
+###### 9.组件扫描具体配置
+
+```xml
+use-default-filters="false": 不使用默认配置 而是用我们自己定义的
+
+
+
+<!--    扫描哪些内容-->
+<context:component-scan base-package="com.company.bean5" use-default-filters="false">
+    <!-- 扫描 Component 所在类-->
+    <context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
+</context:component-scan>
+
+<!--    不扫描哪些内容-->
+<context:component-scan base-package="com.company.bean5" use-default-filters="false">
+    <!-- 不扫描Component 所在类 -->
+    <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Component"/>
+</context:component-scan>
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

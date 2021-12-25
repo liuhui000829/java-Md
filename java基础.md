@@ -1809,6 +1809,7 @@ use-default-filters="false": 不使用默认配置 而是用我们自己定义�
     <!-- 不扫描Component 所在类 -->
     <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Component"/>
 </context:component-scan>
+ads
 ```
 
 

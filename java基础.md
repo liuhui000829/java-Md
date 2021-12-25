@@ -1501,15 +1501,29 @@ mvn -v 配置环境变量之后 是否配置成功
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### 5. Spring5框架
 
 ```java
-1. spring 框架概述
-
-2. IOC容器  (控制反转)
+内容:
+1. spring 框架概述 
+2. IOC容器 (控制反转)
    * IOC底层原理
    * IOC接口（BeanFectory）
-   * IOC操作Bean管理(基于 Xml)
+   * IOC操作Bean管理(基于Xml)
    * IOC操作bean管理(基于注解)
 3. AOP
 4. JdbcTemplate
@@ -1518,57 +1532,45 @@ mvn -v 配置环境变量之后 是否配置成功
  
 ```
 
-#### 5.1 IOC(概念和原理)
-
-##### 1. 什么是IOC
+#### 1. IOC
 
 ```java
-1. 控制反转 把对象创建和对象之间的调用过程,交给Spring进行管理,
-
-2. 使用IOC目的 为了耦合度降低
+1. 什么是IOC
+	* 控制反转 把对象创建和对象之间的调用过程,交给Spring进行管理,
+	* 使用IOC目的 为了耦合度降低
+2. IOC底层原理
+    * xml解析 、工厂模式  、反射
+3. IOC接口
+    * IOC思想基于IOC容器完成,IOC容器底层就是对象工厂
+	* Spring提供了IOC容器实现的两种方式(2个接口) BeanFactory   ApplicationContext
+        * BeanFactory： IOC容器基本实现,是Spring内部的使用接口,不提供开发人员使用	
+		* ApplicationContext:   接口的子接口,提供更多强大的功能,一般由开发人员进行使用
 ```
 
-##### 2. IOC底层原理
-
-```
-xml解析 、工厂模式  、反射
-```
-
-##### 3. IOC接口
-
-```javascript
-1. IOC思想基于IOC容器完成,IOC容器底层就是对象工厂
-
-2. Spring提供了IOC容器实现的两种方式(2个接口) BeanFactory   ApplicationContext
-```
-
-* BeanFactory： IOC容器基本实现,是Spring内部的使用接口,不提供开发人员使用	
-* ApplicationContext:   接口的子接口,提供更多强大的功能,一般由开发人员进行使用
-
-![image-20211223133232838](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211223133232838.png)
+<img src="C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211223133232838.png" alt="image-20211223133232838" style="zoom:100%;" />
 
 
 
-##### 4. IOC的bean管理
+#### 4. IOC的bean管理
 
-```j
+```java
 1. 什么是bean管理
-	* Bean管理指的是两个操作
-		1. 基于xml配置文件方式实现
-			* 创建对象(创建对象的时候默认执行无参构造方法 完成对象的创建)
-				id: 唯一标识
-				class: 类全路径
-			* 注入属性
-				(1) DI: 依赖注入,就是使用属性注入
-			 	set方式:
-			 	构造函数方式:
-			 	
-		2. 基于注解方式实现  从 8开始
-	* spring创建对象
-	* Spring注入属性
+ * Bean管理指的是两个操作(1.基于xml配置文件方式实现 2.基于注解方式实现) 
+ 
+ 	1. 基于xml配置文件方式实现 
+        * 创建对象(创建对象的时候默认执行无参构造方法 完成对象的创建)
+            id: 唯一标识
+            class: 类全路径
+        * 注入属性(依赖注入,就是使用属性注入)
+            set方式:
+            构造函数方式:
+
+	2. 基于注解方式实现  从 8开始
+	// spring 创建对象
+	// Spring 注入属性
 ```
 
-###### 1. xml注入普通类型
+##### 1. xml注入普通类型
 
 ```xml
  
@@ -1578,10 +1580,7 @@ xml解析 、工厂模式  、反射
         <property name="age" value="18"/>
     </bean>
 
-1.1 set命名空间 简化操作   
-
-	在beans中添加一句
-    xmlns:p="http://www.springframework.org/schema/p"
+   简化: set命名空间简化操作,在beans中添加一句 xmlns:p="http://www.springframework.org/schema/p"   
     <bean id ="user" class="com.company.User" p:name="张三" p:age="21"/>
 
 2. <!--构造函数的方式注入-->
@@ -1596,20 +1595,54 @@ xml解析 、工厂模式  、反射
       <property name="name">
       	<null/>
       </property>
+
 (2) 包含特殊字符
  <property name="name">
  	<value><![CDATA[<<南京>>]]></value>
  </property>
 
-4. 注入属性 外部bean
+
+4. 注入属性外部bean
 (1) 创建两个类service类和dao类
 (2) 在sevice调用dao里面的方法
+
+    public class UserDaoImp implements UserDao {
+        @Override
+        public void update() {
+            System.out.println("userDao执行了");
+        }
+    }
+
+    public class UserService {
+        private UserDao userDao;
+
+        public UserService(UserDao userDao) {
+            this.userDao = userDao;
+        }
+
+        public void add() {
+            System.out.println("service add........");
+            userDao.update();
+        }
+    }
+
+    public class test {
+        public static void main(String[] args){
+            ApplicationContext applicationContext = new ClassPathXmlApplicationContext("bean1.xml");
+            UserService userService = applicationContext.getBean("userService", UserService.class);
+            userService.add();
+        }
+    }
+
+    service add........
+    userDao执行了
 
 	<!--server和Dao 对象创建-->
     <bean id="userService" class="com.company.service.UserService">
        <constructor-arg name="userDao" ref="userDaoImp"/>
     </bean>
     <bean id="userDaoImp" class="com.company.dao.UserDaoImp"/>
+
 
 4.2 注入属性 内部bean 和级联赋值
  <bean id="userService" class="com.company.service.UserService">
@@ -1620,7 +1653,7 @@ xml解析 、工厂模式  、反射
 
 ```
 
-###### 2. xml注入集合类型
+##### 2. xml注入集合类型
 
 ```xml
 1. 数组类型	
@@ -1629,8 +1662,18 @@ xml解析 、工厂模式  、反射
 4. set类型
 
 * 在集合之中设置对象类型的值
+public class Stu {
+    private String[] score;
+    private List<String> list;
+    private Map<String, String> map;
+    private Set<String> sets;
+    private List<Course> listSub;
 
+   	...set get方法略
+    }
+}
 <bean id="stu" class="com.company.bean2.Stu">
+    	
         <property name="score">
             <array>
                 <value>张三</value>
@@ -1638,6 +1681,7 @@ xml解析 、工厂模式  、反射
             </array>
         </property>
 
+          
         <property name="list">
             <list>
                 <value>张三1</value>
@@ -1645,6 +1689,7 @@ xml解析 、工厂模式  、反射
             </list>
         </property>
 
+             
         <property name="map">
             <map>
                <entry key="JAVA" value="java"/>
@@ -1681,16 +1726,26 @@ xml解析 、工厂模式  、反射
 
 * 把集合注入部分提取出来
 (1) 在spring配置文件中引入名称空间util
-	* 比p命名空间多了一句
+        
+    xmlns:util="http://www.springframework.org/schema/util"
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+    
+   
 (2) 使用util标签完成list集合注入提取
-
+    <property name="list" ref="courseList"/>
+        
+    <util:list id="courseList">
+        <value>123</value>
+        <value>456</value>
+        <value>789</value>
+    </util:list>
 
 ```
 
-###### 3. IOC操作 Bean管理(FactoryBean)
+##### 3. IOC操作 Bean管理(FactoryBean)
 
 ```
-1. spring 有两种bean，一种是普通bean 另一种是工厂bean（factoryBean）
+1. spring有两种bean，一种是普通bean 另一种是工厂bean（factoryBean）
 	* 普通bean 在配置文件中配置类型就是返回类型
 	* 工厂bean 在配置文件定义bean类型可以和返回类型不一样
 		* 第一步 创建类 让这个类作为工厂bean 实现接口FactoryBean
@@ -1797,7 +1852,6 @@ prop.password=root
 use-default-filters="false": 不使用默认配置 而是用我们自己定义的
 
 
-
 <!--    扫描哪些内容-->
 <context:component-scan base-package="com.company.bean5" use-default-filters="false">
     <!-- 扫描 Component 所在类-->
@@ -1809,26 +1863,122 @@ use-default-filters="false": 不使用默认配置 而是用我们自己定义�
     <!-- 不扫描Component 所在类 -->
     <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Component"/>
 </context:component-scan>
-ads
+
 ```
 
 
 
+#### 5.2 AOP（概念）
+
+```java
+ 1.什么是AOP
+  	1. 面向切面编程，利用aop可以对业务逻辑的各个部分进行隔离,从而使得业务逻辑各个部分之间的耦合度降低,提高程序的可重用性,同时提高开发的效率
+  	2. 通俗描述: 不通过修改源代码的方式,在主干功能里面添加新功能
+    3. 使用登录例子说明
+```
+
+![image-20211225220908906](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211225220908906.png)
 
 
 
+##### 1. Aop底层原理
+
+```
+1. Aop底层使用动态代理
+	(1) 有两种情况动态代理
+	第一种: 有接口的情况下  使用JDK动态代理
+	第二种: 没有接口的情况下	使用CGLIB动态代理
+```
+
+**1. 创建接口实现类代理对象,增强类中的方法**
+
+![image-20211225222306906](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211225222306906.png)
 
 
 
+**2. 创建子类的代理对象,增强类中的方法**
+
+![image-20211225222122678](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211225222122678.png)
 
 
 
+##### 2. Aop(JDK动态代理)
 
+```java
+ java.lang.reflect.Proxy
 
+ static object  newProxyInstance(ClassLoader loader, 类<?>[] interfaces, InvocationHandler h) 
+                返回指定接口的代理类的实例，该接口将方法调用分派给指定的调用处理程序。
+     
+ 方法有三个参数:
+	1. 类加载器
+    2. 增强方法所在的类，这个类实现的接口，支持多个接口
+    3. 实现InvocationHandler 接口, 创建代理对象，写增强的方法
+ 1. JDk动态代理代码
+    
+```
 
+**JDK动态代理代码**
 
+```java
+(1) 创建接口,定义方法
+    public interface UserDao {
+        int add(int a, int b);
+        String update(String id);
+	}
+(2) 创建接口实现类,实现方法
+    public class UserDaoImpl implements UserDao {
 
+    @Override
+    public int add(int a, int b) {
+        return a+b;
+    }
 
+    @Override
+    public String update(String id) {
+        return id;
+    }
+}
+(3) 使用Proxy类创建接口代理对象
+    public class JDKProxy {
+    public static void main(String[] args) {
+        // 创建接口实现类代理类对象
+        Class[] interfaces = {UserDao.class};
+        UserDaoImpl userDao = new UserDaoImpl();
+        UserDao dao = (UserDao) Proxy.newProxyInstance(JDKProxy.class.getClassLoader(), interfaces 						  		  ,new UserDaoProxy(userDao));
+        dao.add(1,2);
+        
+    }
+}
+
+//创建代理对象代码
+@SuppressWarnings("all")
+class UserDaoProxy implements InvocationHandler {
+
+    // 1.把创建的是谁的对象 把谁传递过来
+    private Object obj;
+
+    public UserDaoProxy(Object obj) {
+        this.obj = obj;
+    }
+
+    // 增强的逻辑
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        // 方法之前
+        System.out.println("方法之前执行" + method.getName() + " 创建的参数" + Arrays.toString(args));
+        // 当前方法
+        Object res = method.invoke(obj, args);
+        // 方法之后
+        System.out.println("之后执行" + obj);
+        return res;
+    }
+}
+
+方法之前执行add 创建的参数[1, 2]
+调用了add
+之后执行com.company.spring5.UserDaoImpl@4b1210ee
+```
 
 
 

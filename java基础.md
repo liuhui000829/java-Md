@@ -1096,7 +1096,7 @@ SQL分类
 
 ##### 5. 约束
 
-```
+```sql
     		
     8. 约束
     	* 概念: 对表中的数据进行约束,保证数据的正确性,有效性和完成性
@@ -1182,7 +1182,7 @@ SQL分类
 
 ##### 7. 多表查询
 
-```
+```sql
 * 多表查询的分类
 	1. 内连接查询
 		1. 隐式内连接	
@@ -1348,7 +1348,7 @@ HTTPS: 安全的
   * get 请求能够携带的参数比较少 大小有限制 会在浏览器的url地址栏显示数据内容 不安全 但效率高
   * post 请求能携带的参数没有限制 大小没有限制 不会在浏览器的url地址显示数据内容 安全 但不高校
 
-```java
+```http
 1. Request URL: https://www.baidu.com/		// 请求地址
 2. Request Method: GET						// get方法/post方法
 3. Status Code: 200 OK						// 状态码
@@ -1358,7 +1358,7 @@ HTTPS: 安全的
 
 <h3>2. 消息头</h3>
 
-```javascript
+```http
 Accept: text/html							// 告诉浏览器 它支持的数据类型
 Accept-Encoding: gzip, deflate, br			// 支持的编码格式 GBK UTF-8 GB2312 ISO8559-1
 Accept-Language: zh-CN,zh;q=0.9,en;q=0.8	// 告诉浏览器 他的语言环境
@@ -1372,7 +1372,7 @@ Connection: keep-alive						// 告诉浏览器请是否保持连接
 
 * 服务器 -- 相应 -- 客户端-
 
-```
+```http
 Cache-Control: private			缓存控制
 Connection: keep-alive			保持连接
 Content-Encoding: gzip			编码
@@ -1382,7 +1382,7 @@ X-Ua-Compatible: IE=Edge,chrome=1  浏览器相应兼容性
 
 * 相应体
 
-```
+```http
 Accept: text/html							// 告诉浏览器 它支持的数据类型
 Accept-Encoding: gzip, deflate, br			// 支持的编码格式 GBK UTF-8 GB2312 ISO8559-1
 Accept-Language: zh-CN,zh;q=0.9,en;q=0.8	// 告诉浏览器 他的语言环境
@@ -1458,8 +1458,8 @@ mvn -v 配置环境变量之后 是否配置成功
 * 国内建议使用阿里云镜像
 * conf文件夹 ==> setting.xml 中配置
 
-```java
-<mirror>  
+```xml
+	<mirror>  
        <id>nexus-aliyun</id>  
        <mirrorOf>central</mirrorOf>    
        <name>Nexus aliyun</name>  
@@ -1551,7 +1551,7 @@ mvn -v 配置环境变量之后 是否配置成功
 
 
 
-#### 4. IOC的bean管理
+#### 2. IOC的bean管理
 
 ```java
 1. 什么是bean管理
@@ -1570,7 +1570,7 @@ mvn -v 配置环境变量之后 是否配置成功
 	// Spring 注入属性
 ```
 
-##### 1. xml注入普通类型
+#### 3. xml注入普通类型
 
 ```xml
  
@@ -1605,7 +1605,7 @@ mvn -v 配置环境变量之后 是否配置成功
 4. 注入属性外部bean
 (1) 创建两个类service类和dao类
 (2) 在sevice调用dao里面的方法
-
+<!--
     public class UserDaoImp implements UserDao {
         @Override
         public void update() {
@@ -1633,7 +1633,7 @@ mvn -v 配置环境变量之后 是否配置成功
             userService.add();
         }
     }
-
+-->
     service add........
     userDao执行了
 
@@ -1653,7 +1653,7 @@ mvn -v 配置环境变量之后 是否配置成功
 
 ```
 
-##### 2. xml注入集合类型
+#### 4. xml注入集合类型
 
 ```xml
 1. 数组类型	
@@ -1742,26 +1742,70 @@ public class Stu {
 
 ```
 
-##### 3. IOC操作 Bean管理(FactoryBean)
+#### 5. IOC操作 Bean管理
 
-```
-1. spring有两种bean，一种是普通bean 另一种是工厂bean（factoryBean）
+```xml
+1. FactoryBean
+    spring有两种bean，一种是普通bean 另一种是工厂bean（factoryBean）
+	
 	* 普通bean 在配置文件中配置类型就是返回类型
+		<bean id="userDaoImp" class="com.company.dao.UserDaoImp"/>
+	
 	* 工厂bean 在配置文件定义bean类型可以和返回类型不一样
 		* 第一步 创建类 让这个类作为工厂bean 实现接口FactoryBean
 		* 第二步 实现接口里面的方法，在实现的方法中定义返回的bean类型
+<!--
+        public class Course {
+            private String cname;
+            public String getCname() {
+                return this.cname;
+            }
+
+            public void setCname(String cname) {
+                this.cname = cname;
+            }
+		}
+
+		public class MyBeanFactory implements FactoryBean<Course> {
+            @Override
+            public Course getObject() throws Exception {
+                Course course = new Course();
+                course.setCname("abc");
+                return course;
+            }
+            
+            @Override
+            public Class<?> getObjectType() {
+                return null;
+            }
+		}
+	-->
+
+		
+2. bean作用域	
+	在spring中 设置创建bean实例是单实例还是多实例 默认是单实例
+	* scope属性的设置: singleton单实例 prototype 多实例
+		<bean 
+			id="myBeanFactory"
+          	class="com.company.bean2.MyBeanFactory"
+          	scope="prototype"
+		/>
+		<!--
+            ApplicationContext applicationContext=new ClassPathXmlApplicationContext("bean2.xml");
+            Course course = applicationContext.getBean("myBeanFactory", Course.class);
+            Course course2 = applicationContext.getBean("myBeanFactory", Course.class);
+            System.out.println(course);
+            System.out.println(course2);
+			// 地址不一样
+		-->
+		
+	* singleton 记载spring配置文件的时候就创建了对象 而 prototype是调用getbean的时候才创建 所以是多实例
 		
 ```
 
-###### 4. IOC操作bean管理 （bean作用域）
 
-```
-1. 在spring中 设置创建bean实例是单实例还是多实例 默认是单实例
-	* scope属性的设置 singleton单实例  prototype 多实例
-	* singleton 记载spring配置文件的时候就创建了对象 而 prototype是调用getbean的时候才创建 所以是多实例
-```
 
-###### 5. Bean的生命周期
+#### 7. Bean的生命周期
 
 ```xml
 一个5步 加2步
@@ -1777,7 +1821,7 @@ bean的后置处理器 作用: 全局的bean都会用到
 	初始化之前(第三步) 之前和之后
 ```
 
-###### 6. IOC操作bean管理(xml自动装配)
+#### 8. IOC操作bean管理(xml自动装配)
 
 ```xml
 1. 什么是自动装配
@@ -1790,9 +1834,10 @@ byName: 注意注入的bean的id和类中属性名称一致
     </bean>
 byType: 根据属性类型注入
 
+
 ```
 
-###### 7. IOC操作 bean管理 (外部属性文件)
+#### 9. IOC操作 bean管理 (外部属性文件)
 
 ```xml
 1. 直接配置数据库信息
@@ -1803,7 +1848,7 @@ byType: 根据属性类型注入
             <property name="url" value="jdbc:mysql://localhost:3306/db"/>
             <property name="username" value="root"/>
             <property name="password" value="root"/>
-        </bean>
+        </bean
 
 	(2) 引入德鲁伊连接池依赖jar包
 
@@ -1828,7 +1873,7 @@ prop.password=root
     </bean>
 ```
 
-###### 8.基于注解方式的bean管理操作
+#### 10. 基于注解方式的bean管理操作
 
 ```
 1. 什么是注解
@@ -1846,7 +1891,7 @@ prop.password=root
 	第二步: 开启组件扫描
 ```
 
-###### 9.组件扫描具体配置
+#### 11. 组件扫描具体配置
 
 ```xml
 use-default-filters="false": 不使用默认配置 而是用我们自己定义的
@@ -1868,7 +1913,7 @@ use-default-filters="false": 不使用默认配置 而是用我们自己定义�
 
 
 
-#### 5.2 AOP（概念）
+#### 12. AOP（概念）
 
 ```java
  1.什么是AOP
@@ -1881,7 +1926,7 @@ use-default-filters="false": 不使用默认配置 而是用我们自己定义�
 
 
 
-##### 1. Aop底层原理
+#### 13. Aop底层原理
 
 ```
 1. Aop底层使用动态代理
@@ -1902,7 +1947,7 @@ use-default-filters="false": 不使用默认配置 而是用我们自己定义�
 
 
 
-##### 2. Aop(JDK动态代理)
+#### 14. Aop(JDK动态代理)
 
 ```java
  java.lang.reflect.Proxy

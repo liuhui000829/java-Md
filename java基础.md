@@ -1555,7 +1555,7 @@ mvn -v 配置环境变量之后 是否配置成功
 
 ```java
 1. 什么是bean管理
- * Bean管理指的是两个操作(1.基于xml配置文件方式实现 2.基于注解方式实现) 
+ * Bean管理指的是两个操作(spring创建对象和Spring注入属性)(xml和注解2个方式) 
  
  	1. 基于xml配置文件方式实现 
         * 创建对象(创建对象的时候默认执行无参构造方法 完成对象的创建)
@@ -1565,9 +1565,8 @@ mvn -v 配置环境变量之后 是否配置成功
             set方式:
             构造函数方式:
 
-	2. 基于注解方式实现  从 8开始
-	// spring 创建对象
-	// Spring 注入属性
+	2. 基于注解方式实现  
+	   
 ```
 
 #### 3. xml注入普通类型
@@ -1579,8 +1578,8 @@ mvn -v 配置环境变量之后 是否配置成功
         <property name="name" value="张三"/>
         <property name="age" value="18"/>
     </bean>
-
-   简化: set命名空间简化操作,在beans中添加一句 xmlns:p="http://www.springframework.org/schema/p"   
+	
+	引入命名空间的方式 xmlns:p="http://www.springframework.org/schema/p" 
     <bean id ="user" class="com.company.User" p:name="张三" p:age="21"/>
 
 2. <!--构造函数的方式注入-->
@@ -1605,7 +1604,7 @@ mvn -v 配置环境变量之后 是否配置成功
 4. 注入属性外部bean
 (1) 创建两个类service类和dao类
 (2) 在sevice调用dao里面的方法
-<!--
+
     public class UserDaoImp implements UserDao {
         @Override
         public void update() {
@@ -1631,17 +1630,20 @@ mvn -v 配置环境变量之后 是否配置成功
             ApplicationContext applicationContext = new ClassPathXmlApplicationContext("bean1.xml");
             UserService userService = applicationContext.getBean("userService", UserService.class);
             userService.add();
+
+            // service add........
+            // userDao执行了
+ 	 		
         }
     }
--->
-    service add........
-    userDao执行了
 
-	<!--server和Dao 对象创建-->
-    <bean id="userService" class="com.company.service.UserService">
-       <constructor-arg name="userDao" ref="userDaoImp"/>
-    </bean>
-    <bean id="userDaoImp" class="com.company.dao.UserDaoImp"/>
+  
+
+<!--server和Dao 对象创建-->
+<bean id="userService" class="com.company.service.UserService">
+    <constructor-arg name="userDao" ref="userDaoImp"/>
+</bean>
+<bean id="userDaoImp" class="com.company.dao.UserDaoImp"/>
 
 
 4.2 注入属性 内部bean 和级联赋值
@@ -1742,19 +1744,21 @@ public class Stu {
 
 ```
 
-#### 5. IOC操作 Bean管理
+#### 5. IOC操作 Bean(FactoryBean)和生命周期
 
-```xml
+```java
 1. FactoryBean
-    spring有两种bean，一种是普通bean 另一种是工厂bean（factoryBean）
+    spring有两种bean，1.普通bean 2.工厂bean（factoryBean）
 	
-	* 普通bean 在配置文件中配置类型就是返回类型
+	* 普通bean: 在配置文件中配置类型就是返回类型
 		<bean id="userDaoImp" class="com.company.dao.UserDaoImp"/>
+         ApplicationContext applicationContext = new ClassPathXmlApplicationContext("bean2.xml");
+         UserDaoImp userDaoImp = applicationContext.getBean("userDaoImp", UserDaoImp.class);
 	
-	* 工厂bean 在配置文件定义bean类型可以和返回类型不一样
+	* 工厂bean: 在配置文件定义bean类型可以和返回类型不一样
 		* 第一步 创建类 让这个类作为工厂bean 实现接口FactoryBean
 		* 第二步 实现接口里面的方法，在实现的方法中定义返回的bean类型
-<!--
+
         public class Course {
             private String cname;
             public String getCname() {
@@ -1766,6 +1770,7 @@ public class Stu {
             }
 		}
 
+		// 工厂bean
 		public class MyBeanFactory implements FactoryBean<Course> {
             @Override
             public Course getObject() throws Exception {
@@ -1779,90 +1784,212 @@ public class Stu {
                 return null;
             }
 		}
-	-->
+		// xml配置
+		<bean id="myBeanFactory" class="com.company.bean2.MyBeanFactory"/>
+        // main方法
+ 		ClassPathXmlApplicationContext context=new ClassPathXmlApplicationContext("bean2.xml");
+        Course course = context.getBean("myBeanFactory",Course.class);
+		System.out.println(course.getCname())   // abc
+	
 
 		
 2. bean作用域	
-	在spring中 设置创建bean实例是单实例还是多实例 默认是单实例
-	* scope属性的设置: singleton单实例 prototype 多实例
+	在spring中 设置创建bean实例是单实例还是多实例 
+	* scope属性的设置: singleton单实例 ,prototype多实例  注意:默认是单实例
 		<bean 
 			id="myBeanFactory"
           	class="com.company.bean2.MyBeanFactory"
           	scope="prototype"
-		/>
-		<!--
+		 />
+		
             ApplicationContext applicationContext=new ClassPathXmlApplicationContext("bean2.xml");
             Course course = applicationContext.getBean("myBeanFactory", Course.class);
             Course course2 = applicationContext.getBean("myBeanFactory", Course.class);
             System.out.println(course);
             System.out.println(course2);
-			// 地址不一样
-		-->
+			// 地址输出不一样
 		
-	* singleton 记载spring配置文件的时候就创建了对象 而 prototype是调用getbean的时候才创建 所以是多实例
+		
+	* singleton 加载spring配置文件的时候就创建了对象  
+	* prototype 是调用getbean的时候才创建所以是多实例
 		
 ```
 
 
 
-#### 7. Bean的生命周期
+#### 6. Bean的生命周期
 
-```xml
-一个5步 加2步
-1. 通过构造器创建的bean实例
+```java
+... 5步 + 2步 
+概念: 从对象创建到对象销毁的过程
+
+1. 通过构造器创建的bean实例(无参构造)
 2. 为bean的属性设置和其他bean的引用 (调用set方法)
-	* 把bean的实例传递给bean后置处理器的方法
-3. 调用bean的初始化的方法 (需要手动配置初始化	的方法)
-	* 把bean的实例传递给bean后置处理器的方法	
-4. bean就可以使用了
-5. 当容器关闭的时候 调用销毁的方法 (需要手动配置销毁的方法)
+		?? = x	
+3. 调用bean的初始化的方法 (需要手动配置初始化的方法)
+	    ?? = y		
+4. bean就可以使用了(对象获取到了)
+5. 当容器关闭的时候调用销毁的方法 (需要手动配置销毁的方法)
 
-bean的后置处理器 作用: 全局的bean都会用到
-	初始化之前(第三步) 之前和之后
+   后者处理器的2步
+x: 把bean的实例传递给bean前置处理器的方法
+y: 把bean的实例传递给bean后置处理器的方法
+
+bean的后置处理器 作用: 全局的bean都会用到,初始化之前(x)和初始化之后(y)
+	
+
+// 1.
+public class Course {
+    private String cname;
+
+    public Course() {
+        System.out.println("第一步 执行无参构造创建bean实例");
+    }
+
+    public String getCname() {
+        return this.cname;
+    }
+
+    public void setCname(String cname) {
+        this.cname = cname;
+        System.out.println("第二步 执行set方法设置值");
+    }
+
+    public void initMethod(){
+        System.out.println("第三步 调用初始化方法");
+    }
+    public void destroyMethod(){
+        System.out.println("第五步 调用销毁方法");
+    }
+    
+// 2. 写上一个类实现BeanPostProcessor接口  (进入到这个接口中复制两个方法)
+public class MyBeanPost implements BeanPostProcessor {
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("前置处理器");
+        return bean;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("后置处理器");
+        return bean;
+    }
+}
+
+
+    
+// 3. xml配置
+<bean id="course"
+    class="com.company.bean2.Course"
+    init-method="initMethod"
+    destroy-method="destroyMethod">
+   			<property name="cname" value="777"/>
+</bean>
+          
+        
+        
+<!-- 全局处理器: 因为这个bean实现了BeanPostProcessor接口 
+     spring自动识别(写了这个bean那么所有配置文件中的bean都会添加这个方法) -->    
+    
+<bean id="myBeanPost" class="com.company.bean2.MyBeanPost"/>
+   
+    
+// 4.
+public static void main(String[] args) {
+    ClassPathXmlApplicationContext context=new ClassPathXmlApplicationContext("bean2.xml");
+    context.getBean("course",Course.class);
+    System.out.println("第四步 获取到bean实例对象");
+
+    // 手动让bean实例销毁
+    context.close();
+    }
+         
+     /*
+        第一步 执行无参构造创建bean实例
+        第二步 执行set方法设置值
+        前置处理器(x)
+        第三步 调用初始化方法
+        后置处理器(y)
+        第四步 获取到bean实例对象
+        第五步 调用销毁方法
+     */
+     
+    
+
 ```
 
-#### 8. IOC操作bean管理(xml自动装配)
+#### 7. IOC操作bean管理(xml自动装配)
 
 ```xml
 1. 什么是自动装配
-	* 根据指定装配规则 (属性名称或者属性类型) spring 自动将匹配的属性值进行注入
-	* autowire:  byType(根据属性) byName(根据名称)
-byName: 注意注入的bean的id和类中属性名称一致
-	<bean id="emp" class="com.company.bean2.autowire.Emp" autowire="byName"/>
-    <bean id="dept" class="com.company.bean2.autowire.Dept">
-        <property name="name" value="开发部"/>
-    </bean>
-byType: 根据属性类型注入
+	* 根据指定装配规则 (属性名称或者属性类型) spring自动将匹配的属性值进行注入
+	* autowire值的设置:
+		* byName: 注意注入的bean的id和类中属性名称一致
+	    * byType: 根据属性类型注入
 
 
 ```
 
-#### 9. IOC操作 bean管理 (外部属性文件)
+```java
+// 代码演示
+public class Dept {
+    private String name;
+	// ...set get 略
+}
+public class Emp {
+    private String name;
+    private Dept dept; // x
+	// 略
+}
+ // autowire="byName" 根据属性名称自动装配  x和y名称要对应
+ <bean id="emp" class="com.company.bean2.autowire.Emp" autowire="byName"/>
+
+ // 同理 byType 根据属性类型自动装配 x和y类型要对应(注意 如果有多个相同类型那么它不能识别 比如把y复制一份id改个名)
+ //<bean id="emp" class="com.company.bean2.autowire.Emp" autowire="byType"/> 
+     
+ 
+ // y
+ <bean id="dept" class="com.company.bean2.autowire.Dept">
+      <property name="name" value="开发部"/>
+ </bean> 
+
+
+```
+
+
+
+#### 8. IOC操作 bean管理 (外部属性文件)
 
 ```xml
 1. 直接配置数据库信息
 	(1) 配置德鲁伊连接池
-        <!--配置数据库连接池-->
+        <!--配置数据库连接池普通方式-->
         <bean id="dataSource"  class="com.alibaba.druid.pool.DruidDataSource">
             <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
             <property name="url" value="jdbc:mysql://localhost:3306/db"/>
             <property name="username" value="root"/>
             <property name="password" value="root"/>
-        </bean
+		</bean>
 
-	(2) 引入德鲁伊连接池依赖jar包
+	(2)引入德鲁伊连接池依赖jar包  druid.jar
+		
 
-	
 
-2. 引入外部属性文件配置数据库连接池
-创建 jdbc.properties 文件
+2. 引入外部属性文件配置数据库连接池(创建jdbc.properties文件)
 
 prop.driverClassName=com.mysql.jdbc.Driver
 prop.url=jdbc:mysql://localhost:3306/db
 prop.username=root
 prop.password=root
 
-命名空间 也得有 跟p一样
+// 引入context命名空间
+
+xmlns:context="http://www.springframework.org/schema/context"
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+
+
+// 引入外部属性文件
  <context:property-placeholder location="classpath:jdbc.properties"/>
     <!--    配置连接池-->
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
@@ -1873,47 +2000,141 @@ prop.password=root
     </bean>
 ```
 
-#### 10. 基于注解方式的bean管理操作
+#### 9. 基于注解方式的bean管理操作
 
-```
+```java
 1. 什么是注解
 	* 注解是代码特殊标记 格式: @注解名称(属性名称= 属性值,属性名称= 属性值......)
 	* 使用注解的目的，简化xml配置
-2. Spring 针对 bean管理创建对象提供注解
-	* @Component	
-	* @Service	
-	* @Controller
-	* @Repository
-上面四个注解功能是一样的 都是用来创建bean实例
+2. Spring针对bean管理创建对象提供注解
+	* @Component   // 一般用在普通的组件 	
+	* @Service	   // 一般用在业务逻辑层或者service层
+	* @Controller  // 一般用在web层
+	* @Repository  // 一般用在dao层
+    上面四个注解功能是一样的 都是用来创建bean实例
 
 3. 基于注解方式实现bean操作
-	第一步: 引入aop依赖
+	第一步: 引入aop依赖 
+		* spring-aop.jar
 	第二步: 开启组件扫描
-```
-
-#### 11. 组件扫描具体配置
-
-```xml
-use-default-filters="false": 不使用默认配置 而是用我们自己定义的
+		* 如果扫描多个包,多个包使用,隔开
+		* 扫描包上层目录
+			例:<context:component-scan base-package="com.company.bean5"/>
 
 
-<!--    扫描哪些内容-->
+4. 开启组件扫描中细节的配置
+
+	use-default-filters="false": 表示现在不使用默认filter 而是用我们自己定义的filter
+	context:include-filter, 设置扫描哪些内容
+	context:exclude-filter, 设置不扫描哪些内容
+
+// 包中所有的类都扫描
+<context:component-scan base-package="com.company.bean5"/>
+
+
 <context:component-scan base-package="com.company.bean5" use-default-filters="false">
-    <!-- 扫描 Component 所在类-->
+    <!-- 扫描 @Component 所在类-->
     <context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
 </context:component-scan>
 
-<!--    不扫描哪些内容-->
+
 <context:component-scan base-package="com.company.bean5" use-default-filters="false">
-    <!-- 不扫描Component 所在类 -->
+    <!-- 不扫描 @Component 所在类 -->
     <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Component"/>
 </context:component-scan>
 
+
+5. 基于注解方式实现属性注入
+	* @Autowired	根据属性类型注入
+	* @Qualifier	根据属性名称注入
+	* @Resource		可根据属性名称 可根据类型注入
+	····上三个都是根据对象注入
+	* @Value		注入普通类型
+    
+    
+    
+     1. @Autowired 是单独的没有value属性(根据类型注入有缺陷)
+    
+     2. @Qualifier 必须配合@Autowired
+             @Autowired
+             @Qualifier(value="userDaoImpl")
+    
+     3. @Resource  								// 根据类型注入  
+        @Resource(name = "userDaoImpl")         // 根据名称注入
+    	
+      注意:@Resource是javax扩展包中的  @Autowired和@Qualifier是Spring包中的 spring建议使用两个的组合
+     
+     4. @Value
+           @Value("abc")  完整写法@Value(value="abc")如果只有一个值那么可以省略value
+   		   private String name;
+```
+
+**1. 基于注解方式实现对象创建**
+
+```java
+  
+<!--开启组件扫描 bean5包下的所有注解-->
+<context:component-scan base-package="com.company.bean5"/>
+
+
+public interface UserDao {
+    void add();
+}
+
+@Repository
+public class UserDaoImpl implements UserDao{
+    @Override
+    public void add() {
+        System.out.println("userDaoImp....");
+    }
+}
+
+
+@Service // 1.完整写法是@Service(value="userService") 2.这个注解相当于<bean id="userService"/>   
+public class UserService {
+    
+    @Value(value = "abc")
+    private String name;
+
+    @Autowired   // 根据类型注入
+    @Qualifier(value = "userDaoImpl")   // 根据名称注入
+    private UserDao userDao;
+
+    public void add() {
+        System.out.println("service add..." + name);
+        userDao.add();
+    }
+    
+    
+   ApplicationContext applicationContext = new ClassPathXmlApplicationContext("bean5.xml");
+   UserService userService = applicationContext.getBean("userService", UserService.class);
+   userService.add();
+	
+    // service add...abc
+	// userDaoImp....
+```
+
+**2. 纯注解开发**
+
+```java
+1. 创建配置类,替代xml文件
+@Configuration              // 作为配置类,替代xml配置文件
+@ComponentScan(basePackages = {"com.company.bean5"})
+public class SpringConfig {
+}
+
+... 跟上面一样 省略
+    
+// 加载配置类
+ApplicationContext applicationContext = new AnnotationConfigApplicationContext(SpringConfig.class);
+UserService userService = applicationContext.getBean("userService", UserService.class);
+userService.add();   
+    
 ```
 
 
 
-#### 12. AOP（概念）
+#### 10. AOP（概念）
 
 ```java
  1.什么是AOP
@@ -1926,12 +2147,12 @@ use-default-filters="false": 不使用默认配置 而是用我们自己定义�
 
 
 
-#### 13. Aop底层原理
+#### 11. Aop底层原理
 
 ```
 1. Aop底层使用动态代理
 	(1) 有两种情况动态代理
-	第一种: 有接口的情况下  使用JDK动态代理
+	第一种: 有接口的情况下     使用JDK动态代理
 	第二种: 没有接口的情况下	使用CGLIB动态代理
 ```
 
@@ -1947,7 +2168,7 @@ use-default-filters="false": 不使用默认配置 而是用我们自己定义�
 
 
 
-#### 14. Aop(JDK动态代理)
+#### 12. Aop(JDK动态代理)
 
 ```java
  java.lang.reflect.Proxy
@@ -1963,7 +2184,7 @@ use-default-filters="false": 不使用默认配置 而是用我们自己定义�
     
 ```
 
-**JDK动态代理代码**
+**1. JDK动态代理代码**
 
 ```java
 (1) 创建接口,定义方法
@@ -1976,6 +2197,7 @@ use-default-filters="false": 不使用默认配置 而是用我们自己定义�
 
     @Override
     public int add(int a, int b) {
+       	System.out.println("调用了add方法");
         return a+b;
     }
 
@@ -1986,48 +2208,250 @@ use-default-filters="false": 不使用默认配置 而是用我们自己定义�
 }
 (3) 使用Proxy类创建接口代理对象
     public class JDKProxy {
-    public static void main(String[] args) {
-        // 创建接口实现类代理类对象
-        Class[] interfaces = {UserDao.class};
-        UserDaoImpl userDao = new UserDaoImpl();
-        UserDao dao = (UserDao) Proxy.newProxyInstance(JDKProxy.class.getClassLoader(), interfaces 						  		  ,new UserDaoProxy(userDao));
-        dao.add(1,2);
-        
-    }
+        public static void main(String[] args) {
+            // 创建接口实现类代理类对象
+            Class[] interfaces = {UserDao.class};
+            UserDaoImpl userDao = new UserDaoImpl();
+            // 返回代理对象
+            UserDao dao = (UserDao) Proxy.newProxyInstance(JDKProxy.class.getClassLoader(), interfaces 						  		  ,new UserDaoProxy(userDao));
+            dao.add(1,2);
+
+        }
 }
 
-//创建代理对象代码
-@SuppressWarnings("all")
-class UserDaoProxy implements InvocationHandler {
+	//创建代理对象代码
+    @SuppressWarnings("all")
+    public class UserDaoProxy implements InvocationHandler {
 
-    // 1.把创建的是谁的对象 把谁传递过来
-    private Object obj;
+        // 1.把创建的是谁的对象 把谁传递过来
+        private Object obj;
 
-    public UserDaoProxy(Object obj) {
-        this.obj = obj;
+        public UserDaoProxy(Object obj) {
+            this.obj = obj;
+        }
+
+        // 增强的逻辑
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            // 方法之前
+            System.out.println("方法之前执行" + method.getName() + " 创建的参数" + Arrays.toString(args));
+            // 当前方法
+            Object res = method.invoke(obj, args);
+            // 方法之后
+            System.out.println("之后执行" + obj);
+            return res;
+        }
     }
-
-    // 增强的逻辑
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        // 方法之前
-        System.out.println("方法之前执行" + method.getName() + " 创建的参数" + Arrays.toString(args));
-        // 当前方法
-        Object res = method.invoke(obj, args);
-        // 方法之后
-        System.out.println("之后执行" + obj);
-        return res;
-    }
-}
 
 方法之前执行add 创建的参数[1, 2]
 调用了add
 之后执行com.company.spring5.UserDaoImpl@4b1210ee
 ```
 
+#### 13 . Aop(操作,术语等)
+
+```java
+Aop术语:
+
+1. 连接点
+    * 类中哪些方法可以被增强,这些方法就被称为连接点
+2. 切入点
+   	* 实际被增强的方法，称为切入点
+3. 通知(增强)
+    * 实际被增强的逻辑部分被称为通知
+    * 通知有多种类型	
+    1. 前置通知    方法之前执行
+    2. 后置通知    方法之后执行
+    3. 环绕通知	   方法之前和之后都会执行
+    4. 异常通知	   方法出来异常会通知
+    5. 最终通知	   类似于java中finally	
+            
+4. 切面
+	* 是一个动作
+    * 把通知应用到切入点的过程
+    
+    
+/********************************************************************************************/   
+    
+Aop操作:
+
+1.Spring框架一般都是基于AspectJ实现Aop操作
+	(1)什么是AspectJ
+    AspectJ不是Spring组成的一部分,独立Aop框架,一般把AspectJ和Spring框架一起使用,进行Aop操作
+
+2. 基于AspectJ实现Aop操作
+	(1)基于xml配置文件实现
+    (2)基于注解方式实现
+    
+3. 引入Aop相关的依赖
+    spring-aspectjs.jar
+    cglib.jar
+    aopalliance.jar
+    aspectjweave.jar
+    
+4. 切入点表达式
+    (1) 切入点表达式作用: 知道那个类里面的哪个方法进行增强
+    (2) 语法结构
+    execution([权限修饰符][返回类型][类全路径][方法名称][出来列表])
+    
+    举例1. 对com.liuhui.dao.book类里面的add方法增强
+    	  execution(* com.liuhui.dao.book.add(..))
+    
+    举例2. 对com.liuhui.dao.book类里面的所有方法增强
+    	  execution(* com.liuhui.dao.book.*(..))	
+    
+    举例3. 对com.liuhui.dao.包里面所有类,类里面所有方法增强
+    	  execution(* com.liuhui.dao.*.*(..))	
+```
+
+#### 14. Aop操作 (Aspect注解）
+
+```java
+1. 创建类,在类中定义方法
+    
+2. 编写增强类  
+	* 在增强类里面,创建方法,让不同方法代表不同的通知类型 
+
+3. 进行通知的配置
+    * 1. 在spring配置文件中,开启注解扫描
+ 	* 2. 使用注解创建User和UserProxy对象
+    * 3. 在增强类上面添加注解@AspectJ (生成类的代理对象)
+    * 4. 在spring配置文件中开启生成代理对象    
+ 
+4. 配置不同类型的通知   
+	* 在增强类里面,在作为通知方法上面添加通知类型注释,使用切入点表达式配置
+    
+5. 抽取相同切入点
+    @Pointcut("execution(* com.company.spring5.aopanno.User.add(..))")
+    public void pointDemo(){
+    } 
+
+6. 有多个增强类对同一个方法进行增强 设置增强类的优先级 
+    * 在增强类上面添加注释 @Order(数字类型值),数字类型值越小优先级越高
+    @order(1)
+	public class UserProxy {}
+    
+      
+// 被增强的类
+@Component	// 创建对象,这个注解相当于 <bean id="user"/>
+public class User {
+    public void add(){
+        System.out.println("add.");
+    }
+}
+
+ 
+// 增强类 1,
+@Component
+@Aspect     // 生成代理对象
+@order(1)
+public class UserProxy {
+    
+    // 抽取相同切入点 
+    @Pointcut("execution(* com.company.spring5.aopanno.User.add(..))")
+    public void pointDemo(){
+    }  
+    
+    @Before("pointDemo()")  // .. 参数列表
+    public void before() {
+        System.out.println("before");
+    }
+
+    @After(value="pointDemo()")
+    public void after(){
+        System.out.println("after");
+    }
+
+    // 环绕通知
+    @Around(value="pointDemo()")
+    public void around(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+        System.out.println("环绕之前");
+        // 被增强的方法执行
+        System.out.println("环绕中"+proceedingJoinPoint.proceed());
+        System.out.println("环绕之后");
+    }
+
+    // 返回通知
+    @AfterReturning(value="pointDemo()")
+    public void AfterReturning(){
+        System.out.println("AfterReturning");
+    }
+
+    // 异常通知
+    @AfterThrowing(value="pointDemo()")
+    public void AfterThrowing(){
+        System.out.println("AfterThrowing");
+    }
+}   
+ 
+// 增强类 2
+@Component
+@Aspect
+@Order(2)
+public class PersonProxy {
+    // 抽取相同切入点
+    @Pointcut("execution(* com.company.spring5.aopanno.User.add(..))")
+    public void pointDemo() {}
+    
+    @Before("pointDemo()")
+    public void before() {
+        System.out.println("before.. person");
+    }
+}
+    
+  ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring5.xml");
+  User user = applicationContext.getBean("user", User.class);
+  user.add();   
+    
+        环绕之前
+        before
+        before..person
+        add...
+        AfterReturning
+        after
+        环绕中null
+        环绕之后
+    
+  // spring5.xml
+  xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"    
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-				context.xsd
+  http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd  
+    
+   <!-- 开启注解扫描 -->
+   <context:component-scan base-package="com.company.spring5.aopanno"/>  
+   
+   <!--开启Aspect生成代理对象-->
+   <aop:aspectj-autoproxy/>
+
+```
+
+**完全注解开发**
+
+```java
+// 创建配置类 不需要xml配置文件
+@Configuration
+@ComponentScan(basePackages = {"com.company.spring5.aopanno"})      //替代注解扫描
+@EnableAspectJAutoProxy(proxyTargetClass = true)                    // Aspect生成代理对象
+public class ConfigAop {
+    
+}
 
 
+  ApplicationContext applicationContext=new AnnotationConfigApplicationContext(ConfigAop.class);
+  User user= applicationContext.getBean("user",User.class);
+  user.add();
 
+    环绕之前
+    before
+    before.. person
+    add...
+    AfterReturning
+    after
+    环绕中null
+    环绕之后
+
+```
 
 
 

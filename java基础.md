@@ -977,7 +977,7 @@ SQL分类
 
 ##### 2. DML: 增删改数据
 
-```
+```sqlite
 1. 添加数据:
 	* insert into tb(列名1,列名2,...列名n)values(值1,值2...值n);
 	* insert into tb(列名1,列名2,...列名n)values(值1,值2...值n),(值1,值2...值n)... // 添加多条
@@ -999,7 +999,7 @@ SQL分类
 
 ##### 3. DQL: 查询语句 
 
-```
+```sql
 
 	1. 排序查询
 		* 语法: order by 子句
@@ -1291,7 +1291,7 @@ SQL分类
 
   2. **没有： 去DNS服务器找 找的就返回 找不到就返回找不到**
 
-![image-20211222185143136](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211222185143136.png)
+![image-20211222185143136](typora-user-images/image-20211222185143136.png)
 
   
 
@@ -1445,7 +1445,7 @@ Maven会规定好你应该如何去编写我们的java代码。必须要按照�
 * MAVEN_HOME      // maven目录
 * 在系统的path中配置 %MAVEN_HOME %\bin
 
-![image-20211222192452749](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211222192452749.png)
+![image-20211222192452749](typora-user-images\image-20211222192452749.png)
 
 mvn -v 配置环境变量之后 是否配置成功
 
@@ -1481,17 +1481,17 @@ mvn -v 配置环境变量之后 是否配置成功
 
 1. 创建一个maven web项目
 
-![image-20211222195600112](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211222195600112.png)
+![image-20211222195600112](typora-user-images\image-20211222195600112.png)
 
 2. 安装成功
 
-![image-20211222213304814](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211222213304814.png)
+![image-20211222213304814](typora-user-images\image-20211222213304814.png)
 
 3. 查看maven仓库中多了什么东西
 4. IDEA中的Maven设置
 5. IDEA项目创建成功后,最后看一眼Maven的配置
 
-![image-20211222213720667](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211222213720667.png)
+![image-20211222213720667](typora-user-images\image-20211222213720667.png)
 
 
 
@@ -1547,7 +1547,7 @@ mvn -v 配置环境变量之后 是否配置成功
 		* ApplicationContext:   接口的子接口,提供更多强大的功能,一般由开发人员进行使用
 ```
 
-<img src="C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211223133232838.png" alt="image-20211223133232838" style="zoom:100%;" />
+<img src="typora-user-images\image-20211223133232838.png" alt="image-20211222213720667" style="zoom:150%;" />
 
 
 
@@ -2143,7 +2143,7 @@ userService.add();
     3. 使用登录例子说明
 ```
 
-![image-20211225220908906](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211225220908906.png)
+![image-20211225220908906](typora-user-images\image-20211225220908906.png)
 
 
 
@@ -2158,13 +2158,13 @@ userService.add();
 
 **1. 创建接口实现类代理对象,增强类中的方法**
 
-![image-20211225222306906](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211225222306906.png)
+![image-20211225222306906](typora-user-images\image-20211225222306906.png)
 
 
 
 **2. 创建子类的代理对象,增强类中的方法**
 
-![image-20211225222122678](C:\Users\刘先生\AppData\Roaming\Typora\typora-user-images\image-20211225222122678.png)
+![image-20211225222122678](typora-user-images\image-20211225222122678.png)
 
 
 
@@ -2415,7 +2415,7 @@ public class PersonProxy {
   // spring5.xml
   xmlns:context="http://www.springframework.org/schema/context"
        xmlns:aop="http://www.springframework.org/schema/aop"    
-  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-				context.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd  
     
    <!-- 开启注解扫描 -->
@@ -2453,11 +2453,192 @@ public class ConfigAop {
 
 ```
 
+#### 15 jdbcTemplete
+
+```java
+1. 什么是jdbcTemplete
+    * Spring框架对JDBC进行封装,使用jdbcTemplete方便对数据库的操作
+2. 准备工作
+	1. 下载包
+        1. spring-jdbc
+        2. mysql-connection
+        3. druid
+        4. spring-tx  事务	
+        5. spring-orm 整合其他资源的包
+
+	2. 在spring配置中配置数据库连接池
+    
+        新建jdbc.properties文件
+            prop.driverClassName=com.mysql.cj.jdbc.Driver
+            prop.url=jdbc:mysql://localhost:3306/db?				       autoReconnect=true&useUnicode=true&createDatabaseIfNotExist=true&characterEncoding=utf8&useSSL=true&serverTimezone=UTC		
+            prop.username=root
+            prop.password=root
+                
+                
+        //注解扫描
+        <context:component-scan base-package="com.jdbc"/>
+		// 引入外部属性文件
+        <context:property-placeholder location="classpath:jdbc.properties"/>
+        // 配置连接池
+        <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+            <property name="driverClassName" value="${prop.driverClassName}"/>
+            <property name="url" value="${prop.url}"/>
+            <property name="username" value="${prop.username}"/>
+            <property name="password" value="${prop.password}"/>
+        </bean>  
+	
+	3. 配置Jdbctemplate模板对象,注入dataSource
+        <!--配置jdbcTemplate对象 注入DataSource-->
+            
+        <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+            <!--注入dataSource-->
+            <property name="dataSource" ref="dataSource"/>
+        </bean>
+
+	4.创建service类
+        @Service
+        @SuppressWarnings("all")
+        public class UserService {
+            // 注入Dao
+            @Autowired
+            @Qualifier("bookDaoImpl")
+            private UserDao userDao;
+        }
+	
+
+    5. 创建dao 注入jdbcTemplate对象
+        @Repository
+        @SuppressWarnings("all")
+        public class UserDaoImpl implements UesrDao{
+
+            // 注入jdbcTemplate
+            @Autowired
+            @Qualifier("jdbcTemplate")
+            private JdbcTemplate jdbcTemplate;
+        }
+
+	6. 创建一个实体类 (实体类用entity这个包)
+        public class User {
+
+            private int uid;
+            private String userName;
+            private String password;
+           
+            get set 略...
+        }
+	
+	7.编写 dao 和service
+        1.在dao进行数据库增删改查操作
+        2.调用JDbcTemplate对象里的update方法实现添加操作
+        
+
+```
+
+#### 16. JdbcTemplate(增删改查)
+
+```sql
+
+1. 增
+    		String sql = "insert into tab_user(name,username,password)values(?,?,?)";
+            Object[] obj = {user.getName(), user.getUserName(), user.getPassword()};
+            int update = jdbcTemplate.update(sql, obj);  // 这个参数是个可变参数
+            
+2. 删
+    		String sql = "delete from tab_user where username =?";
+        	int del = jdbcTemplate.update(sql, username);
+3. 改
+    		String sql="update tab_user set username=?,password=? where uid=?";
+            Object [] obj={user.getUserName(),user.getPassword(),user.getUid()};
+            int update=jdbcTemplate.update(sql,obj);
+4.查询
+    		1. 返回某个值,比如查询表中有多少条记录
+    		  String sql="select count(*) from tab_user";
+       		  return jdbcTemplate.queryForObject(sql,Integer.class);  // 第二个参数是返回值类型的class
+    			
+			2. 返回对象 根据id查询user信息
+              String sql = "select * from tab_user where uid=?";
+              return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<User>(User.class), id);
+			
+			3. 返回集合，分页查询
+              String sql = "select * from tab_user";
+        	  return jdbcTemplate.query(sql,new BeanPropertyRowMapper<>(User.class));
+        	  
+        	  分页查询:limit 页数 条数
+        	  select * from student limit 0,3
+        	  
+        	  
+5. 批量操作 表中有多条数据的
+			  String sql = "insert into tab_user(username,password)values(?,?)";
+        	  int[] num = jdbcTemplate.batchUpdate(sql, objects);
+        	  System.out.println(Arrays.toString(num));
+                          
+```
+
+#### 17. jdbc事务
+
+```xml
+1. 事务概念
+    * 事务是数据库操作的基本单元,逻辑上一组操作,要么都成功要么都失败,如果有一个失败那么整个操作都失败
+    * 经典场景,银行转账
+2. 事务的四个特性(ACID)
+    1. 原子性  要么都成功 要么失败
+    2. 一致性	操作之前跟操作之后总量不变
+    3. 隔离性  多事务操作之下不会产生影响
+    4. 持久性  持久化存储
+    
+3. 事务操作(Spring 事务管理介绍)
+    1. 事务添加到JavaEE三层结构中Service层(业务逻辑层)
+    2. 在Spring进行事务管理操作
+     	* 有两种方式: 编程式事务管理和声明式事务管理 (使用)
+ 	3. 声明式事务管理
+    	(1) 基于注解方式(使用)
+        (2) 基于xml配置文件方式
+    4. 在Spring进行声明式事务管理，底层使用AOP原理
+    5. Spring事务管理API
+    	(1) 提供了一个接口，代表事务管理器 整个接口针对不同的框架提供不同的实现类
+
+        <!--创建事务管理器-->
+		<bean id="transactionManager"
+              class="org.springframework.jdbc.datasource.DataSourceTransactionManager"> 				
+        	<!-- 注入数据源-->
+        	<property name="dataSource" ref="dataSource"/>
+    	</bean>
+    	<!--开启事务注解-->
+    	<tx:annotation-driven transaction-manager="transactionManager"/>
+         
+		参考bean3.xml
+    
+		(2) 在service 类上面(或者service里面方法上面)添加事务注解
+            @Transactional
+            public class UserService {}
+			(1) 在类上面添加，表示整个类里面所有的方法都添加事务
+			(2) 在方法上面添加，表示只有整个方法添加事务
 
 
+```
 
+**1. 声明式事务参数配置**
 
+```xml
+1. 在service类上面添加注释@Transactional在整个注解里面配置事务相关的参数
+   * progagation : 事务传播行为
+		(1) 多事务方法之间进行调用,整个过程中事务式如何进行管理的 
+   * ioslation : 事务隔离级别
+		(1) 事务有个特性 隔离性，多事务操作之间不产生影响,不考虑隔离性产生跟多问题
+		(2) 三个读取的问题: 脏读 不可重复读 虚(幻)读
+			* 脏读: 一个未提交的事务 读取到另一个未提交事务的数据
 
+   * timeout : 超时时间
+   * readOnly : 是否只读	
+   * rollbackFor :回滚
+   * norollbackFor:不归滚
+```
+
+**2. 事务传播行为 7种类**
+
+<img src="typora-user-images\image-20211227195127605.png" alt="image-20211227195127605" style="zoom:100%;" />
+
+![image-20211227195511229](typora-user-images\image-20211227195511229.png)
 
 
 

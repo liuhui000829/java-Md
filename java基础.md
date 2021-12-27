@@ -1,5 +1,7 @@
 
 
+
+
 ### 1 . java基础文件内容
 
 #### 2. liuhui.com.oop.a1 a2 a3 day1
@@ -2619,19 +2621,31 @@ public class ConfigAop {
 
 **1. 声明式事务参数配置**
 
-```xml
+```java
 1. 在service类上面添加注释@Transactional在整个注解里面配置事务相关的参数
    * progagation : 事务传播行为
 		(1) 多事务方法之间进行调用,整个过程中事务式如何进行管理的 
    * ioslation : 事务隔离级别
 		(1) 事务有个特性 隔离性，多事务操作之间不产生影响,不考虑隔离性产生跟多问题
-		(2) 三个读取的问题: 脏读 不可重复读 虚(幻)读
+		(2) 三个读取的问题: 脏读 ,不可重复读, 虚(幻)读
 			* 脏读: 一个未提交的事务 读取到另一个未提交事务的数据
-
+			* 不可重复读取: 一个未提交事务读取到另一个提交事务修改的数据
+			* 虚读: 一个未提交的事务读取到另一个提交事务添加的数据
+			
+			// 解决方案:通过设置事务的隔离性就能解决事务 三个读取的问题
    * timeout : 超时时间
+		* 事务需要在一定的时间内提交，如果不提交那么就会回滚 ,
+		* 事务默认是-1 表示是不超时，设置时间是以秒为单位      
    * readOnly : 是否只读	
+        * 默认值是false,表示可以进行增删该查的操作
+        * 如果设置成true,表示只能进行查询操作
    * rollbackFor :回滚
+        * 设置出现哪些异常进行事务回滚
    * norollbackFor:不归滚
+        * 设置出现哪些异常不进行事务回滚
+       
+       @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.SERIALIZABLE,timeout = 10,readOnly = true)
+       public class UserService{} 
 ```
 
 **2. 事务传播行为 7种类**
@@ -2639,6 +2653,29 @@ public class ConfigAop {
 <img src="typora-user-images\image-20211227195127605.png" alt="image-20211227195127605" style="zoom:100%;" />
 
 ![image-20211227195511229](typora-user-images\image-20211227195511229.png)
+
+**3. 事务的隔离级别**
+
+
+
+![image-20211227220638252](typora-user-images\image-20211227220638252.png)
+
+#### 18. JDBC完全注解开发
+
+```java
+1. 
+
+```
+
+
+
+
+
+
+
+
+
+
 
 
 

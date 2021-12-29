@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+<!--    <bean id="stu" class="com.company.bean2.Stu">-->
+<!--        <property name="score">-->
+<!--            <array>-->
+<!--                <value>张三</value>-->
+<!--                <value>李四</value>-->
+<!--            </array>-->
+<!--        </property>-->
+
+<!--        <property name="list" ref="courseList"/>-->
+<!--        <property name="map">-->
+<!--            <map>-->
+<!--                <entry key="JAVA" value="java"/>-->
+<!--                <entry key="PHP" value="php"/>-->
+<!--            </map>-->
+<!--        </property>-->
+
+<!--        <property name="sets">-->
+<!--            <set>-->
+<!--                <value>MySQl</value>-->
+<!--                <value>Redis</value>-->
+<!--            </set>-->
+<!--        </property>-->
+<!--        &lt;!&ndash;        注入集合 值是对象&ndash;&gt;-->
+<!--        <property name="listSub">-->
+<!--            <list>-->
+<!--                <ref bean="course1"/>-->
+<!--                <ref bean="course2"/>-->
+<!--            </list>-->
+<!--        </property>-->
+
+
+<!--    </bean>-->
+
+<!--&lt;!&ndash;      创建多个Course对象&ndash;&gt;-->
+<!--    <bean id="course1" class="com.company.bean2.Course">-->
+<!--        <property name="cname" value="Spring5框架"/>-->
+<!--    </bean>-->
+
+<!--    <bean id="course2" class="com.company.bean2.Course">-->
+<!--        <property name="cname" value="Mybatas框架"/>-->
+<!--    </bean>-->
+
+<!--&lt;!&ndash;    提取list集合类型属性注入&ndash;&gt;-->
+<!--    <util:list id="courseList">-->
+<!--        <value>123</value>-->
+<!--        <value>456</value>-->
+<!--        <value>789</value>-->
+<!--    </util:list>-->
+
+<!--    <bean id="myBeanFactory"-->
+<!--          class="com.company.bean2.MyBeanFactory"-->
+<!--          scope="prototype"/>-->
+
+
+    <bean id="course"
+          class="com.company.bean2.Course"
+          init-method="initMethod"
+          destroy-method="destroyMethod">
+        <property name="cname" value="777"/>
+    </bean>
+    <!--全局前置与后置处理器-->
+    <bean id="myBeanPost" class="com.company.bean2.MyBeanPost"/>
+
+</beans>

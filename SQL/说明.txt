@@ -1,0 +1,2 @@
+db.sql   =>db数据库
+db测试.sql  ==> sql文件

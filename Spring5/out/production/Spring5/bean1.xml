@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--set方式注入属性 p简化操作 命名空间-->
+<!--    <bean id ="user" class="User" p:name="null" p:age="21"/>-->
+
+
+
+    <!--set方式注入属性-->
+<!--    <bean id ="user" class="User">-->
+<!--        <property name="name">-->
+<!--            <value><![CDATA[<<南京>>]]></value>-->
+<!--        </property>-->
+<!--        <property name="age" value="18"/>-->
+<!--    </bean>-->
+
+<!--    server和Dao 对象创建 外部bean-->
+<!--    <bean id="userService" class="UserService">-->
+<!--       <constructor-arg name="userDao" ref="userDaoImp"/>-->
+<!--    </bean>-->
+<!--    <bean id="userDaoImp" class="UserDaoImp"/>-->
+
+    <!--    server和Dao 对象创建 内部bean-->
+    <bean id="userService" class="com.company.bean1.service.UserService">
+        <constructor-arg name="userDao">
+                <bean class="com.company.bean1.dao.UserDaoImp"/>
+        </constructor-arg>
+    </bean>
+
+</beans>

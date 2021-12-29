@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+                           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+<!--        // 自动装配-->
+<!--        <bean id="emp" class="com.company.bean2.autowire.Emp" autowire="byName"/>-->
+<!--        <bean id="dept" class="com.company.bean2.autowire.Dept">-->
+<!--            <property name="name" value="开发部"/>-->
+<!--        </bean>-->
+
+<!--        配置数据库连接池-->
+<!--        <bean id="dataSource"  class="com.alibaba.druid.pool.DruidDataSource">-->
+<!--            <property name="driverClassName" value="com.mysql.jdbc.Driver"/>-->
+<!--            <property name="url" value="jdbc:mysql://localhost:3306/db"/>-->
+<!--            <property name="username" value="root"/>-->
+<!--            <property name="password" value="root"/>-->
+<!--        </bean> -->
+
+<!--    <context:component-scan base-package="com.jdbc"/>-->
+
+<!--    &lt;!&ndash;    通过外部方式引入  &ndash;&gt;-->
+<!--    &lt;!&ndash;    引入外部属性文件  &ndash;&gt;-->
+<!--    <context:property-placeholder location="classpath:jdbc.properties"/>-->
+
+<!--    &lt;!&ndash;    配置连接池&ndash;&gt;-->
+<!--    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">-->
+<!--        <property name="driverClassName" value="${prop.driverClassName}"/>-->
+<!--        <property name="url" value="${prop.url}"/>-->
+<!--        <property name="username" value="${prop.username}"/>-->
+<!--        <property name="password" value="${prop.password}"/>-->
+<!--    </bean>-->
+
+<!--    &lt;!&ndash;配置jdbcTemplate对象 注入DataSource&ndash;&gt;-->
+<!--    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">-->
+<!--        &lt;!&ndash;注入dataSource&ndash;&gt;-->
+<!--        <property name="dataSource" ref="dataSource"/>-->
+<!--    </bean>-->
+
+<!--    &lt;!&ndash;    创建一个事务管理器&ndash;&gt;-->
+<!--    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">-->
+<!--        &lt;!&ndash;        注入数据源&ndash;&gt;-->
+<!--        <property name="dataSource" ref="dataSource"/>-->
+<!--    </bean>-->
+<!--    &lt;!&ndash;    开启事务注解&ndash;&gt;-->
+<!--    <tx:annotation-driven transaction-manager="transactionManager"/>-->
+
+</beans>

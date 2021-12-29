@@ -1228,282 +1228,457 @@ SQL分类
 
 ### 4. JavaWeb
 
-#### 1. 基本概念
+#### 1. web相关的概念
 
-#### 2. web服务器
+```java
+1. 软件架构
+    1. c/s: 客户端/服务器端
+    2. b/s: 浏览器/服务器端
+     
+2. 资源分类
+     1. 静态资源:所有用户访问后，得到的结果都是一样的,称为静态资源,静态资源可以直接被浏览器解析
+         * 如: html,css,javascript 等
+     2. 动态资源:每个用户访问相同资源后,得到的结果可能不一样.称为动态资源，动态资源被访问后，需要转换为静态资源,在返回浏览器
+		 * 如: servlet/jsp,php,asp...
 
-#### 3. Tomcat
-##### 3.1.安装Tomcat
-
-```
-
-```
-
-
-
-##### 3.2. Tomcat启动和配置
-
-**启动和关闭**
-
-```
-* bin目录下       startup.bat 			shutdown.bat
-```
-
-**访问测试: localhsot:8080**
-
-**conf -> server.xml 配置文件**
-
-**可以配置默认端口号:**
-
-* tomcat的默认端口号名称: 8080
-* mysql:3306
-* http:80
-* https:443
+3. 网络通信三要素
+     1. IP: 电子设备(计算机)在网络中的唯一标识
+     2. 端口: (应用程序在计算机的唯一标识)。 0~65536
+     3. 传输协议 :规定了数据传输的规则
+         * 基础协议:
+			1. tcp:安全协议,三次握手,速度较快
+            2. udp:不安全协议.速度快     
+             
 
 ```
-  <Connector port="8081" protocol="HTTP/1.1"
-               connectionTimeout="20000"
-               redirectPort="8443" />
-```
 
-**可以配置主机名称**
+**下图说明上述的关系**
 
- * 默认主机名称为 localhsot->127.0.0.1
- * .默认网站应用存放的位置为:webapps
+![image-20211229100045968](typora-user-images\image-20211229100045968.png)
 
-```
-在windows stystem32为中 搜索drivers ==> ets 把hosts修改为www.liuhui.com
-<Host name="www.liuhui.com"  appBase="webapps"
+#### 2. web服务器软件
+
+```xml
+* 服务器: 安装了服务器软件的计算机
+* 服务器软件: 接收用户的请求,处理请求，做出响应
+* web服务器软件: 接收用户的请求,处理请求，做出响应
+	* 在web服务器软件中,可以部署web项目,让用户通过浏览器来访问这些项目
+	* web容器
+	
+* 常见的java相关的web服务器软件
+	* webLogic:  oracle公司,  大型的JavaEE服务器,支持所有的javaEE规则,收费的 
+    * webSphere: IBM公司,     大型的JavaEE服务器,支持所有的javaEE规则,收费的
+    * JBOSS:     JBOSS公司的, 大型的JavaEE服务器,支持所有的javaEE规则,收费的
+    * Tomcat:	 Apache基金组织，中小型的JavEE服务器,仅仅支持少量的JavaEE规范servlet/jsp。开源的，免费的
+	
+* JavaEE: java语言在企业级开发中使用的技术规范的总和,一共规定了13项大的规范
+	* javaSE(java基础)	javaEE(java企业版)		javaME(java迷你版)
+    
+* Tomcat: web服务器软件
+    1. 下载: https://tomcat.apache.org/
+	2. 安装: 解压压缩包即可: 
+		* 注意: 安装目录建议不要有中文或者空格
+    3. 文件结构
+        * bin: 可执行文件  里面的.sh是linux系统中的
+        * conf: 配置文件
+		* lib: 依赖的jar的包
+        * logs: 日志文件
+        * temp: 临时文件
+        * webapps: 存放web项目
+        * worK: 存放运行时的一些数据	
+	4. 启动: 
+		* bin\startup.bat
+        * 访问: 浏览器输入: http://localhost:8080 或者cmd >ipconfig  http://192.168.1.6:8080 别人就可以访问我了    		
+		* 可能遇到的问题:
+			1. 黑窗体一闪而过:
+				* 没有正确配置JAVA_HOME环境变量
+            2. 启动报错:
+				1. 暴力: 去找到占用的端口号,并且找到对应的进程,杀死该进程
+                   * cmd> netstat -ano 
+                2. 温柔: 修改自身端口号
+                   * config\server.xml
+                   * <Connector port="8080" 
+                                protocol="HTTP/1.1" 
+                                connectionTimeout="20000"
+                                redirectPort="8443" 
+                                />
+               		
+               	   * 一般会将tomcat默认端口号修改为80. 80端口号是http协议的默认端口号(在访问时,就不用输入端口号了)
+            
+	5. 关闭:
+		1. 正常关闭:
+			* bin\shutdown.bat   或者 ctrl+c
+	    2. 强制关闭:
+			* 点击启动窗口的X
+	
+	6. 配置:
+		* 部署项目的方式:
+			1. 直接将项目放到webapps目录下即可。
+				* /hello: 项目的访问路径 === 虚拟目录
+				* 简单部署: 先将项目打成一个war包， 在把war包放置到webapps下 war包会自动的解压缩
+
+			2. 在config\Catalina\locathost创建任意名称的xml文件,在文件中编写 例子:liuhui.xml
+				  <Context docBase="E:\hello" />
+            	* 虚拟目录: xml文件的名称  例子: http://localhost:8080/liuhui/hello.html
+            
+         * 静态项目和动态项目
+			* 目录结构
+				* java动态项目的目录结构
+					-- 项目的根目录
+						-- WEB-INF目录:
+							-- web.xml: web项目的核心配置文件
+							-- classes目录: 放置字节码文件的目录
+							-- lib目录: 放置依赖的jar包
+
+ 
+		 * 将tomcat继承到idea中，并且创建JavaEE的项目,部署项目
+		 	* 热部署: on update action : update resource
+					 xxxxxxxxxxxxxx   : update resource
+
+
+	7. 如何修改 tomcat 端口号
+		* 默认主机名称为 localhsot -->127.0.0.1
+ 		* 默认网站应用存放的位置为:webapps
+		* 在windows stystem32为中 搜索drivers ==> ets 把hosts修改为www.liuhui.com
+			<Host name="www.liuhui.com"  appBase="webapps"
             unpackWARs="true" autoDeploy="true">
+
 ```
 
-<h2>高难度面试题</h2>
+**高难度面试题**
 
+```
 请你谈谈网站是如何进行访问的
+	1. 输入一个域名: 回车
+	2. 检查本机的 C:\Windows\System32\drivers\etc\hosts配置文件下有没有这个域名的映射
+		* 有: 直接返回对应的ip地址 这个地址中 有我们需要的web程序 可以直接访问
+		* 没有: 去DNS服务器找 找的就返回 找不到就返回找不到 
+```
 
-1.输入一个域名: 回车
-
-2.检查本机的 C:\Windows\System32\drivers\etc\hosts配置文件下有没有这个域名的映射
-
-  1. **有: 直接返回对应的ip地址 这个地址中 有我们需要的web程序 可以直接访问**
-
-     ```
-     	127.0.0.1       www.liuhui.com
-     ```
-
-  2. **没有： 去DNS服务器找 找的就返回 找不到就返回找不到**
+**图来说明**
 
 ![image-20211222185143136](typora-user-images/image-20211222185143136.png)
 
-  
-
-##### 3.3 发布一个web网站
-
-* 将自己写的网站 放到服务器Tomcat中指定的web应用的文件夹webapps下,
-
-网站应该有的结构
+#### 4. HTTP
 
 ```
--- webapps : Tomcat服务器的web目录
- - RooT
- -liuStudy : 网站的目录名
- - WEB-INF
- 	-classes : java程序
- 	-lib : web应用所依赖的jar包
- 	-web.xml: 网站的配置文件
- - index.html 默认的首页
- -static
- 	-css
- 	-js
- 	-img
+1. 什么是http
+    * HTTP:超文本传输协议
+    * 可以传输 html, 图片 音乐 视频 定位 地图...等     
+	* 端口: 80
+    * https: 它是安全的 端口: 443  
+
+2. 两个时代
+	* HTTP/1.0 客户端可以与web服务器连接后,每次连接都会建立一个连接 
+	* http/1.1 客户端可以与web服务器连接后,复用连接
+	
+3. 请求数据格式
+	1. 请求行
+    * 请求方式		请求url		请求协议版本
+       GET		/login.html		HTTP/1.1
+    	
+    * Http协议中有7中请求方式,常用的有2种
+    	* GET:
+			1. 请求参数在请求体中,在URL后
+            2. 请求的URL长度有限制
+            3. 不太安全
+    	* Post
+            1. 请求参数在请求体中
+            2. 请求的url长度没有限制
+            3. 相对安全
+2. 请求头 (客户端告诉服务器端一些信息)
+	* 请求名称: 请求头值
+	* 常见的请求头:
+		1. User-Agent:浏览器告诉服务器,我访问你使用的浏览器版本信息
+			* 可以在服务器端获取该头的信息,解决浏览器的兼容问题
+		2. Referer: http://localhost/login.html 参考下图 x
+        	* 告诉服务器,我(当前请求)从哪里来
+				* 作用:
+					1.防盗链:
+					2.统计工作:
+3. 请求空行
+	* 用来分隔请求头和请求体的
+4. 请求体(正文)
+	* 封装Post请求消息的请求参数的
+	* 字符串格式:
+		POST/login.html     HTTP/1.1
+		Host: localhost
+		...
+
+7. 特点
+	1. 基于TCP/IP的高级协议
+	2. 默认端口号:80
+	3. 基于请求/响应模型的: 一次请求对应一个响应
+	4. 无状态的: 每次请求之间相互独立,不能交互数据
+	
+	
+8. http请求
+	* 请求行:
+        1. Request URL: https://www.baidu.com/		// 请求地址
+        2. Request Method: GET						// get方法/post方法
+        3. Status Code: 200 OK						// 状态码
+        4. Remote Address: 36.152.44.95:443			// 远程地址
+        5. Referrer Policy: strict-origin-when-cross-origin	// 一个协议
+
+	* 消息头:
+        Accept: text/html							// 告诉浏览器 它支持的数据类型
+        Accept-Encoding: gzip, deflate, br			// 支持的编码格式 GBK UTF-8 GB2312 ISO8559-1
+        Accept-Language: zh-CN,zh;q=0.9,en;q=0.8	// 告诉浏览器 他的语言环境
+        Cache-Control: max-age=0					// 缓存控制
+        Connection: keep-alive						// 告诉浏览器请是否保持连接
+
+9. http响应
+	* 响应头
+        Cache-Control: private			缓存控制
+        Connection: keep-alive			保持连接
+        Content-Encoding: gzip			编码
+        Content-Type: text/html;charset=utf-8	类型
+        X-Ua-Compatible: IE=Edge,chrome=1  浏览器相应兼容性
+        
+    * 响应体
+        Accept: text/html							// 告诉浏览器 它支持的数据类型
+        Accept-Encoding: gzip, deflate, br			// 支持的编码格式 GBK UTF-8 GB2312 ISO8559-1
+        Accept-Language: zh-CN,zh;q=0.9,en;q=0.8	// 告诉浏览器 他的语言环境
+        Cache-Control: max-age=0					// 缓存控制
+        Connection: keep-alive						// 告诉浏览器请是否保持连接
+
+        HOST :    主机 
+        Reflush : 告诉浏览器多久刷新一次
+        Location : 让网页重新定位
+        
+	* 响应的状态码
+		1. 200: 成功  
+
+		2. 3xx:请求重定向 304
+			* 重定向: 你重新到我给你的新位置 去
+
+		3. 4xx: 找不到资源  404
+
+		4. 5xx：服务器代码错误 500 	502网关错误
+	
+	
+
 ```
 
-#### 4.http
+**浏览器的Referer是什么 x**
 
-##### 4.1 什么是http
-
-HTTP(超文本传输协议) 是一个简单的请求 -相应协议.它通常运行在TCP之上
-
-* 文本 ：html，字符串
-* 超文本: 图片 音乐 视频 定位 地图 ......
-* 端口:80
-
-HTTPS: 安全的
-
-* 端口:443
-
-##### 4.2 两个时代
-
-* http1.0
-  * HTTP/1.0 客户端可以与web服务器连接后,只能获取一个web资源,断开连接
-* http2.0
-  * http/1.1 客户端可以与web服务器连接后,只能获取多个web资源
-
-##### 4.3  HTTP请求
-
-* 客户端 --发送请求--服务端
-
-<h3> 1. 请求行</h3>
-
-* 请求行中的方式:GET
-* 请求方式: Get post HEAD Delete Put tract
-  * get 请求能够携带的参数比较少 大小有限制 会在浏览器的url地址栏显示数据内容 不安全 但效率高
-  * post 请求能携带的参数没有限制 大小没有限制 不会在浏览器的url地址显示数据内容 安全 但不高校
-
-```http
-1. Request URL: https://www.baidu.com/		// 请求地址
-2. Request Method: GET						// get方法/post方法
-3. Status Code: 200 OK						// 状态码
-4. Remote Address: 36.152.44.95:443			// 远程地址
-5. Referrer Policy: strict-origin-when-cross-origin	// 一个协议
-```
-
-<h3>2. 消息头</h3>
-
-```http
-Accept: text/html							// 告诉浏览器 它支持的数据类型
-Accept-Encoding: gzip, deflate, br			// 支持的编码格式 GBK UTF-8 GB2312 ISO8559-1
-Accept-Language: zh-CN,zh;q=0.9,en;q=0.8	// 告诉浏览器 他的语言环境
-Cache-Control: max-age=0					// 缓存控制
-Connection: keep-alive						// 告诉浏览器请是否保持连接
-```
+![image-20211229201046705](typora-user-images\image-20211229201046705.png)
 
 
 
-##### 4.4 HTTP响应
-
-* 服务器 -- 相应 -- 客户端-
-
-```http
-Cache-Control: private			缓存控制
-Connection: keep-alive			保持连接
-Content-Encoding: gzip			编码
-Content-Type: text/html;charset=utf-8	类型
-X-Ua-Compatible: IE=Edge,chrome=1  浏览器相应兼容性
-```
-
-* 相应体
-
-```http
-Accept: text/html							// 告诉浏览器 它支持的数据类型
-Accept-Encoding: gzip, deflate, br			// 支持的编码格式 GBK UTF-8 GB2312 ISO8559-1
-Accept-Language: zh-CN,zh;q=0.9,en;q=0.8	// 告诉浏览器 他的语言环境
-Cache-Control: max-age=0					// 缓存控制
-Connection: keep-alive						// 告诉浏览器请是否保持连接
-
-HOST :    主机 
-Reflush : 告诉浏览器多久刷新一次
-Location : 让网页重新定位
-```
-
-相应状态码
-
-200: 成功  
-
-3xx:请求重定向 304
-
-*  重定向: 你重新到我给你的新位置 去
-
-4xx: 找不到资源  404
-
-5xx：服务器代码错误 500 	502网关错误
-
-<h3>常见面试题</h3>
-
-当你的浏览器中地址输入url回车 经历了什么?
+ 
 
 
 
-
-
-#### 5. Maven
-
-<hr/>
-
-**我为什么要学习这个技术**
-
- 	1. 在javaweb开发中 需要使用大量的jar包,我们动手去导入
- 	2. 如何能够让一个东西自动帮我导入和配置这个jar包 由此MEVEN诞生了
-
-#####  5.1 Meven 项目架构管理工具
-
-我们目前用来就是方便导入Jar包的
-
-Maven的核心思想: **约定大于配置**
-
- * 有约束 不要去违反
-
-Maven会规定好你应该如何去编写我们的java代码。必须要按照这个规定来:
-
-##### 5.2 下载安装Maven
-
-##### 5.3 Maven环境变量配置
-
-在我们的系统环境变量中
-
-配置如下配置: 		新建
-
-* M2_HOME  			// maven下的bin目录
-* MAVEN_HOME      // maven目录
-* 在系统的path中配置 %MAVEN_HOME %\bin
-
-![image-20211222192452749](typora-user-images\image-20211222192452749.png)
-
-mvn -v 配置环境变量之后 是否配置成功
-
-
-
-##### 5.4 阿里云镜像
-
-* 镜像： mirrors
-  * 作用: 加速我们的下载
-* 国内建议使用阿里云镜像
-* conf文件夹 ==> setting.xml 中配置
+#### 5. Servlet
 
 ```xml
-	<mirror>  
-       <id>nexus-aliyun</id>  
-       <mirrorOf>central</mirrorOf>    
-       <name>Nexus aliyun</name>  
-       <url>http://maven.aliyun.com/nexus/content/groups/public</url>  
-    </mirror> 
+* 全称: Servlet applet
+* 概念: 运行在服务器端口的小程序
+    * Servlet 就是一个接口,定义了java类被浏览器访问到(tomcat识别)的规则
+    * 将来我们自定义一个类,实现servlet接口,复写方法
+* 快速入门:
+	1. 创建一个javaEE项目
+    2. 定义一个类 必须实现servlet的接口
+    3. 配置一下servlet
+        在web.xml中
+			 <!--  配置Servlet  -->
+                <servlet>
+                    <servlet-name>demo1</servlet-name>
+                    <servlet-class>com.liuhui.javaweb01.HelloServlet</servlet-class>
+                </servlet>
+                <!--  配置servlet的映射  -->
+                <servlet-mapping>
+                    <servlet-name>demo1</servlet-name>
+                    <url-pattern>/</url-pattern>
+                </servlet-mapping>
+
+* 执行原理: 
+	1. 当服务器接收到客户端浏览器的请求后,会解析请求的url路径,获取访问的Servlet的资源路径
+	2. 查找web.xml文件,是否有对应的<url-pattern></url-pattern>的标签体内容
+	3. 如果有,则在找到对应的<servlet-class></servlet-class> 全类名
+	4. tomcat会将字节码文件加载进内存，创建其对象
+	5. 调用方法。
+
+
+* servlet生命周期
+	1. 被创建	     执行init方法 		只执行一次
+
+		* servlet什么时候被出创建
+			* 默认情况下,第一次访问时，servlet被创建
+			* 可以配置执行servlet的创建时间 参考下列配置 y
+
+		* Servlet的init方法，只执行一次,说明一个servlet在内存中只存在一个对象,则servlet是单例的
+			* 多个用户访问时候，可能存在线程安全问题
+			   解决: 尽量不要在servlet中声明成员变量 即使定义了成员变量 也不要对它修改值 
+		
+
+	2. 提供服务		执行service方法      执行多次
+		 
+
+	3. 被销毁		 执行disroty 		 只执行一次
+		* 只有服务器正常关闭时,才会执行destroy方法
+
+
+<!--y:指定servlet的创建时机 -->
+<servlet>
+        <servlet-name>demo2</servlet-name>
+        <servlet-class>com.liuhui.javaweb01.HelloServlet2</servlet-class>
+<!--        指定servlet的创建时机
+                * 负数: 第一次被访问时候创建
+                * 正数或者0: 服务器启动的时候创建
+                默认的是 -1
+-->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+   
 ```
 
-##### 5.5 本地仓库
+**1. servlet是干啥的图说明**
 
-本地仓库 远程仓库:
+![image-20211229131700966](typora-user-images\image-20211229131700966.png)
 
-**建立一个本次仓库**
+
+
+**2. servlet工作原理图**
+
+![image-20211229133327245](typora-user-images\image-20211229133327245.png)
+
+
+
+#### 6. servlet 3.0
 
 ```java
-<localRepository>D:\Application\apache-maven-3.8.4\repo_jar</localRepository>
+1. 好处:
+	* 支持注解配置,可以不需要web.xml
+2. 步骤:
+	1. 创建javaEE项目,选择servlet3.0以上的版本,可以步创建web.xml
+    2. 定义一个类,实现serlvet接口
+    3. 复写方法
+    4. 在类的上面进行@WebServlet注解配置
+        @WebServlet("/资源路径")  //相当于url-pattern
+        public class HelloServlet extends HttpServlet {}
+
+3. IDEA与Tomcat的相关配置
+    1. IDEA会为每一个tomcat部署的项目单独建立一份配置文件
+    	* 查看控制台的 log: Using CATALINA_BASE:  
+	   		* C:\Users\刘先生\AppData\Local\JetBrains\IntelliJIdea2021.3\tomcat
+    
+    2. 工作空间项目  和  tomcat部署的web项目
+    	* tomcat真正访问的是"tomcat部署的web项目","tomcat部署的web项目"对应着"工作空间项目"的web目录下的所有资源
+        * WEB-INF 目录下的资源不能被浏览器直接访问
+        * 断点调试: 使用"小虫子"启动 debug启动
+       
+        
+            
+4. Servlet的体系结构
+            
+   Servlet			-- 接口 
+       ↓     
+   GenericServlet	-- 抽象类
+   	   ↓	
+   HttpServlet	    -- 抽象类
+        * GenericServlet: 将servelt接口中其他方法做了默认实现,只有service()方法是抽象的
+            * 将来定义Servlet类时,可以继承GenericServlet,实现Service()方法即可
+            
+        * HttpServlet:对http协议的一种封装，简化操作
+            * 定义类继承HttpServlet
+            * 复写doPost()/doGet()方法
+        
+5. Servlet相关配置
+ 	1. urlPattern:Servlet访问路径
+        1. 一个Servlet可以定义多个访问路径: @WebServlet({"/d1","/d2"}) 
+			* 注意多个Servlet上面的路径不能冲突否则报错 服务器都启动不起来
+                @WebServlet({"/demo1","/demo2"})
+                public class HelloServlet1 implements Servlet {}
+                @WebServlet({"/demo1","/demo2"})
+                public class HelloServlet2 implements Servlet {}
+		2. 路径的定义规则
+            * /xxx
+            * /xxx/xxx 简化: /xxx/*  通配符写法(优先级最低)
+            * *.自定义名字   *.do
+            	例如: 
+        			 @WebServlet({"*.liuhui"})
+                	 public class HelloServlet2 implements Servlet {} */
+
+
+             
+
 ```
 
-##### 5.6 在IDEA中使用Maven
+#### 7. Request对象
 
-1. 创建一个maven web项目
+```
+1. request对象和response对象的原理
+	1. request和response对象有服务器创建的，我们来使用它
+	2. request对象用来获取请求消息,response对象用来设置响应消息
+	
+2. request对象继承体系的结构
+	ServletRequest			--接口
+		↓		继承
+    HttpServletRequest		--接口
+    	↓		实现
+   	org.apache.catalina.connector.RequestFacade 类(tomcat)
+3. request功能: 
+	1. 获取请求消息数据
+		1. 获取请求行数据
+			* GET	/day14/demo1?name=zhangsan	  HTTP/1.1
+			* 方法:
+				1. 获取请求方式: GET
+					* String getMethod()
+					
+				2. 获取虚拟目录: /day14
+					* String getContextPath()
+					
+				3. 获取Servlet路径: /demo1
+					* String getServletPath()
+					
+				4. 获取请求参数: name=zhangsan 
+					* String getQueryString()
+					
+				5. 获取请求的uri: 
+					* String getRequestURI() ==>/day14/demo1
+					* StringBuffer getRequestURL() ==>http://localhost/day14/demo1
+				
+				6. 获取协议和版本: HTTP/1.1
+					* String getProtocal()
+				
+				7. 获取客户机的ip地址
+					* String getRemoteAddr()
+		2. 获取请求头数据
+			1. 方法:
+				* String getHeader(String name): 通过请求头的名称获取请求的值
+				* Enumeration<String> getHeaderNames(): 获取所有请求头的名称 Enumeration接口实现了迭代器
+		3. 获取请求体数据
+			1. 获取请求体数据
+				* 请求体: 只有post请求方式,才有请求体,在请求体中封装了Post请求的请求参数
+				* 步骤:
+                	1. 获取流对象
+                		* BufferedReader getReader(): 获取字符输入流，只能操作字符数据
+                		* ServletInputStream getInputStream(): 获取字节流 可以操作所有类型数据
+                			* 在文件上传知识点后讲解
+                	2. 再从流对象中拿数据
+                	
+   	         	            	
+	2. 其他功能
+		* 获取请求参数通用方式( 不论是get还是post请求方式都可以使用下了方法来获取请求)
+			1. String getParameter(String name): 根据参数名称获取参数值 usename=zs&password=123
+			2. String getParameterValues(String name): 根据参数名称获取参数值的数组 hobby=xx&&hobby=name
+			3. Enumeration<String> getParameterNames(): 获取所有请求的参数名称
+			4. Map<String,String[]> getParameterMap(): 获取所有参数的map集合
+			
+		* 请求转发
+		* 共享数据
+		* 获取ServletContext
 
-![image-20211222195600112](typora-user-images\image-20211222195600112.png)
+javaweb-02\com.example.Request.requestDemo1 有例子  
 
-2. 安装成功
+```
 
-![image-20211222213304814](typora-user-images\image-20211222213304814.png)
+**request和resposne原理图谱**
 
-3. 查看maven仓库中多了什么东西
-4. IDEA中的Maven设置
-5. IDEA项目创建成功后,最后看一眼Maven的配置
-
-![image-20211222213720667](typora-user-images\image-20211222213720667.png)
-
-
-
-
-
-
-
-
-
-
+![image-20211229204751938](typora-user-images\image-20211229204751938.png)
 
 
 
@@ -1635,7 +1810,6 @@ mvn -v 配置环境变量之后 是否配置成功
 
             // service add........
             // userDao执行了
- 	 		
         }
     }
 
@@ -2663,9 +2837,358 @@ public class ConfigAop {
 #### 18. JDBC完全注解开发
 
 ```java
-1. 
+1.
+@Configuration  // 表示是配置类
+@ComponentScan(basePackages = {"com.jdbc"})     // 注解扫描
+@EnableTransactionManagement                    // 开启事务
+public class ConfigJdbc {
+    // 创建数据库连接池
+    @Bean
+    public DruidDataSource getDruidDataSource() {
+        DruidDataSource dataSource = new DruidDataSource();
+        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/db?autoReconnect=true&useUnicode=true&createDatabaseIfNotExist=true&characterEncoding=utf8&useSSL=true&serverTimezone=UTC");
+        dataSource.setUsername("root");
+        dataSource.setPassword("root");
+        return dataSource;
+
+    }
+    // 创建jdbc模板对象
+    @Bean
+    public JdbcTemplate getJdbcTemplate(DataSource dataSource) {   //相当于把 DruidDataSource druidDataSource 																		注入了进来
+        JdbcTemplate jdbcTemplate = new JdbcTemplate();
+        // 注入Datasource
+        jdbcTemplate.setDataSource(dataSource);
+        return jdbcTemplate;
+    }
+
+    // 创建事务管理器
+    @Bean
+    public DataSourceTransactionManager setDataSourceTransactionManager(DataSource dataSource) {
+        DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
+        dataSourceTransactionManager.setDataSource(dataSource);
+        return dataSourceTransactionManager;
+    }
+    
+    注意: userServer 中注入jdbcTemplate得用@Resource要匹配
+```
+
+#### 19 .Spring5框架新功能
+
+```java
+1. 整个 Spring5 框架得代码基于Java8，运行时兼容JDK9，许多不建议使用的类和方法咋i代码库中删除，
+    
+2. spring5.0了通用得日志功能
+   (1) Spring5 已经移除了Log4jConfigListener 官方建议使用Log4j2
+   (2) spirng5框架整合Log4j2
+    
+第一步: 引入依赖
+    log4j-api.jar
+    log4j-core.jar
+    log4j-slf4j-impl.jar
+    slf4j-api.jar
+    
+第二步: 创建log4j2.xml配置文件(名字是固定的)
+    
+    
+ 
+```
+
+
+
+### 6. SpringMVC
+
+<hr/>
+
+#### 1. SpringMVC简介
+
+**1. 什么是MVC**
+
+```java
+MVC是一种软件架构思想,将软件按照模型,试图,控制器来划分
+M: model, 模型层，指工程中的javaBean,作用是处理数据
+javaBean分为两类:
+	* 一类是实体类Bean: 专门存储业务数据的 如student User等
+    * 一类是业务处理Bean: 指Service或者 Dao对象 ，专门用来处理业务逻辑和数据访问
+V: view ,视图层，指工程中的html或者jsp等页面，作用是与用户交互,展示数据
+C: Controller, 控制层 指工程中的servlet 作用是接收请求和相应浏览器
+
+MVC工作流程:
+	用户通过视图层发送请求到服务器,在服务器中请求被Controller接收,Controller调用相应的model层处理请求,处理完毕后将结果返回到
+    Controller,Controller再根据请求处理的结果找到相应的view试图,渲染数据后最终响应给浏览器
 
 ```
+
+**2. 什么是SpringMVC**
+
+```
+SpringMVC是Spring的一个后续产品,是Spring的一个子项目
+
+SpringMVC是Spring为表现层开发提供的一整套完备的解决方案。在表现层框架经历Struts、WebWork、Struts2等诸多产品的历代更迭之后，目前业界普遍选择了SpringMVC作为javaEE 项目表现层开发的首选方案
+	注: 三层架构分为表述层(表现层) 业务逻辑层 数据访问层 表述层表示前台页面和后台servlet
+```
+
+**3. SpringMVC的特点**
+
+```java
+* Spring家族原生产品, 与IOC容器等基础设施无缝对接
+    
+* 基于原生的Servlet,通过了功能强大的前端控制器DispatcherServlet, 对请求和响应进行统一处理    
+    
+* 表现层各细分领域需要解决的问题全方位覆盖，提供全面解决方案
+    
+* 代码清晰简洁,大幅度提升开发小略
+    
+* 内部组件化程度高，可插拔式组件即插即用,想要什么功能配置响应组件即可
+    
+* 性能卓越,尤其适合现代大型，超大型互联网项目要求
+
+
+
+```
+
+#### 2. HelloWord
+
+**1. 创建Meven工程**
+
+```xml
+a> 添加web模块
+	C:\Users\刘先生\Desktop\java-Md\Spring_MVC\springmvc-demo1\src\main\webapp\WEB-INF\web.xml 完整的
+
+b> 打包方式:war  
+    
+	<!-- pom.xml中添加最后一行 -->
+	<groupId>org.example</groupId>
+    <artifactId>springmvc-demo1</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
+
+c> 引入依赖
+
+    <!-- springmvc -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>5.3.1</version>
+    </dependency>
+    <!-- 日志 -->
+    <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.2.3</version>
+    </dependency>
+
+    <!-- servletApi -->
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>3.1.0</version>
+        <scope>provided</scope>
+    </dependency>
+
+    <!-- spring5 和Thymeleaf整合包 -->
+    <dependency>
+        <groupId>org.thymeleaf</groupId>
+        <artifactId>thymeleaf-spring5</artifactId>
+        <version>3.0.12.RELEASE</version>
+    </dependency>
+
+```
+
+**2. 配置web.xml**
+
+**a> 默认配置方式**
+
+此配置作用下，springMVC的配置文件默认位于WEB-INF下,默认名称为<servlet-name>-servlet.xml列如，以下配置所对应springMVC的配置文件位于WEB-INF下，文件名称为springMVC-servlet.xml
+
+```xml
+<!--    !配置springmvc的前端控制器 对浏览器方式的亲求进行统一处理-->
+<servlet>
+    <servlet-name>SpringMVC</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>SpringMVC</servlet-name>
+    <!-- 
+		 设置springMVC的核心控制器所能处理的请求的请求路径/所匹配的请求可以是/login .html .js .css 方式的请求路径
+ 		 但是不能匹配.jsp请求路径的请求
+	-->
+    <url-pattern>/</url-pattern>
+</servlet-mapping>
+
+```
+
+
+
+**b> 扩展配置方式**
+
+可通过init-param标签设置SpringMVC配置文件的位置和名称,通过load-startup标签设置SpringMVC前端控制器DispatcherServlet的初始化时间
+
+```xml
+
+<!--        配置springmvc的前端控制器 对浏览器方式的亲求进行统一处理-->
+    <servlet>
+        <servlet-name>SpringMVC</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+<!--        配置springmvc配置文件的位置和名称-->
+        <init-param>
+            <!--contextConfigLocation 为固定值 -->
+            <param-name>contextConfigLocation</param-name>
+            <!--使用classpath：表示从类路径查找配置文件,例如maven工程中的src/main/resources -->
+            <param-value>classpath:springMVC.xml</param-value>
+        </init-param>
+<!--        作为框架的核心组件,在启动过程中有大量的初始化操作
+			这些操作放在第一次请求时才会执行会严重影响访问速度
+			因此需要通过此标签启动控制DispatcherServlet的初始化时间提前到服务器启动时-->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SpringMVC</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+
+```
+
+**3. 创建请求控制器**
+
+由于前端控制器对浏览器发送的请求进行了统一的处理,但是具体的请求有不同处理过程,因此需要创建处理具体请求的类，即请求控制器
+
+请求控制器中每一个处理器的请求的方法成为控制器方法
+
+因为SpringMVC的控制器由一个POJO（普通的java类）担任,因此需要通过@Controller注解将其标识为一个控制层组件,交给SpringIOC容器管理,因此SpringMVC能够识别控制器的存在
+
+```java
+@Controller
+public class HelloContrlloer{
+    
+}
+```
+
+**4. springMVC的配置**
+
+```xml
+	<!--注解扫描-->
+    <context:component-scan base-package="com.liuhui.mvc.controller"/>
+    <!--配置Thymeleaf试图解析器-->
+    <bean id="viewResolver" class="org.thymeleaf.spring5.view.ThymeleafViewResolver">
+        <property name="order" value="1"/>
+        <property name="characterEncoding" value="UTF-8"/>
+        <property name="templateEngine">
+            <bean class="org.thymeleaf.spring5.SpringTemplateEngine">
+                <property name="templateResolver">
+                    <bean class="org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver">
+                        <!--试图前缀-->
+                        <property name="prefix" value="/WEB-INF/templates"/>
+                        <!--试图后缀-->
+                        <property name="suffix" value=".html"/>
+                        <property name="characterEncoding" value="UTF_8"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+```
+
+
+
+### 7. Maven
+
+<hr/>
+
+**我为什么要学习这个技术**
+
+ 	1. 在javaweb开发中 需要使用大量的jar包,我们动手去导入
+ 	2. 如何能够让一个东西自动帮我导入和配置这个jar包 由此MEVEN诞生了
+
+#####  5.1 Meven 项目架构管理工具
+
+我们目前用来就是方便导入Jar包的
+
+Maven的核心思想: **约定大于配置**
+
+ * 有约束 不要去违反
+
+Maven会规定好你应该如何去编写我们的java代码。必须要按照这个规定来:
+
+##### 5.2 下载安装Maven
+
+##### 5.3 Maven环境变量配置
+
+在我们的系统环境变量中
+
+配置如下配置: 		新建
+
+* M2_HOME  			// maven下的bin目录
+* MAVEN_HOME      // maven目录
+* 在系统的path中配置 %MAVEN_HOME %\bin
+
+![image-20211222192452749](typora-user-images\image-20211222192452749.png)
+
+mvn -v 配置环境变量之后 是否配置成功
+
+
+
+##### 5.4 阿里云镜像
+
+* 镜像： mirrors
+  * 作用: 加速我们的下载
+* 国内建议使用阿里云镜像
+* conf文件夹 ==> setting.xml 中配置
+
+```xml
+	<mirror>  
+       <id>nexus-aliyun</id>  
+       <mirrorOf>central</mirrorOf>    
+       <name>Nexus aliyun</name>  
+       <url>http://maven.aliyun.com/nexus/content/groups/public</url>  
+    </mirror> 
+```
+
+##### 5.5 本地仓库
+
+本地仓库 远程仓库:
+
+**建立一个本次仓库**
+
+```java
+<localRepository>D:\Application\apache-maven-3.8.4\repo_jar</localRepository>
+```
+
+##### 5.6 在IDEA中使用Maven
+
+1. 创建一个maven web项目
+
+![image-20211222195600112](typora-user-images\image-20211222195600112.png)
+
+2. 安装成功
+
+![image-20211222213304814](typora-user-images\image-20211222213304814.png)
+
+3. 查看maven仓库中多了什么东西
+4. IDEA中的Maven设置
+5. IDEA项目创建成功后,最后看一眼Maven的配置
+
+![image-20211222213720667](typora-user-images\image-20211222213720667.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

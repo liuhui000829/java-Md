@@ -1,10 +1,10 @@
 
 
+# 一. java基础
 
+## 1.  java基础文件内容
 
-# 一. java基础文件内容
-
-## 2. liuhui.com.oop.a1 a2 a3 day1
+### 2. liuhui.com.oop.a1 a2 a3 day1
 
 ```java
 // 1. a1
@@ -26,7 +26,7 @@ Student StudentServer Test
     
 ```
 
-## 3. liuhui.com.oop.作用域问题
+### 3. liuhui.com.oop.作用域问题
 
 ```
 1. 一个类在两个包都有 怎么解决
@@ -34,19 +34,19 @@ Student StudentServer Test
 2. 测试 public private 默认修饰符 protected 访问权限
 ```
 
-## 4. liuhui.com.oop.继承
+### 4. liuhui.com.oop.继承
 
 ```
 Animal Dog Cat Test 简单的实现继承
 ```
 
-## 5.liuhui.com.oop.static内容
+### 5.liuhui.com.oop.static内容
 
 ```
 1.satic 修饰属性, 代码块, 方法问题 各种情况的简单练习
 ```
 
-## 6. liuhui.com.oop.static选民投票
+### 6. liuhui.com.oop.static选民投票
 
 ```
 	模拟实现选民投票过程：
@@ -54,13 +54,13 @@ Animal Dog Cat Test 简单的实现继承
  * 并且当投票总数达到100时，就停止投票 输出总投票数 以及候选人的票数 以及结果
 ```
 
-## 7. liuhui.com.oop.static测试类
+### 7. liuhui.com.oop.static测试类
 
 ```1.
 一个类只能new 10次怎么办
 ```
 
-## 8. liuhui.com.oop.多态
+### 8. liuhui.com.oop.多态
 
 ```
 1. 简单的实现了多态   2.向上转型 向下转型  
@@ -68,7 +68,7 @@ Animal Dog Cat Test 简单的实现继承
 3. Master 模拟多态
 ```
 
-## 9. liuhui.com.oop.抽象类和接口
+9. ### liuhui.com.oop.抽象类和接口
 
 ```
 1. 抽象类和接口
@@ -82,7 +82,7 @@ Animal Dog Cat Test 简单的实现继承
 
 ```
 
-## 10. liuhui.com.oop.异常
+### 10. liuhui.com.oop.异常
 
 ```
 6个类 自定义异常等
@@ -90,7 +90,7 @@ Animal Dog Cat Test 简单的实现继承
 
 
 
-## 11. liuhui.com.高级特性.集合
+### 11. liuhui.com.高级特性.集合
 
 ```
 ArrayList linkedList HashSet HashMap lambda表达式 泛型等等
@@ -98,7 +98,7 @@ ArrayList linkedList HashSet HashMap lambda表达式 泛型等等
 
 
 
-## 12. liuhui.com.高级特性.IO
+### 12. liuhui.com.高级特性.IO
 
 ```
 1. 文件的操作
@@ -106,7 +106,7 @@ ArrayList linkedList HashSet HashMap lambda表达式 泛型等等
 3. io 字符流  读写	(对象形式不一样)
 ```
 
-## 13. liuhui.com.高级特性.反射与注解
+### 13. liuhui.com.高级特性.反射与注解
 
 ```
 反射: Person personDemo
@@ -114,20 +114,20 @@ ArrayList linkedList HashSet HashMap lambda表达式 泛型等等
 注解: 注解小用途, 6个文件
 ```
 
-## 14. liuhui.com.高级特性.线程
+### 14. liuhui.com.高级特性.线程
 
 ```
 Thread 类
 Runable 接口  简单的练习
 ```
 
-## 15. liuhui.com.高级特性.枚举包装类
+### 15. liuhui.com.高级特性.枚举包装类
 
 ```
 八大类型的一些方法  random date 等等
 ```
 
-## 16 . liuhui.com.高级特性.Json
+### 16 . liuhui.com.高级特性.Json
 
 ```
 json的转换 引入 fastJson工具类 导入
@@ -153,7 +153,7 @@ json的转换 引入 fastJson工具类 导入
 
 **继承是Java中实现代码重用的重要手段之一。Java中只支持单根继承，即一个类只能有一个直接父类**
 
-```
+```java
 		一 .子类访问父类的问题?
  *      
  		1.访问父类构造方法   super();   super(name)
@@ -189,11 +189,11 @@ json的转换 引入 fastJson工具类 导入
 
 ### 2. 修饰符 与 作用域问题
 
-```
+```java
  一个类在两个包都有 那么就得用   liuhui.com.oop.作用域问题.Student stu2=new liuhui.com.oop.作用域问题.Student()形式
 ```
 
-```
+```java
 
 *  scope/修饰符     当前类中    同一个包中   子类中     任何地方
 
@@ -205,7 +205,7 @@ json的转换 引入 fastJson工具类 导入
 
 ### 3. static
 
-```
+```java
 static可以用来修饰
 
 1. 成员变量  静态变量，可以直接通过类名访问
@@ -249,7 +249,7 @@ static修饰符
 
 ### 4. 重写 重载 多态 上下转型
 
-```
+```java
 1. 重写
 	子类重写父类方法注意事项
 
@@ -289,7 +289,7 @@ static修饰符
 
 ### 5. 抽象类和接口
 
-```
+```java
 												抽象类
 // 抽象类VS普通类
 
@@ -377,9 +377,9 @@ Java中的接口
 
 ## 2 . 常用类
 
-##### 1.Object
+### 1.Object
 
-```
+```java
 Object类被子类经常重写的方法
 
 toString()	返回当前对象本身的有关信息，按字符串对象返回
@@ -389,9 +389,9 @@ getClass()	获取当前对象所属的类信息，返回Class对象
 
 ```
 
-##### 2.Arrays
+### 2.Arrays
 
-```
+```java
 Arrays 工具类的使用
         
 * 1. boolean equals(array1,array2) 比较两个数组是否相等
@@ -402,9 +402,9 @@ Arrays 工具类的使用
 * 6. int binarySearch(array,val)   查询元素值val在数组中的下标 (要求数组中元素已经按升序排列)
 ```
 
-##### 3. ArrayList & LinkedList
+### 3. ArrayList & LinkedList
 
-```
+```java
 1. ArrayList
 
 boolean add(Object o)	在列表的末尾顺序添加元素，起始索引位置从0开始
@@ -427,9 +427,9 @@ Object  removeFirst()	删除并返回列表中的第一个元素
 Object  removeLast()	删除并返回列表中的最后一个元素
 ```
 
-##### 4.Map
+### 4. Map
 
-```
+```java
 Object put(Object key, Object val)	以“键-值”对的方式进行存储
 Object get(Object key)	根据键返回相关联的值，如果不存在指定的键，返回null
 Object remove(Object key)	删除由指定的键映射的“键-值对”
@@ -437,6 +437,13 @@ int size()	返回元素个数
 Set keySet()	返回键的集合
 Collection values()	返回值的集合
 boolean containsKey(Object key)	如果存在由指定的键映射的“键-值对”，返回true
+```
+
+### 5. Date
+
+```java
+new Date().getTime()  //获取毫秒数
+
 ```
 
 
@@ -1399,8 +1406,8 @@ c. 请求数据格式
             2. Referer: http://localhost/login.html 参考下图 x
                 * 告诉服务器,我(当前请求)从哪里来
                     * 作用:
-                        1.防盗链:
-                        2.统计工作:
+                        1. 防盗链:
+                        2. 统计工作:
     3. 请求空行
         * 用来分隔请求头和请求体的
     4. 请求体(正文)
@@ -1485,10 +1492,13 @@ HTTP协议:
 				* Context-type: 服务器告诉客户端本次响应体数据的格式以及编码格式
 				* context-length: 字节的个数
 				* Date:	日期
-				* Context-disposition: 服务器告诉客户端以什么样的格式打开响应体数据
+				* Content-disposition: 服务器告诉客户端以什么样的格式打开响应体数据
 					* 值:
-					* in-line: 默认值,在当前页面内打开
-					* attachment: 以附件形式打开响应体(文件下载)
+                        * in-line: 默认值,在当前页面内打开
+                        * attachment: 以附件形式打开响应体(文件下载)
+                         例子:(不区分大小写)
+                         response.setHeader("content-disposition", "attachment;filename=" + filename);	 
+                        
 		3. 响应空行
 		4. 响应体: 传输的数据
 			
@@ -1863,7 +1873,17 @@ http://localhost:8080/javaweb-02/loginServlet?username=aa&password=bb&hobby=boll
     			* 字符输出流: PrintWriter getWriter()
     			* 字节输出流: ServletOutputStream getOutputStream()
     		2. 使用输出流,将数据输出到客户端浏览器中 
-    		
+                    
+    				// 1.字符流 简单的形式,设置编码,在取流之前设置
+                	response.setContentType("text/html;charset=utf-8")
+               		response.getWriter().write("你好")
+                    
+                    // 2.字节流
+                    response.setContentType("text/html;charset=utf-8")
+                    // 获取字节输出流
+                    ServletOutputStream servletOutputStream = response.getOutputStream();
+                    // 输出数据
+                    servletOutputStream.write("好的".getBytes("utf-8"));
     		
     		
 * 案例:
@@ -1913,10 +1933,135 @@ http://localhost:8080/javaweb-02/loginServlet?username=aa&password=bb&hobby=boll
             3. 告诉浏览器响应体使用的编码
                 // 简单的形式,设置编码,在取流之前设置
                 response.setContentType("text/html;charset=utf-8")
+                response.getWriter().write("你好")
+                
     3. 服务器输出字节数据到浏览器
+            response.setContentType("text/html;charset=utf-8")
+             //2. 获取字节输出流
+        	ServletOutputStream servletOutputStream = response.getOutputStream();
+        	//输出数据
+        	servletOutputStream.write("好的".getBytes("utf-8"));
+
+
+		字符流一般用来输出字符等等, 字节流用来输出图片等等一些
+            
+            
+    4. 验证码: 
+		1. 本质: 图片
+        2. 目的: 防止表单恶意提交
 ```
 
+## 6. ServletContext对象
 
+```java
+1. 概念: 代表了整合web应用,可以和程序的容器(服务器)来通信
+2. 获取: 
+	1. 通过request对象获取
+        request.getServletContext();
+	2. 通过HttpServlet获取
+        this.getServletContext();
+		
+  	ServletContext servletContext1 = request.getServletContext();
+    ServletContext servletContext2 = this.getServletContext();
+    System.out.println(servletContext1 == servletContext2);  // true
+		
+3. 功能:
+	1. 获取MIME类型  (tomcat config web.xml)
+        * MIME类型: 在互联网通信过程中定义的一种文件类型
+            * 格式: 大类型/小类型 		text/html 		image/jpeg
+        * 获取: String getMimeType(String file)
+    2. 域对象:共享数据
+        * setAttribute(String name,Object value)
+        * getAttribute(String name);
+        * removeAttribue(String name);
+
+		* ServletContext对象范围: 所有用户所有请求的数据
+            ServletContextDemo1 {servletContext2.setAttribute("user","张三");}
+			ServletContextDemo2 {servletContext2.getAttribute("user")}   // 张三
+			换个浏览器也是如此
+            
+    3. 获取文件的真实(服务器)路径
+        1. 方法: String getRealPath(String path);
+			 String realPathC = servletContext.getRealPath("/c.txt"); // 获取的是webapp下的c.txt
+       		 String realPathB = servletContext.getRealPath("/WEB-INF/b.txt"); // 获取的是WEB-INF下的b.txt
+       		 String realPathA = servletContext.getRealPath("/WEB-INF/classes/a.txt"); // 获取的是src下的txt
+
+
+4. 案例
+    * 文件下载需求
+    	1. 页面显示超链接
+    	2. 点击超链接之后弹出下载提示框
+    	3. 完成图片文件下载
+    * 分析
+    	1. 超链接指向的资源如果能被浏览器解析,则在浏览器中显示,如果不能解析,则弹出下载提示框,不满足需求
+    	2. 任何资源都必须弹出下载提示框
+    	3. 任何响应头设置资源的打开方式:
+			* context-disposition：attachment;filename=xxx
+                
+    * 步骤:
+		1. 定义页面,编辑超链接href属性,指向Servlet,传递资源名称filename
+    	2. 定义servlet
+            1. 获取文件名称
+            2. 使用字节输入流加载文件进内存
+            3. 指定response的响应头; content-disposition:attachment;filename=xxx
+            4. 将数据写到response输出流
+	
+     * 问题:
+		* 中文文件问题
+            * 结局思路
+            	1. 获取客户端使用的浏览器版本信息
+            	2. 根据不同的版本信息,是指fileName的编码方式不同
+                    // 解决中文文件名问题
+                    // 1. 获取user-agent请求头
+                    String agent = request.getHeader("user-agent");
+                    // 2. 使用工具类方法编码文件名即可  DownLoadUtils(工具类)
+                    filename = DownLoadUtils.getFileName(agent, filename);
+
+
+
+   		// 1. 获取文件名称
+        String filename = request.getParameter("fileName");
+        
+
+        // 2. 使用字节输入流加载文件进内存 
+        ServletContext servletContext = this.getServletContext();
+        String realPath = servletContext.getRealPath("/images/" + filename);
+
+
+        // 3. 用字节流文件关联
+        FileInputStream fis = new FileInputStream(realPath);
+
+        // 设置response的响应头
+        // 3.1 设置响应头类型
+        String mimetype = servletContext.getMimeType("filename");
+        response.setHeader("content-type", mimetype);
+        // 3.2设置响应头打开方式:context-disposition
+
+        // 解决中文文件名问题
+        // 1. 获取user-agent请求头
+        String agent = request.getHeader("user-agent");
+        // 2. 使用工具类方法编码文件名即可
+        filename = DownLoadUtils.getFileName(agent, filename);
+        
+        response.setHeader("content-disposition", "attachment;filename=" + filename);
+
+        
+        //将输入流的数据写出到输出流中
+        ServletOutputStream sos = response.getOutputStream();
+        byte[] buff = new byte[1024 * 8];
+        int len = 0;
+        while ((len = fis.read(buff)) != -1) {
+            sos.write(buff, 0, len);
+        }
+        fis.close();
+
+
+javaweb-02\java\utils 工具类
+
+
+
+
+```
 
 
 

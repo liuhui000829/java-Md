@@ -2,7 +2,7 @@
 
 
 
-# 一. java基础123
+# 一. java基础
 ## 1.  java基础文件内容
 
 ### 2. liuhui.com.oop.a1 a2 a3 day1

@@ -2,7 +2,7 @@
 
 
 
-# 一. java基础123
+# 一. java基础
 ## 1.  java基础文件内容
 
 ### 2. liuhui.com.oop.a1 a2 a3 day1
@@ -133,14 +133,6 @@ Runable 接口  简单的练习
 ```
 json的转换 引入 fastJson工具类 导入
 ```
-
-
-
-
-
-
-
-
 
 
 

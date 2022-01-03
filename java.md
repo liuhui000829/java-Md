@@ -439,6 +439,13 @@ new Date().getTime()  //获取毫秒数
 
 ```
 
+### 6.String
+
+```java
+xxx.equalsIgnoreCase(xxx): 忽略大小写
+
+```
+
 
 
 
@@ -451,7 +458,7 @@ new Date().getTime()  //获取毫秒数
 
 ### 1.集合
 
-```
+```java
 Java集合框架提供了一套性能优良、使用方便的接口和类，它们位于java.util包中
 
 Collection 接口
@@ -550,10 +557,13 @@ Collections类可以对集合进行排序、查找和替换操作
 
 ```
 
-### 2.IO
+### 2. IO
 
-```
 
+
+
+
+```java
 文件的读写
 
 1. 写入流
@@ -1678,7 +1688,8 @@ HTTP协议:
                 	 public class HelloServlet2 implements Servlet {} */
 					访问的时候是: /虚拟目录/xxx.liuhui
 
-             
+6. 快速生成doGet doPost模板
+    * setting > 搜索 code template >找到　file and code template> 右侧选择other >选择web> java code templates> 	  Servlet Annotated class.java
 
 ```
 
@@ -1839,7 +1850,7 @@ http://localhost:8080/javaweb-02/loginServlet?username=aa&password=bb&hobby=boll
 ### 4. 小案列(登录注册)
 
 ```java
-小案例:用户登录
+小案例:用户登录(demo1)
     1. 编写login.html登录页面
     2. 使用Druid数据库连接池技术 操作mysql
     3. 使用jdbcTemplate技术封装JDBC
@@ -2062,9 +2073,213 @@ javaweb-02\java\utils 工具类
 
 ```
 
+## 7. 会话技术
+
+### 1. Cookie
+
+```java
+Cookie:
+1. 会话: 一次会话中包含多次请求和响应
+    * 一次会话: 浏览器第一次给服务器资源发送请求,会话建立,直到一方断开为止
+    * 功能: 在一次会话的范围内的多次请求间,共享数据
+    * 方式:
+		1. 客户端会话技术: Cookie
+        2. 服务器端会话技术: Session
+2. 使用步骤:
+	1. 创建Cookie对象,绑定数据
+        * new Cookie(String name,String value)
+    2. 发送Cookie对象
+        * response,addCookie(Cookie cookie)
+    3. 获取Cookie,拿到数据
+        * Cookie [] request.getCookies()
+3. cookie原理: 参考下图
+    * 基于响应头set-cookie和请求头cookie实现
+    
+4. cookie的细节
+    1. 一次可不可以发送多个cookie?
+    	可以:
+			Cookie cookie1 = new Cookie("msg2", "hello2");
+            Cookie cookie2 = new Cookie("msg3", "hello3");
+            //2. 发送cookie
+            response.addCookie(cookie1);
+            response.addCookie(cookie2);
+    2. cookie在浏览器中可以保存多长时间呢
+        1. 默认情况下，当浏览器关闭后，cookie数据被销毁
+        2. 持久化存储:
+			* setMaxAge(int seconds){
+                1. 正数: 将cookie数据写入到硬盘文件中，持久化存储 cookie存活时间
+                2. 负数: 默认值 -1
+                3. 零:   删除cookie信息
+            }
+			cookie1.setMaxAge(30);		//存活30秒		
+		
+    3. cookie能不能存储中文
+        * 在Tomcat8之前 cookie不能直接存储中文数据
+        * 在Tomcat8之后 cookie支持中文数据。但是对于特殊字符还是不支持，建议使用url编码存储，url解码解析 
+        	* URLEncoder.encode(xxx, "utf-8"); url编码
+			  URLDecoder.decode(xxx, "utf-8"); rul解码
+    4. cookie获取的范围是多大
+    	1. 假设在一个Tomcat服务器中,部署了多个web项目,那么这些web项目中cookie能不能共享
+        	* 默认情况下cookie不能共享
+        	* setPath(String path):设置cookie的获取范围,默认情况下,设置当前的虚拟目录
+        	* 如果要共享,则可以将path设置为"/"
+    			Cookie cookie = new Cookie("msg2", "setMaxAge");
+                cookie.setMaxAge(300);   // 在客户端存活300秒
+                cookie.setPath("/");
+                response.addCookie(cookie);
+			* 一个服务启动两个项目  只需要在添加项目哪里 多添加一个 
+    	
+        2. 不同Tomcat服务器间cookie共享问题?
+            * setDomain(String path): 如果一级域名相同，那么多个服务器之间cookie可以共享
+            	*setDomain(".baidu.com"),那么tieba.baidu.com 和 new.badiu.com中cookie可以共享 
+    
+    
+    5. cookie的特点和作用
+        1. cookie存储数据在客户端浏览器
+        2. 浏览器对于单个cookie的大小有限制(4KB),已经对同一域名下的总cookie数量也有限制(20个以内)
+        
+        * cookie的作用
+        	1. cookie一般用于存储少量不太敏感的数据
+            2. 在不登录的情况下，完成服务器对客户端身份的识别    
+                
+     6. 案例: 记住上一次访问的时间
+         1. 需求:
+			1. 访问一个servelt,如果是第一次访问则提示; 你好，欢迎你首次访问
+            3. 如果不是第一次访问,则提示:欢迎回来,你上次的访问时间为: 显示时间字符串
+                
+        response.setContentType("text/html;charset=utf-8");
+        Cookie[] cookies = request.getCookies();
+        System.out.println(cookies);
+        boolean flag = false;
+
+        if (cookies != null && cookies.length > 0) {
+            for (Cookie cookie : cookies) {
+                if ("lastname".equals(cookie.getName())) {
+                    flag = true;
+                    Date date = new Date();
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 : HH:mm:ss");
+
+                    // URL编码
+                    String str_date = URLEncoder.encode(simpleDateFormat.format(date), "utf-8");
+
+                    // 重新设置cookie的值
+                    cookie.setValue(str_date);
+                    cookie.setMaxAge(60 * 60 * 24 * 30);
+                    response.addCookie(cookie);
+
+                    // URL解码
+                    String value = URLDecoder.decode(cookie.getValue(), "utf-8");
+                    response.getWriter().write("<h1>欢迎回来,你上次的访问时间是:" + value + "<h1>");
+                    break;
+                }
+            }
+        }
+        if (cookies == null || cookies.length == 0 || flag == false) {
+            Date date = new Date();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日 : HH:mm:ss");
+
+
+            // URL编码  (为社么用url编码 因为有空格 阿斯克码是32)
+            String str_date = URLEncoder.encode(simpleDateFormat.format(date), "utf-8");
+
+            Cookie cookie = new Cookie("lastname", str_date);
+            cookie.setMaxAge(60 * 60 * 24 * 30);
+            response.addCookie(cookie);
+
+            response.getWriter().write("<h1>欢迎你首次访问<h1>");
+        }
+
+```
+
+**cookie原理**
+
+![image-20220102122718351](typora-user-images\image-20220102122718351.png)
 
 
 
+### 2. Session
+
+```java
+1. 概念: 服务器端会话技术,再一次会话的多次请求之间共享数据,将数据保存在服务器端的对象中,HTTPSession
+2. 快速入门:
+	* 获取HttpSession对象:
+		HttpSession session = request.getSession();
+	* 使用HttpSession对象:
+		Object getAttribute(String name)
+        void   setAttribute(String name,Object value);
+		void   removeAttribute(String name);		
+
+3. 原理:    
+    * session的实现是依赖与cookie的 请求头和响应头中
+	* 和cookie一样 session的字符串在cookie中拼接着   
+        
+4. 细节:
+	1. 当客户端关闭后,服务器不关闭,两次获取的session是否为一个
+        * 默认情况下 不是
+        * 如果需要相同，则可以创建Cookie,键为JSESSIONID,设置最大存活时间,让cookie持久化存储
+        	Cookie cookie = new Cookie("sessionId", httpSession.getId());
+            cookie.setMaxAge(60 * 60);
+            response.addCookie(cookie);
+    2. 当客户端不关闭后,服务器关闭,两次获取的session是否为一个
+        * 不是同一个,但是要却被数据不丢失
+        	1. session的钝化
+        		* 在服务器正常关闭之前,将session对象序列化到硬盘上
+        	2. session的活化
+ 				* 在服务器启动之后,将session文件转化为内存中的session对象即可
+     
+        	注意: tomcat自动的执行钝化 活化 但是idea不会
+                * 步骤: idea打成war包
+
+
+    3. session的失效时间 (也就是session什么时候销毁)   
+  		1. 服务器关闭
+		2. session对象调用一个方法(invalidate())
+        3. session默认的失效时间是30分钟
+        	* 选择性配置修改  Tomcat conf web.xml <session-config>30</session-config>
+                    
+    4. session的特点
+       	1. session用于一次会话的多次请求的数据，存在服务器端
+		2. session可以存储任意类型，任意大小的数据
+       
+		* session与cookie的区别
+            1. session存储在服务端 cookie在客户端
+            2. session没有数据大小限制,cookie有
+            3. session数据安全，cookie相对于不安全
+                    
+    5. 案例: 验证码 (demo2)
+        1. 案例需求:
+			1. 访问带有验证码的登录页面login.jsp
+            2. 用户输入用户名,密码以及验证码
+            	* 如果username 和password输入错误，跳转到登录页面，提示：username和 passowrd错误
+                * 如果验证码输入有误,跳转到登录页面 提示：验证码错误
+                * 如果全部输入正确，则跳转到success.jsp显示: xxx，欢迎你
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+    
+```
+
+**session原理图**
+
+![image-20220102191138228](\typora-user-images\image-20220102191138228.png)
+
+
+
+**案例分析图纸**
+
+![image-20220103153102487](typora-user-images\image-20220103153102487.png)
 
 
 

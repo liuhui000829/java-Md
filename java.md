@@ -1402,10 +1402,14 @@ c. 请求数据格式
                 1. 请求参数在请求体中,在URL后
                 2. 请求的URL长度有限制
                 3. 不太安全
+                4. 上传功能做不了
+                5. get不会出现中文乱码
             * Post
                 1. 请求参数在请求体中
                 2. 请求的url长度没有限制
                 3. 相对安全
+                4. 因为数据是在请求体中 上传可以做
+                5. post会出现中文乱码
             
     2. 请求头 (客户端告诉服务器端一些信息)
         * 请求名称: 请求头值
@@ -1492,7 +1496,12 @@ HTTP协议:
                 * 1xx: 服务器接收客户端消息,但没有接收完成,等待一段时间后,发送1xx状态码
                 * 2xx: 成功			 代表: 200
                 * 3xx: 重定向     		代表: 302(重定向) 参考下图x  304(访问缓存) 参考下图y			
+                
                 * 4xx: 客户端错误  	   代表: 404 (请求路径没有对应的资源) 405(请求方式没有对应的doxx()方法)
+                						    400 (错误的请求) 由于被认为是客户端对错误（例如：畸形的请求语法、无效的请求											信息帧或者虚拟的请求路由），服务器无法或不会处理当前请求。 参数错误
+                						   * 不满足headers属性,此时页面也显示404
+                						    
+                						    
                 * 5xx: 服务器端错误	  代表: 500 服务器内部出现异常
 					
 		2. 响应头
@@ -3535,23 +3544,23 @@ SpringMVC是Spring为表现层开发提供的一整套完备的解决方案。�
 
     * 性能卓越,尤其适合现代大型，超大型互联网项目要求
 
-
-
 ```
 
 **MVC图谱**
 
 ![image-20220103175031632](\typora-user-images\image-20220103175031632.png)
 
-## 2. HelloWord
+
+
+## 2. 第一个HelloWord
 
 **1. 创建Meven工程**
 
 ```xml
-a> 添加web模块
+a > 添加web模块
 	C:\Users\刘先生\Desktop\java-Md\Spring_MVC\springmvc-demo1\src\main\webapp\WEB-INF\web.xml 完整的
 
-b> 打包方式:war  
+b > 打包方式:war  
     
 	<!-- pom.xml中添加最后一行 -->
 	<groupId>org.example</groupId>
@@ -3559,7 +3568,7 @@ b> 打包方式:war
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
-c> 引入依赖
+c > 引入依赖
 
     <!-- springmvc -->
     <dependency>
@@ -3593,12 +3602,11 @@ c> 引入依赖
 
 **2. 配置web.xml**
 
-**a> 默认配置方式**
-
-此配置作用下，springMVC的配置文件默认位于WEB-INF下,默认名称为<servlet-name>-servlet.xml列如，以下配置所对应springMVC的配置文件位于WEB-INF下，文件名称为springMVC-servlet.xml
-
 ```xml
-<!--    !配置springmvc的前端控制器 对浏览器方式的亲求进行统一处理-->
+1. 默认配置方式
+   此配置作用下，springMVC的配置文件默认位于WEB-INF下,默认名称为<servlet-name>-servlet.xml列如，以下配置所对应springMVC的配置文件位于WEB-INF下，文件名称为springMVC-servlet.xml
+
+<!-- 配置springmvc的前端控制器 对浏览器方式的亲求进行统一处理-->
 <servlet>
     <servlet-name>SpringMVC</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -3612,21 +3620,18 @@ c> 引入依赖
     <url-pattern>/</url-pattern>
 </servlet-mapping>
 
-```
 
-
-
-**b> 扩展配置方式**
-
+       
+       
+2. 扩展配置方式
 可通过init-param标签设置SpringMVC配置文件的位置和名称,通过load-startup标签设置SpringMVC前端控制器DispatcherServlet的初始化时间
 
-```xml
 
-<!--        配置springmvc的前端控制器 对浏览器方式的亲求进行统一处理-->
+<!-- 配置springmvc的前端控制器 对浏览器方式的亲求进行统一处理-->
     <servlet>
         <servlet-name>SpringMVC</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-<!--        配置springmvc配置文件的位置和名称-->
+<!-- 配置springmvc配置文件的位置和名称-->
         <init-param>
             <!--contextConfigLocation 为固定值 -->
             <param-name>contextConfigLocation</param-name>
@@ -3661,11 +3666,12 @@ public class HelloContrlloer{
 }
 ```
 
-**4. springMVC的配置**
+**4. springMVC.xml的配置**
 
 ```xml
 	<!--注解扫描-->
     <context:component-scan base-package="com.liuhui.mvc.controller"/>
+
     <!--配置Thymeleaf试图解析器-->
     <bean id="viewResolver" class="org.thymeleaf.spring5.view.ThymeleafViewResolver">
         <property name="order" value="1"/>
@@ -3685,7 +3691,504 @@ public class HelloContrlloer{
         </property>
     </bean>
 
+
+
+
+
 ```
+
+**5. thymeleaf语法跳转**
+
+```java
+// html标签中添加这个 支持thymeleaf语法
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    
+// thymeleaf语法
+<a th:href="@{/target}">访问目标页面target.html</a>
+
+@RequestMapping("/target")
+	public String toTarget(){
+	return "target";
+}
+    
+
+```
+
+## 3. RequestMapping注解
+
+```java
+ @RequestMapping 
+    1. 注解的功能
+    	* 从注解名称上我们可以看的,@RequestMappiing注解的作用是将请求和处理请求的控制器方法关联起来，建立映射关系
+    	  sprimgMVC 接收到指定的请求，就会来找到在映射关系中对应的控制器方法来处理这个请求
+    
+    2. 注解的位置
+    	* 标识一个类: 设置映射请求路径的初始信息
+        * 标识一个方法: 设置映射请求的具体信息
+            @Controller					
+            @RequestMapping("/test")   
+            public class HelloController {			// 访问地址为 localhsot/springmvc/test/target
+                
+                @RequestMapping("/")
+                public String index(){
+                    return "index";
+                }
+                @RequestMapping("/target")
+                public String target(){
+                    return "target";
+                }
+              
+            } 
+
+    3. value属性 匹配的请求路径
+    	value = {"/target", "/target2"}, 匹配任意一个即可
+      
+    4. method属性: 匹配请求方式   
+        method = {RequestMethod.GET,RequestMethod.DELETE},   //匹配这两种请求任意一个就行
+		@GetMapping , @PostMapping: 使用方式和@RequestMapping差不多
+        注:
+            1. 对于处理指定请求方式的控制器方法,SpringMVC中提供了@RequestMapping的派生注解
+                * 处理get请求的映射用@GetMapping
+                * 处理post请求的映射用@PostMapping
+                    ... put delete略
+
+            2. 常用的请求方式有get post put delete
+                * 但是目前浏览器只支持get和post,若在form表单提交时,为method设置了其他请求方式的字符串
+                 (put或者delete),则按照默认的请求方式get处理
+                * 若要发送put或者delete请求,则需要通过spring提供的过滤器HiddenHttpMethodFilter,在
+                  restful部分会有笔记
+        
+	5. params属性:
+	   * "param": 匹配的请求必须携带param参数
+	   * "!param": 匹配的请求必须不能携带param参数
+       * "param=value": 匹配的请求必须携带param参数且值必须为value
+	   * "param!=value": 匹配的请求必须携带param参数且值不能为value 
+          
+       例子: params = {"user","password=1234"},   // 这个必须同时满足
+
+  	6. springMVC支持ant风格的路径
+       ?: 表示任意的单个字符
+       *: 表示任意0个或者多字符
+       **: 表示任意的一层或多层目录
+       注意: 在使用**时,只能使用/**/xxx的方式
+       
+        @GetMapping("/a?a/testAnt")  比如:  aaa/testAnt  	abc/testAnt
+        @GetMapping("/a*b/testAnt")	 比如:  aaaaaaab/testAnt	 ab/test/Ant 
+        @GetMapping("/**/testAnt")   比如: /a/b/c/testAnt /a/testAnt
+        public String testAnt(){
+            return "index";
+        }
+           
+           
+    7. SpringMVC中支持路径的占位符(重点)
+   		* 原始请求方式: /deleteUser?username=123&password=456
+     	* rest请求方式: /deleteUser/123/456
+            
+           @GetMapping ("/testRest/{username}/{password}")
+    	   public String testRest(
+            					  @PathVariable("username") String username,
+                                  @PathVariable("password") String password){
+            return "target";
+        }
+      
+总的例子:
+    @RequestMapping(
+            value = {"/target", "/target2"},
+            method = {RequestMethod.GET,RequestMethod.DELETE},   //匹配这两种请求
+            params = {"user","password=1234"},   // 这个必须同时满足
+            headers = {"host=localhost"}        // 请求头中host的值为localhost:80
+    )
+    public String toTarget() {
+        return "target";
+    }
+
+
+
+
+
+```
+
+## 4.SpringMVC获取请求参数
+
+**1. 通过servletApi获取**
+
+ 将HttpServletRequest作为控制器方法的形参,此时HttpServletRequest类型的参数表示封装了当前请求的请求报文对象
+
+```java
+  // 通过servletApi获取
+    @RequestMapping("/testServletAPI")
+    public String testServletAPI(HttpServletRequest req){
+        String username= req.getParameter("username");
+        String password= req.getParameter("password"); 
+        System.out.println(username+"  "+password);
+        return "success";
+    }
+```
+
+**2. 通过控制器方法的形参获取 **
+
+```java
+	// 要求请求的参数名和方法的形参对应 
+    // 比如请求的url:  localhsot/springmvc/testServletAPI?username=xxx&password=xxx
+    @PostMapping("/testServletAPI")
+    public String testServletAPI(String username,String password){
+        System.out.println(username+"  "+password);
+        return "success";
+    }
+
+
+```
+
+**3. @RequestParam  @RequestHeader  @CookieValue ** 
+
+```java
+   @RequestParam:  将请求参数和控制器方法的形参创建映射关系 
+   @RequestHeader: 将请求头信息和控制器方法的形参创建映射关系 
+       * 有个三个属性: value required defaultValue 用法同@RequestParam
+   @CookieValue:   将cookie数据和控制器方法的形参创建映射关系 	
+       * 有个三个属性: value required defaultValue 用法同@RequestParam
+    
+    // 如果请求的url为:localhsot/springmvc/testServletAPI?user_name=xxx&pass_word=xxx&hobby=a&hobby=b
+    // 那么就不能匹配了 所以借助@RequestParam(value)修改 当然你也可以直接修改String username,但是这样会让代码的
+    // 耦合度增加 我们要面向扩展编程
+   
+    * value: 指定为形参赋值的 请求参数的 参数名 
+    * required = false 是否必须 (如果为true 没有传递参数 则为400) 
+    * defaultValue 默认值
+    @PostMapping("/testServletAPI") 
+    public String testServletAPI(
+    		@RequestParam(value = "user_name", required = false, defaultValue = "hehe") String username,
+            @RequestParam(value = "pass_word", required = false, defaultValue = "hehe") String password,
+    		@RequestParam(value = "hobby", 	   required = false, defaultValue = "hehe") String[] hobby,
+        	// 取到请求头中host的值 赋值给String host
+            @RequestHeader(value = "host",     required = true,  defaultValue = "localhost") String host) {
+        	// JESSIONID 是固定值
+            @CookieValue(value="JSESSIONID",   required = true,  defaultValue = "xxxxxxxx") String cookie
+        System.out.println(username + "  " + password + "  " + Arrays.toString(hobby) + "  " + host);
+        return "success";
+    }
+```
+
+**4. 通过POJO(实体类获取)**
+
+可以在控制器方法形参位置放一个实体类对象, 此时若浏览器传输的请求的所有参数名都匹配suer中的属性名,那么就会为实体类属性赋值
+
+```java
+ 	@PostMapping("/testServletAPI") 
+    public String testServletAPI(User user)
+    	
+        System.out.println(user);  ==>{id=null,username="",password=""}
+        return "success";
+    }
+```
+
+**5. 获取请求参数乱码的问题**
+
+```xml
+
+    <!--web.xml  过滤器 在服务器启动之前执行 为了解决post中文乱码问题-->
+	
+    <filter>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceRequestEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+```
+
+
+
+## 5. 域对象共享数据
+
+**1. 使用servletAPI向request域对象共享数据**
+
+```java
+	@RequestMapping("/success")
+    public String testRequestByServletAPI(HttpServletRequest req) {
+        req.setAttribute("testRequestScope","hello,servletAPI");
+        return "success";
+    }
+
+
+```
+
+**2. 使用ModelAndView向request域对象共享数据**
+
+```java
+// 使用servletAPI向request域对象共享数据
+// @RequestMapping("/testRequestByServletAPI")
+
+@RequestMapping("/testModelAndView")
+public ModelAndView testModelAndView() {
+    ModelAndView modelAndView = new ModelAndView();
+    // 处理模型数据,即向请求域request共享数据
+    modelAndView.addObject("testRequestScope", "hello,testMoadelAndView");
+    // 设置视图名称
+    modelAndView.setViewName("success");
+    return modelAndView;
+}
+
+
+```
+
+**3. 使用Model向request请求域对象共享数据**
+
+```java
+// 使用Model向request域对象共享数据
+    @RequestMapping("/testModel")
+    public String testModelAndView(Model model) {
+        model.addAttribute("testRequestScope", "hello,Model");
+        System.out.println(model); // {testRequestScope=hello,Model}
+        System.out.println(model.getClass().getSimpleName()) //BindingAwareModelMap
+        return "success";
+    }
+
+
+```
+
+**4. 使用Map向request域对象共享数据**
+
+```java
+// 使用Map向request域对象共享数据
+    @RequestMapping("/testMap")
+    public String testModelAndView(Map<String,Object> map) {
+        map.put("testRequestScope", "hello,map");
+        System.out.println(map); // {testRequestScope=hello,map}
+        System.out.println(map.getClass().getSimpleName()) //BindingAwareModelMap
+        return "success";
+    }
+```
+
+
+
+**5. 使用ModelMap向request域对象共享数据**
+
+```java
+// 使用ModelMap向request域对象共享数据
+    @RequestMapping("/testModelMap")
+    public String testModelAndView(ModelMap modelMap) {
+        modelMap.addAttribute("testRequestScope", "hello,ModelMap");
+        System.out.println(modelMap); // {testRequestScope=hello,Modelmap}
+        System.out.println(modelMap.getClass().getSimpleName()) //BindingAwareModelMap
+        return "success";
+    }
+
+
+```
+
+**6. Model    Map    ModelMap 之间的关系**
+
+```java
+Model Map ModelMap 类型的参数其实本质上都是BindingAwareModelMap类型的
+    // 建议使用ModelAndView
+    
+    public interface Model{}
+	public class ModelMap extends LinkedHashMap<String, Object>{}
+	public class ExtendedModelMap extends ModelMap implements Model{}
+	public class BindingAwareModelMap extends ExtendedModelMap{}
+
+
+```
+
+**7. 向session域共享数据**
+
+```java
+ //向session域共享数据
+    @RequestMapping("/testSession")
+    public String testSession(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        session.setAttribute("testSessionScope", "hello,session");
+        return "success";
+    }
+
+
+```
+
+**8. 向Application域中共享数据**
+
+```java
+//向Application域共享数据
+    @RequestMapping("/testApplication")
+    public String testSession(HttpSession session) {
+        ServletContext applicationContext = session.getServletContext();
+        applicationContext.setAttribute("testApplicationScope", "hello,Applicaiton");
+        return "success";
+    }
+
+
+```
+
+## 6. SpringMVC的视图
+
+SpirngMVC中的试图是View接口,试图的作用是渲染数据,将模型Model中的数据展示给用户 ,SpringMVC试图的种类很多,默认有转发试图和重定向试图
+
+当工程引入JSTL的依赖,转发试图会自动转换成jstlView,若使用的试图技术为ThymeLeaf,在springMVC的配置文件中配置了Thymeleaf的视图解析器,由此试图解析器解析后所得到的是TymeleadfView
+
+**1. ThymeleafView**
+
+当控制器方法中所设置的试图名称没有任何前缀的时候,此时的视图名称会被springMVC配置文件中所配置的视图解析器解析，视图名称拼接视图前缀和视图后缀所得到的最终路径,会通过转发的方式实现跳转
+
+```java
+视图名称没有任何前缀的时候 会被Thymeleaf解析
+
+@RequestMapping("/testThymeleafView")
+    public String testThymeleafView(){
+        return "success";
+    }
+
+
+```
+
+**2. 转发视图**
+
+SpringMVC中默认的转发视图是InternalResourceView
+
+SpringMVC中创建转发视图的情况:
+
+当控制器方法中所设置的视图名称以"forward"为前缀时,创建InternalResourceView视图,此时的视图名称不会被SpringMVC配置文件中所配置的视图解析器解析,而是会将前缀"forward"去掉,剩余部分作为最终路径通过转发的方式实现跳转
+
+例如: "forward:/"  "forward:/employee"
+
+```java
+
+  @RequestMapping("/testForward")
+    public String testForward(){
+        return "forward:/testThymeleafView";   // testThymeleafView 为上方的映射路径
+    }
+
+
+
+
+```
+
+
+
+**3. 重定向视图**
+
+SpringMVC默认的重定向视图是RedirectView
+
+当控制器方法中所设置的视图名称以"redirect"为前缀时,创建RedirectView视图,此时的视图名称不会被SpringMVC配置文件中所配置的视图解析器解析,而是会将前缀"redirect"去掉,剩余部分作为最终路径通过重定向方式实现跳转
+
+例如: "redirect:/"  "redirect:/employee"s
+
+```java
+
+  @RequestMapping("/testRedirect")
+    public String testRedirect(){
+        return "redirect:/helloController/getMapping";
+    }
+
+
+```
+
+**4. 视图控制器**
+
+当控制器方法中,仅仅用来实现页面跳转,即只需要设置视图名称时,可以将处理方法使用view-controller标签进行表示
+
+```xml
+springMVC.html中配置:
+
+    <!-- 在当前的控制器请求中 没有其他的逻辑 只展示一个视图名称的时候 使用这种方式
+		 path: 设置处理的请求地址
+		 view-name: 设置请求地址所对应的视图名称
+	-->
+    <mvc:view-controller path="/" view-name="index"/>
+
+	注:
+	当springMVC中设置任何一个view-controller时，其他控制器中的请求映射将全部失效，此时需要在springMVC的核心配置文件中
+	设置开启mvc注解驱动的标签
+
+    <!-- 开启mvc的注解驱动 -->
+    <mvc:annotation-driven/>
+
+```
+
+## 7.restful
+
+### 1.restful简介
+
+REST:**R**epresentational  **S**tate  **T**ransfer,表现层资源转移
+
+**a>资源**
+
+资源是一个看待服务器的方式,即，将服务器看作是由很多离散的资源组成。每个资源是服务器上一个可命名的抽象概念.因为资源是一个抽象的概念,所以它不仅仅能代表服务器文件系统中的一个文件、数据库中一张表等等具体的东西,可以将资源设计的要多抽象有多抽象,只要想象力允许而且客户端应用层的开发者能够理解。与面向对象设计类似,资源是以名词为核心来组织的，首先关键是名词,一个资源可以由一个或者多个url来标识,URL即是资源的名称,也是资源在web的地址。对某个资源感兴趣的客户端应用，可以通过资源的url与其交互。
+
+**b>资源的表述**
+
+资源的表述是一段对于资源在某个特定时刻的状态的描述。可以在客户端--服务端之间转移(交换).资源的表述还可以由多种格式,例如:HTML/MXL/JSON/纯文本/图片/视频/音频等等.资源的表述格式可以通过协商机制来确定.请求--响应方向的表述通常使用不同的方式
+
+**c>状态转移**
+
+资源的转移说的是: 在客户端和服务端之间转移(transfer) 代表资源状态的表述.通过转移和操作资源的表述,来间接实现操作资源的目的
+
+### 2.restful的实现
+
+具体说: 就是HTTP协议里面,四个表示操作方式的动词: GET、POST、PUT、DELETE。
+
+他们分别对应四个操作: GET用来获取资源	 POST用来添加资源 	PUT用来修改资源	 DELETE用来删除资源
+
+rest 风格提倡 URL地址使用统一的风格设计,从前到后各个单词使用 / 分开,不使用 ? 键值对方式携带请求参数。而是将要发送给服务器的数据作为URL的一部分，以保证整体风格的一致性.
+
+| 操作     | 传统方式         | REST风格                   |
+| -------- | ---------------- | -------------------------- |
+| 查询操作 | getUserById?id=1 | user/1   -->get请求方式    |
+| 保存操作 | saveUser         | user       -->post请求方式 |
+| 删除操作 | deleteUser?id=1  | user/1   -->delete请求方式 |
+| 修改操作 | updateUser       | user/1   -->put请求方式    |
+
+### 3. HiddenHttpMethodFilter
+
+由于浏览器只支持get和post请求方式，那么如何发送put和delete请求呢?
+
+SpringMVC提供了**HiddenHttpMethodFilter**帮助我们将POST请求转换为delete或者put请求
+
+**HiddenHttpMethodFilter** 处理put和delete请求的条件
+
+a> 当前的请求发送必须为post
+
+b> 当前的请求必须传输请求参数_method
+
+```xml
+    <!--配置HiddenHttpMethodFilter-->
+    <filter>
+        <filter-name>HiddenHttpMethodFilter</filter-name>
+        <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>HiddenHttpMethodFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

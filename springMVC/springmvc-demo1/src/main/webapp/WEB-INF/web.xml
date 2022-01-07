@@ -5,7 +5,7 @@
          version="4.0">
 
 
-    <!--   过滤器 在服务器启动之前执行 为了解决post中文乱码问题-->
+    <!--   1. 过滤器 在服务器启动之前执行 为了解决post中文乱码问题-->
     <filter>
         <filter-name>CharacterEncodingFilter</filter-name>
         <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -19,13 +19,19 @@
             <param-name>forceRequestEncoding</param-name>
             <param-value>true</param-value>
         </init-param>
+        <init-param>
+            <param-name>forceResponseEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
     </filter>
     <filter-mapping>
         <filter-name>CharacterEncodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-    
-    <!--    配置HiddenHttpMethodFilter-->
+
+
+
+    <!--    2. 配置HiddenHttpMethodFilter-->
     <filter>
         <filter-name>HiddenHttpMethodFilter</filter-name>
         <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
@@ -35,7 +41,8 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <!--        配置springmvc的前端控制器 对浏览器方式的亲求进行统一处理-->
+
+    <!--        3. 配置springmvc的前端控制器 对浏览器方式的请求进行统一处理-->
     <servlet>
         <servlet-name>SpringMVC</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -55,6 +62,7 @@
         <servlet-name>SpringMVC</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
+
 
 
 

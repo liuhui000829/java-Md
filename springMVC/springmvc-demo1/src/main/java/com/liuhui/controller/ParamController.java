@@ -1,6 +1,5 @@
 package com.liuhui.controller;
 
-import com.liuhui.entity.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 

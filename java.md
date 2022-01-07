@@ -1979,6 +1979,8 @@ http://localhost:8080/javaweb-02/loginServlet?username=aa&password=bb&hobby=boll
         request.getServletContext();
 	2. 通过HttpServlet获取
         this.getServletContext();
+	3. 通过HttpSession 获取
+        httpSession.getServletContext()
 		
   	ServletContext servletContext1 = request.getServletContext();
     ServletContext servletContext2 = this.getServletContext();
@@ -1995,8 +1997,8 @@ http://localhost:8080/javaweb-02/loginServlet?username=aa&password=bb&hobby=boll
         * removeAttribue(String name);
 
 		* ServletContext对象范围: 所有用户所有请求的数据
-            ServletContextDemo1 {servletContext2.setAttribute("user","张三");}
-			ServletContextDemo2 {servletContext2.getAttribute("user")}   // 张三
+            class ServletContextDemo1 {servletContext2.setAttribute("user","张三");}
+			class ServletContextDemo2 {servletContext2.getAttribute("user")}   // 张三
 			换个浏览器也是如此
             
     3. 获取文件的真实(服务器)路径
@@ -2242,7 +2244,7 @@ Cookie:
   		1. 服务器关闭
 		2. session对象调用一个方法(invalidate())
         3. session默认的失效时间是30分钟
-        	* 选择性配置修改  Tomcat conf web.xml <session-config>30</session-config>
+        	* 选择性配置修改  Tomcat >conf> web.xml>  <session-config>30</session-config>
                     
     4. session的特点
        	1. session用于一次会话的多次请求的数据，存在服务器端
@@ -2263,21 +2265,7 @@ Cookie:
                     
                  思路: 图片存入session中 就行了
                       int piccode = (int) request.getSession().getAttribute("result"); // 从session中获取图片
-                
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-    
+
 ```
 
 **session原理图**
@@ -2322,6 +2310,8 @@ Cookie:
 	* Spring提供了IOC容器实现的两种方式(2个接口) BeanFactory   ApplicationContext
         * BeanFactory： IOC容器基本实现,是Spring内部的使用接口,不提供开发人员使用	
 		* ApplicationContext:   接口的子接口,提供更多强大的功能,一般由开发人员进行使用
+            
+          补充: 实现类就是下方的 ClassPathXmlApplicationContext
 ```
 
 <img src="typora-user-images\image-20211223133232838.png" alt="image-20211222213720667" style="zoom:150%;" />
@@ -2342,7 +2332,7 @@ Cookie:
             set方式:
             构造函数方式:
 
-	2. 基于注解方式实现  
+	2. 基于注解方式实现  下方
 	   
 ```
 
@@ -2560,10 +2550,11 @@ public class Stu {
                 return null;
             }
 		}
+
 		// xml配置
 		<bean id="myBeanFactory" class="com.company.bean2.MyBeanFactory"/>
         // main方法
- 		ClassPathXmlApplicationContext context=new ClassPathXmlApplicationContext("bean2.xml");
+ 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("bean2.xml");
         Course course = context.getBean("myBeanFactory",Course.class);
 		System.out.println(course.getCname())   // abc
 	
@@ -2993,7 +2984,7 @@ userService.add();
         }
 }
 
-	//创建代理对象代码
+	// 创建代理对象代码
     @SuppressWarnings("all")
     public class UserDaoProxy implements InvocationHandler {
 
@@ -3552,7 +3543,7 @@ SpringMVC是Spring为表现层开发提供的一整套完备的解决方案。�
 
 
 
-## 2. 第一个HelloWord
+## 2. SpringMVC简单练习
 
 **1. 创建Meven工程**
 
@@ -3803,9 +3794,6 @@ public class HelloContrlloer{
     }
 
 
-
-
-
 ```
 
 ## 4.SpringMVC获取请求参数
@@ -3886,7 +3874,9 @@ public class HelloContrlloer{
 
 ```xml
 
-    <!--web.xml  过滤器 在服务器启动之前执行 为了解决post中文乱码问题-->
+    <!--web.xml  过滤器 在服务器启动之前执行 为了解决post中文乱码问题 要注意这个的过滤器的位置
+	要放在最前面 否则有些过滤不了
+	-->
 	
     <filter>
         <filter-name>CharacterEncodingFilter</filter-name>
@@ -3907,6 +3897,42 @@ public class HelloContrlloer{
     </filter-mapping>
 
 
+```
+
+**6. 响应体乱码问题**
+
+```xml
+ springMVC.xml中配置   只能解决@ResponseBody形式的
+<!--    解决了中文乱码-->
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+<!--            <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>-->
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/plain;charset=utf-8</value>
+                        <value>text/html;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+
+
+
+	@RequestMapping("/testResponse")
+    public void testRequestBody(HttpServletResponse response) throws IOException {
+        response.setContentType("text/html;charset=utf-8");
+        response.getWriter().println("你的你的都是你的");
+
+    }
+
+    @RequestMapping(value="/testResponseBody")
+    @ResponseBody
+    public String testRequestBody()  {
+      return "<h1 style='color:red'>我是一个文本</h1>";
+    }
 ```
 
 
@@ -3971,8 +3997,6 @@ public ModelAndView testModelAndView() {
         return "success";
     }
 ```
-
-
 
 **5. 使用ModelMap向request域对象共享数据**
 
@@ -4118,23 +4142,26 @@ springMVC.html中配置:
 
 ## 7.restful
 
-### 1.restful简介
+**1.restful简介**
 
 REST:**R**epresentational  **S**tate  **T**ransfer,表现层资源转移
 
-**a>资源**
+```text
+1. 资源
 
 资源是一个看待服务器的方式,即，将服务器看作是由很多离散的资源组成。每个资源是服务器上一个可命名的抽象概念.因为资源是一个抽象的概念,所以它不仅仅能代表服务器文件系统中的一个文件、数据库中一张表等等具体的东西,可以将资源设计的要多抽象有多抽象,只要想象力允许而且客户端应用层的开发者能够理解。与面向对象设计类似,资源是以名词为核心来组织的，首先关键是名词,一个资源可以由一个或者多个url来标识,URL即是资源的名称,也是资源在web的地址。对某个资源感兴趣的客户端应用，可以通过资源的url与其交互。
 
-**b>资源的表述**
+2. 资源的表述
 
 资源的表述是一段对于资源在某个特定时刻的状态的描述。可以在客户端--服务端之间转移(交换).资源的表述还可以由多种格式,例如:HTML/MXL/JSON/纯文本/图片/视频/音频等等.资源的表述格式可以通过协商机制来确定.请求--响应方向的表述通常使用不同的方式
 
-**c>状态转移**
+c. 状态转移
 
 资源的转移说的是: 在客户端和服务端之间转移(transfer) 代表资源状态的表述.通过转移和操作资源的表述,来间接实现操作资源的目的
 
-### 2.restful的实现
+```
+
+**2.restful的实现**
 
 具体说: 就是HTTP协议里面,四个表示操作方式的动词: GET、POST、PUT、DELETE。
 
@@ -4149,40 +4176,455 @@ rest 风格提倡 URL地址使用统一的风格设计,从前到后各个单词�
 | 删除操作 | deleteUser?id=1  | user/1   -->delete请求方式 |
 | 修改操作 | updateUser       | user/1   -->put请求方式    |
 
-### 3. HiddenHttpMethodFilter
-
-由于浏览器只支持get和post请求方式，那么如何发送put和delete请求呢?
-
-SpringMVC提供了**HiddenHttpMethodFilter**帮助我们将POST请求转换为delete或者put请求
-
-**HiddenHttpMethodFilter** 处理put和delete请求的条件
-
-a> 当前的请求发送必须为post
-
-b> 当前的请求必须传输请求参数_method
+**3. HiddenHttpMethodFilter**
 
 ```xml
-    <!--配置HiddenHttpMethodFilter-->
+由于浏览器只支持get和post请求方式，那么如何发送put和delete请求呢?
+
+SpringMVC提供了HiddenHttpMethodFilter帮助我们将POST请求转换为delete或者put请求
+
+HiddenHttpMethodFilter 处理put和delete请求的条件
+	* 当前的请求发送必须为post
+	* 当前的请求必须传输请求参数_method   
+
+<!--配置HiddenHttpMethodFilter-->
     <filter>
         <filter-name>HiddenHttpMethodFilter</filter-name>
         <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
     </filter>
     <filter-mapping>
-        <filter-name>HiddenHttpMethodFilter</filter-name>
+        <filter-name>HiddenHttpMethodFilter-</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+
+
+```
+
+**4. restful案例**
+
+**功能清单**
+
+| 功能                | URL地址     | 请求方式 |
+| ------------------- | ----------- | -------- |
+| 访问首页✔           | /           | GET      |
+| 查询全部数据✔       | /employee   | GET      |
+| 删除✔               | /employee/2 | DElETE   |
+| 跳转到添加数据页面✔ | /toAdd      | GET      |
+| 执行保存✔           | /employee   | POST     |
+| 跳转到更新数据页面✔ | /employee/2 | GET      |
+| 执行更新✔           | /employee   | PUT      |
+
+**项目目录结构 :**
+
+```java
+springMVC/springmvc-demo1/  
+    
+ controller:   
+    EmployeeController
+ dao层:
+	EmployeeDaoImpl
+ entity:
+	Employee
+ html:
+	employee_list.html
+ springMVC.xml：
+ web.xml:
+
+ 如果引入静态资源 那么要maven->package重新打包,sprigMVC中配置
+      <!-- 开放静态资源的访问  默认的servlet-->
+      <mvc:default-servlet-handler/>
+```
+
+
+
+## 8. HttpMessageConverter
+
+HttpMessageConverter,报文信息转换器,将请求报文转换为java对象,或将java对象转换为响应报文
+
+HttpMessageConverter 提供了两个注解和两个类型: @RequestBody，@ResponseBody,  RequestEntity   ResponseEntity
+
+### 1. @RequestBody
+
+@RequestBody可以获取请求体,需要在控制器方法中设置一个形参,使用@Requestbody进行标识,当前请求的请求体就会为当前注解所标识的形参赋值 
+
+```java
+ SpringMVC / springmvc-demo1 /HTTPMessageController.java
+     
+     
+     <form method="post" th:action="@{/testRequestBody}">
+        <input type="text" name="username"><br/>
+        <input type="text" name="password"><br/>
+        <input type="submit" value="提交"><br/>
+	 </form>
+     
+         
+    @RequestMapping("testRequestBody")
+    public String testRequestBody(@RequestBody String requestBody){
+        System.out.println(requestBody);
+        return "success";
+    }
+输出结果: username=aaaa&password=bbbb
+
+```
+
+### 2. RequestEntity
+
+RequestEntity封装请求报文的一种类型,需要在控制器方法的形参中设置该类型的形参，当请求的请求报文就会赋值给该形参,可以通过
+
+getHeaders()获取请求头信息,通过getBody()获取请求体信息
+
+```java
+	
+<form method="post" th:action="@{/testRequestEntity}">
+    <input type="text" name="username"><br/>
+    <input type="text" name="password"><br/>
+    <input type="submit" value="提交"><br/>
+</form>
+
+
+
+
+	@RequestMapping("testRequestEntity")
+    public String testRequestBody(RequestEntity<String> requestEntity){
+        System.out.println(requestEntity);
+        System.out.println("============");
+        System.out.println(requestEntity.getHeaders()); // 参考下列 x
+        System.out.println(requestEntity.getBody());    // username=1&password=1
+        return "success";
+    }
+
+
+
+
+<POST http://localhost/springmvc/testRequestEntity,username=1&password=1,[host:"localhost", connection:"keep-alive", content-length:"21", cache-control:"max-age=0", sec-ch-ua:""Google Chrome";v="95", "Chromium";v="95", ";Not A Brand";v="99"", sec-ch-ua-mobile:"?0", sec-ch-ua-platform:""Windows"", upgrade-insecure-requests:"1", origin:"http://localhost", user-agent:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36", accept:"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9", sec-fetch-site:"same-origin", sec-fetch-mode:"navigate", sec-fetch-user:"?1", sec-fetch-dest:"document", referer:"http://localhost/springmvc/", accept-encoding:"gzip, deflate, br", accept-language:"zh-CN,zh;q=0.9,en;q=0.8", Content-Type:"application/x-www-form-urlencoded;charset=UTF-8"]>
+============
+
+
+
+x:
+[host:"localhost", connection:"keep-alive", content-length:"21", cache-control:"max-age=0", sec-ch-ua:""Google Chrome";v="95", "Chromium";v="95", ";Not A Brand";v="99"", sec-ch-ua-mobile:"?0", sec-ch-ua-platform:""Windows"", upgrade-insecure-requests:"1", origin:"http://localhost", user-agent:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36", accept:"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9", sec-fetch-site:"same-origin", sec-fetch-mode:"navigate", sec-fetch-user:"?1", sec-fetch-dest:"document", referer:"http://localhost/springmvc/", accept-encoding:"gzip, deflate, br", accept-language:"zh-CN,zh;q=0.9,en;q=0.8", Content-Type:"application/x-www-form-urlencoded;charset=UTF-8"]
+
+username=1&password=1
+
+
+```
+
+### 3. @ResponseBody
+
+```java
+
+    @RequestMapping(value="/testResponseBody")
+    @ResponseBody
+    public String testRequestBody()  {
+      return "<h1 style='color:red'>我是一个文本</h1>";
+    }
+
+
+```
+
+### 4. springmvc解决中文乱码问题
+
+```xml
+关于springmvc的返回中文乱码的问题，网上可谓是清一色的一样，无外乎就两种，要么在局部类或这方法上解决，类似如下的代码:
+
+1 @GetMapping(value="/error/query",produces="text/json;charset=utf-8")
+2     public String getMessage(){
+3         return "增加对字符编码限制";
+4     }
+另一种方式是在springmvc.xml中配置对应的全局参数，类似下面列举的部分：
+
+复制代码
+ 1       <mvc:message-converters>
+ 2             <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+ 3                 <property name="supportedMediaTypes">
+ 4                     <list>
+ 5                         <value>text/plain;charset=utf-8</value>
+ 6                         <value>text/html;charset=UTF-8</value>
+ 7                     </list>
+ 8                 </property>
+ 9             </bean>
+10         </mvc:message-converters>
+
+当然上面列举的这个是针对返回值为string类型，对于返回json类型的处理方式是一样的，只不过spring4.3对于json处理默认的编码方式使用的是UTF-8,这个我们可以通过springmvc对json处理类MappingJackson2HttpMessageConverter以及父类AbstractJackson2HttpMessageConverter中可以看到，具体源代码的
+
+复制代码
+1 public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+2 
+3 protected void init(ObjectMapper objectMapper) {
+4         this.objectMapper = objectMapper;
+5         setDefaultCharset(DEFAULT_CHARSET);
+6         DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
+7         prettyPrinter.indentObjectsWith(new DefaultIndenter("  ", "\ndata:"));
+8         this.ssePrettyPrinter = prettyPrinter;
+9     }
+复制代码
+代码是我截取了部分的源码，所以说如果你使用的spring4.3及后续版本，且返回值为json，如果全局配置，只需要在xml中配置<mvc:annotation-driven /> 即可，中文不会乱码；如果返回值是String类型，如果全局配置，则需要如小编上面的配置即可。
+
+
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+<!--            <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>-->
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/plain;charset=utf-8</value>
+                        <value>text/html;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+```
+
+### 5. SpringMVC处理JSON
+
+@Responsebody处理json的步骤
+
+a> 导入jackjson的依赖
+
+```xml
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.12.1</version>
+</dependency>
+
+
+```
+
+b> 在SpringMVC的核心配置文件中开启mvc的注解驱动,此时在HandlerAdaptor中会自动装配一个消息转换器:Mappinglackson2HttpMessageConverter，可以将响应到浏览器的java对象转换为json字符串
+
+```xml
+<mvc:annotation-driven/>
+```
+
+c> 在处理其方法上使用@ResponseBody注解进行标识
+
+d> 将java对象直接作为控制器方法返回值返回,就会自动转换为json格式的字符串
+
+```java
+	@RequestMapping("/testResponseUser")
+    @ResponseBody
+    public Employee testRequestUser()  {
+        return new Employee(1001,"aaa","bbb");
+    }
+    // 浏览器响应中展示的结果为   {"id":"1001","username":"aaa","password":"bbb"}
 
 
 
 ```
 
+### 6. SpringMVC处理ajax
+
+a> 请求的超链接:
+
+```html
+<div id="app">
+    <a @click="testAxios" th:href="@{/testAxios}">测试axios</a>
+</div>
+
+```
+
+b> 通过axios和vue处理点击事件
+
+```javascript
+// 1. 添加了静态资源要重新 maven >package
+// 2. springmvc中要添加 <mvc:default-servlet-handler/> 开放静态资源的访问  默认的servlet
+// 3. 解析json也要添加东西 在上面例子中有
+
+<script th:src="@{static/js/vue.js}"></script>   
+<script th:src="@{static/js/axios.js}"></script>
+
+<script>
+    new Vue({
+        el: "#app",
+        methods: {
+            async testAxios(e) {
+                e.preventDefault();
+                let {data} = await axios({
+                    url: e.target.href,
+                    method: "post",
+                    params: {username: "张三", password: "123"}
+                })
+                console.log(data)  
+            }
+        }
+    })
+</script>
+
+	// 控制层
+	@PostMapping ("/testAxios")
+    @ResponseBody
+    public Employee testAxios(String username,String password){
+        return new Employee(1001,username,password);
+    }
+
+```
+
+### 7. @RestController注解
+
+@RestController注解是SpringMVC提供的一个复合注解,标识在控制器的类上,就相当于为类添加了一个@Controller注解，并且为其中的每一个方法添加了@ResponseBody注解
+
+### 8. ResponseEntity
+
+ResponseEntity用于控制器方法的返回值类型，该控制器方法的返回值就是响应到浏览器的响应报文
+
+## 9.文件的上传与下载
+
+**1.文件下载**
+
+使用ResponseEntity实现文件下载的功能
+
+```java
+
+// 下载文件
+    @RequestMapping("/testResponseEntity")
+    public ResponseEntity<byte[]> testResponseEntity(HttpSession httpSession) throws IOException {
+        // 获取servletContext对象
+        ServletContext servletContext=httpSession.getServletContext();
+        // 获取服务器中文件的真实路径
+        String realPath= servletContext.getRealPath("/static/image/1.jpg");
+        System.out.println(realPath);
+        // 创建输入流
+        InputStream inputStream=new FileInputStream(realPath);
+        // 创建字节数组
+        byte [] bytes=new byte[inputStream.available()];   //inputStream.available() 表示字节的长度
+        // 将流读取到字节数组中
+        inputStream.read(bytes);
+        // 创建HttpHeaders对象设置响应头信息
+        MultiValueMap<String,String> httpHeaders= new HttpHeaders();
+        // 设置下载方式以及要下载文件的名字
+        httpHeaders.add("Content-Disposition","attachment;filename=1.jpg");
+        // 设置响应状态码
+        HttpStatus statusCode=HttpStatus.OK;   // 相当于200
+        // 创建ResponseEntity 对象
+        ResponseEntity<byte[]> responseEntity=new ResponseEntity<byte[]>(bytes,httpHeaders,statusCode);
+        // 关闭输入流
+        inputStream.close();
+        return responseEntity;
+    }
+
+}
+
+```
+
+**2. 文件上传**
+
+文件上传要求form表单的请求方式必须是post，并且添加属性enctype="multipart/form-data"
+
+SpringMVC中将上传的文件封装到MultipartFile对象中,通过次对象可以获取文件相关信息
+
+上传步骤:
+
+a> 添加依赖
+
+```xml
+ <dependency>
+     <groupId>commons-fileupload</groupId>
+     <artifactId>commons-fileupload</artifactId>
+     <version>1.3.1</version>
+</dependency>
+
+```
+
+b> 在springmvc中添加配置文件
+
+```xml
+  <!-- 配置文件上传解析器,将上传的文件封装为 MultipartFile-->
+    <bean class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+
+```
+
+c> 上传功能
+
+```java
+ // 上传文件
+    @RequestMapping("/testUp")
+    public String testUp(MultipartFile photo, HttpSession httpSession) throws IOException {
+//        System.out.println(photo.getName());   // photo  表单元素的name
+//        System.out.println(photo.getOriginalFilename()); // 1.jpg  上传文件的名字
+
+        // 获取上传文件的文件名
+        String filename = photo.getOriginalFilename();
+        // 获取文件的后缀名
+        String suffixName = filename.substring(filename.lastIndexOf("."));
+        // 将UUID作为文件名
+        String uuid = UUID.randomUUID().toString();
+        filename = uuid + suffixName;  //防止文件重名
+
+        ServletContext servletContext = httpSession.getServletContext();
+        String photoPath = servletContext.getRealPath("photo");
+        File file = new File(photoPath);
+        // 判断photoPath对应的文件夹是否存在
+        if (!file.exists()) {
+            // 若不存在 则创建目录
+            file.mkdir();
+        }
+        // 最终的文件路径
+        String finalPath = photoPath + File.separator + filename;
+        photo.transferTo(new File(finalPath));  //把资源转移到服务器
+
+
+        return "success";
+    }
+
+```
+
+## 10. 拦截器
+
+**1. 拦截器的配置**
+
+SpringMVC的拦截器用于拦截控制器方法的执行
+
+SpringMVC中的拦截器需要实现HandlerIntercepto接口或者继承HandlerInterceptorAdapter类
+
+```xml
+SpringMVC拦截器必须在springMVC.xml中配置
+
+	<!-- 配置拦截器-->
+    <mvc:interceptors>
+        <!-- <bean  class="com.liuhui.interceptors.FirstInterceptor"/>-->
+        <!-- <ref bean="firstInterceptor"/>-->
+        <!-- 以上两种方式都是对DispatcherServlet所有处理的请求进行拦截-->
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <mvc:exclude-mapping path="/testInterceptor"/>
+            <ref bean="firstInterceptor"/>
+		   <!--以上配置方式可以通过ref或者bean标签设置拦截器 通过mvc:mapping设置需要拦截的请求,
+           通过mvc:exclude-mapping设置需要排除的请求,即不需要拦截请求    -->
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+```
+
+**2. 拦截器的三个抽象方法**
+
+**preHandle:** 控制器方法执行之前执行preHandle(),其boolean类型的返回值表示是否拦截或者放行,返回true为放行,即调用控制器方法:  返回false表示拦截,即不调用控制器方法
+
+**postHandle:** 控制器方法执行之后执行postHandle()
+
+**afterComplation:** 处理完成视图和模型数据,渲染视图完毕之后执行afterComplation()
+
+**3. 多个拦截器的执行顺序**
+
+**a>** 若每个拦截器的preHandle()都返回true
+
+此时多个拦截器的执行顺序和拦截器在SpringMVC的配置文件的顺序有关；
+
+preHandle()会按照顺序执行,而posthandle()和afterComplation()会按照配置的反序执行
+
+**b>** 若某个拦截器的preHandle()返回false
+
+preHandle()返回false和它之前的拦截器的preHandle()都会执行,postHandle()都不执行,返回false的拦截器之前的拦截器的afterComplation()会执行
 
 
 
 
 
+## 11.异常处理
 
-
+**1. 基于配置的异常处理**
 
 
 

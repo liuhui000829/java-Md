@@ -58,8 +58,6 @@ public class FileIO_02 {
                 }
                 sb.append(line).append("\n");
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -69,9 +67,6 @@ public class FileIO_02 {
     /**
      * 写入文件
      *
-     * @param path
-     * @param str
-     * @param isAppend
      */
     public static void writeFile(String path, String str, Boolean isAppend) {
         //创建字符流写的对象 ,isAppend-是否进行拼接

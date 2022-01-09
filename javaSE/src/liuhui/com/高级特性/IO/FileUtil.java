@@ -132,7 +132,6 @@ public class FileUtil {
     /**
      * 递归删除
      *
-     * @param file
      */
     public static void delLinked(File file) {
 
@@ -143,8 +142,8 @@ public class FileUtil {
         }
         for (File chFile : chFiles) {
             System.out.println(chFile);
-            delLinked(chFile);
-        }
+        delLinked(chFile);
+    }
         // 如果不写下面这一行 那么删除不干净
         file.delete();
 

@@ -456,6 +456,459 @@ xxx.equalsIgnoreCase(xxx): 忽略大小写
 
 ## 3. 高级特性
 
+### 1. File类
+
+#### 1.1 概述
+
+**java.io.File** 类是文件和目录路径名的抽象表示,主要用于文件和目录的创建、查找和删除等操作
+
+```java
+/**
+ *  java.io.File类
+ *  文件和目录的抽象表示
+ *  java把电脑中的文件和文件夹(目录)封装成了一个File类,我们可以使用File类对文件和文件夹进行操作
+ *  我们可以使用File的方法
+ *      创建一个文件/文件夹
+ *      删除一个文件/文件夹
+ *      判断文件/文件夹是否存在
+ *      对文件夹进行遍历
+ *      获取文件的大小
+ *  File类是一个与系统无关的类,任何操作系统都可以使用这个类中的方法
+ *
+ *  重点: 记住三个单词
+ *      file: 文件
+ *      directory: 文件夹/目录
+ *      path: 路径
+ */
+```
+
+
+
+#### 1.2 构造方法
+
+* public File(String pathname): 通过给定的<span style="color:red">**路径名字符串**</span>转换为抽象路径名来创建新的 File实例
+* public File(String parent,String child): 从<span style="color:red">**父路径名字符串 和 子路径名字符串**</span>创建新的 File实例
+* public File(File parent,String child): 从<span style="color:red">**父抽象路径名 和 子路径名字符串**</span>创建新的 File实例
+
+```java
+
+/**
+ * 相对路径: 是一个完整的路径
+ * 		以盘符(c: d:)开始的路径	C:\Users\刘先生\Desktop\java-Md\testDirectory\aa.txt
+ * 		
+ * 绝对路径: 是一个简化的路径
+ * 		相当于当前项目的根目录(.\testDirectory\aa.txt)
+ * 注意:
+ * 1. 路径不区分大小写
+ * 2. 路径中的文件名称分隔符windows使用反斜杠,反斜杠是转义字符,两个反斜杠表示一个普通的反斜杠
+ */
+@SuppressWarnings("all")
+public class FileDemo2 {
+    public static void main(String[] args) {
+		// show1();
+        // show2("c:","a.txt");
+        // show2("d:","a.txt");   // d:\a.txt
+        show3();
+    }
+
+    public static void show1() {
+        /* public File(String pathname): 通过给定的路径名字符串转换为抽象路径名来创建新的 File实例
+        参数:
+            1.String pathname: 字符拆的路径名称
+            2.路径可以是以文件结尾,也可以是以文件夹结尾
+            3.路径可以是相对路径,也可以是绝对路径
+            4.路径可以是存在的,也可以是不存在的
+            5.创建File对象,只是把字符串路径封装为File对象,不考虑路径的真假情况
+            
+      */
+        String pathName = "C:\\Users\\刘先生\\Desktop\\java-Md\\javaSE\\a.txt";	// 不存在a.txt 
+        File file = new File(pathName);
+        System.out.println(file);   	// C:\Users\刘先生\Desktop\java-Md\javaSE\a.txt
+
+
+        String pathName2 = "C:\\Users\\刘先生\\Desktop\\java-Md\\javaSE"; 			// 项目根路径 
+        File file2 = new File(pathName2);
+        System.out.println(file2); 		// C:\Users\刘先生\Desktop\java-Md\javaSE
+
+
+        String pathName3 = "b.txt"; 											  // 相对路径
+        File file3 = new File(pathName3);
+        System.out.println(file3);  	// b.txt
+
+    }
+
+    public static void show2(String parent, String child) {
+    /*
+        File(String parent,String child): 从父路径名字符串 和 子路径名字符串创建新的 File实例
+        参数: 把路径分成了两部分
+            String parent: 父路径
+            String child:  子路径
+        好处:
+            父路径和子路径,可以单独的书写,用起来非常的灵活,父路径和子路径都可以变化
+
+     */
+        File file = new File(parent, child);
+        System.out.println(file);
+    }
+
+    public static void show3() {
+    /*
+        File(File parent,String child): 根据parent抽象路径名 和 child路径名字符串创建新的 File实例
+        参数: 把路径分成了两部分
+            File parent: parent抽象路径名
+            String child:  子路径
+        好处:
+            父路径和子路径,可以单独的书写,用起来非常的灵活,父路径和子路径都可以变化
+            父路径是file类型,可以使用File的方法对路径进行一些操作,在使用路径创建对象
+     */
+        File parent = new File("c:\\");
+        File file = new File(parent, "hello.java");
+        System.out.println(file);   // c:\hello.java
+    }
+
+}
+
+```
+
+#### 1.3 File类的静态方法
+
+```java
+ /*
+        static String pathSeparator      与系统相关的路径分隔符字符，为方便起见，表示为字符串。
+        static char pathSeparatorChar    与系统相关的路径分隔符。
+
+        static String separator          与系统相关的默认名称 - 分隔符字符，以方便的方式表示为字符串。
+        static char separatorChar        与系统相关的默认名称分隔符。
+
+        1. 操作路径: 路径不能写死
+            c:\develop\a\a.txt                windows操作系统这样写
+            c:/develop/a/a.txt                linux操作系统这样西
+            全部替换成 File.separator 动态的
+            ”c:”+File.separator+“develop”+File.separator+“a”+File.separator+“a.txt“
+    */
+
+        String pathSeparator = File.pathSeparator;  // 路径分隔符 window: 分号;  linux: 冒号
+        System.out.println(pathSeparator);          // ;
+
+        String separator = File.separator;          // 文件名称分隔符 window: 反斜杠\   linux:正斜杠/
+        System.out.println(separator);              // \
+
+```
+
+
+
+#### 1.4 获取功能的方法:
+
+* public String getAbsolutePath(): 返回File的绝对路径名字符串
+* public String getPath(): 将File转换为路径名字符串
+
+ *  public String getName(): 返回由此File表示的文件或者目录的名称
+ *  public long length(); 返回由此File表示的文件的长度
+
+​	   方法演示,代码如下
+
+```java
+-000 ；public class FileGet {
+    public static void main(String[] args) {
+    /*
+         public String getAbsolutePath(): 返回File的绝对路径名字符串
+         public String getPath(): 将File转换为路径名字符串
+         public String getName(): 返回由此File表示的文件或者目录的名称
+         public long length(); 返回由此File表示的文件的长度
+
+    */
+        show4();
+    }
+
+    public static void show1() {
+    /*
+         public String getAbsolutePath(): 返回File的绝对路径名字符串
+         1.获取构造方法中传递的路径
+         2.无论是 绝对路径 还是 相对路径,getAbsolutePath()返回的都是绝对路径
+
+     */
+
+        File file = new File("C:\\Users\\刘先生\\Desktop\\java-Md\\javaSE\\a.txt");
+        System.out.println(file.getAbsolutePath());     //C:\Users\刘先生\Desktop\java-Md\javaSE\a.txt
+
+        File file2 = new File("a.txt");
+        System.out.println(file2.getAbsolutePath());     //C:\Users\刘先生\Desktop\java-Md\javaSE\a.txt
+
+
+    }
+
+    public static void show2() {
+    /*
+          public String getPath(): 将File转换为路径名字符串
+          1.获取构造方法中传递的路径
+          2.相对的返回相对的,绝对的返回绝对的,是什么就返回什么
+          3.toString()方法调用的就是getPath()方法
+          源码:
+            public String toString() {
+                return getPath();
+            }
+
+     */
+
+        File file = new File("C:\\Users\\刘先生\\Desktop\\java-Md\\javaSE\\a.txt");
+        System.out.println(file.getPath());     // C:\Users\刘先生\Desktop\java-Md\javaSE\a.txt
+
+        File file2 = new File("a.txt");
+        System.out.println(file2.getPath());    // a.txt
+
+        // 测试toString()方法
+        System.out.println(file.toString());    // C:\Users\刘先生\Desktop\java-Md\javaSE\a.txt
+        System.out.println(file2.toString());   // a.txt
+
+    }
+
+    public static void show3() {
+    /*
+          public String getName(): 返回由此File表示的文件或者目录的名称
+          获取的是构造方法传递路径的结尾部分(文件/文件夹)
+
+    */
+
+        File file = new File("C:\\Users\\刘先生\\Desktop\\java-Md\\javaSE\\a.txt");
+        System.out.println(file.getName());      // a.txt
+
+        File file2 = new File("C:\\Users\\刘先生\\Desktop\\java-Md\\javaSE");
+        System.out.println(file2.getName());     // javaSE
+
+
+    }
+
+    public static void show4() {
+    /*
+          public long length(); 返回由此File表示的文件的长度
+          获取的是构造方法指定的文件的大小,以字节为单位
+          注意:
+            1.文件夹是没有大小概念的,不能获取文件夹的大小
+            2.如果构造方法中给出的路径不存在,那么返回0
+
+     */
+
+        File file = new File("C:\\Users\\刘先生\\Desktop\\1.jpg");
+        System.out.println(file.length());  // 1,040,672 字节
+
+        // 不存咋的图片
+        File file2 = new File("C:\\Users\\刘先生\\Desktop\\2.jpg");
+        System.out.println(file2.length());  // 0
+
+        // 文件夹
+        File file3 = new File("C:\\Users\\刘先生\\Desktop\\java-Md");
+        System.out.println(file3.length());  // 4096
+
+    }
+}
+
+```
+
+
+
+#### 1.5 判断功能的方法:
+
+public boolean exists(); 此File表示的文件或目录是否实际存在。
+
+public boolean isDirectory(): 此File表示的是否是目录
+
+public boolean ifFile(): 此File表示的是否是文件
+
+```java
+public class FileDemo3 {
+    public static void main(String[] args) {
+    /*
+         public boolean exists(); 此File表示的文件或目录是否实际存在。
+         public boolean isDirectory(): 此File表示的是否是目录
+         public boolean ifFile(): 此File表示的是否是文件
+
+    */
+        show2();
+    }
+
+    public static void show1() {
+    /*
+        public boolean exists(); 此File表示的文件或目录是否实际存在。
+        1.用户判断构造方法中的路径是否存在
+            存在: true
+            不存在: false
+     */
+
+        File file = new File("C:\\Users\\刘先生\\Desktop\\java-Md\\javaSE");
+        System.out.println(file.exists());      // true
+
+        // 相对路径 相对于项目的根路径 相当于C:\\Users\\刘先生\\Desktop\\java-Md\\javaSE\\java基础.iml
+        File file2 = new File("java基础.iml");
+        System.out.println(file2.exists());     // true
+
+        // 不存在的相对路径 相对于项目的根路径
+        File file3 = new File("java基础2.iml");
+        System.out.println(file3.exists());     // false
+
+    }
+
+    public static void show2() {
+    /*
+         public boolean isDirectory(): 此File表示的是否是目录
+         public boolean ifFile(): 此File表示的是否是文件
+         注意:
+            1.用之前最好用exists判断一下,不存在就不用判断了
+            2.这两个方法是互斥的 因为电脑中要么是文件夹要么是文件
+     */
+        
+        String pathName="C:\\Users\\刘先生\\Desktop\\java-Md\\javaSE";	// 绝对路径
+        String pathName2="java基础.iml";  // 相对路径
+
+        File file = new File(pathName);
+        if(file.exists()){  // 不存在就没有必要获取
+            System.out.println("file "+file.isDirectory());     // true
+            System.out.println("file "+file.isFile());          // false
+        }
+
+        File file2 = new File(pathName2);
+        if(file2.exists()){
+            System.out.println("file2 "+file2.isDirectory());   // false
+            System.out.println("file2 "+file2.isFile());        // true
+        }
+    }
+}
+```
+
+#### 1.4 创建和删除功能的方法:
+
+* public boolean createNewFile();当且仅当具有该名称的文件不存在时,创建一个新的文件
+* public boolean delete(); 删除由此File表示的文件或目录
+* public boolean mkdir(); 创建由此File表示的目录
+* public boolean mkdirs();创建由此File表示的目录, 包括任何必须但不存在的目录
+
+​	   方法演示,代码如下
+
+```java
+
+public class FileDemo4 {
+    public static void main(String[] args) throws IOException {
+        
+        show3();
+    }
+
+    public static void show1() throws IOException {
+    /*
+        public boolean createNewFile();当且仅当具有该名称的文件不存在时,创建一个新的文件夹
+        创建文件的路径和名称在构造方法中给出(构造方法的参数)
+        返回值:boolean
+            true:文件不存在,创建文件,返回true
+            false:文件存在,不会创建,返回false
+        注意:
+            1.此方法只能创建文件,不能创建文件夹
+            2.创建文件的路径必须存在,否则会抛出异常
+
+     */
+
+        File file = new File("C:\\Users\\刘先生\\Desktop\\java-Md\\javaSE\\test.txt");
+        boolean newFile = file.createNewFile();
+        System.out.println(newFile);      // true
+
+
+        File file2 = new File("src\\test.txt");     // 相对路径  相对于项目根路径
+        boolean newFile2 = file2.createNewFile();
+        System.out.println(newFile2);      // true
+
+
+    }
+
+    public static void show2() {
+    /*
+        public boolean mkdir(); 创建单级文件夹
+        public boolean mkdirs();创建单极文件夹和创建多级文件夹
+        返回值:boolean
+            true:文件夹不存在,创建文件夹,返回true
+            false:文件夹存在,不会创建,返回false
+        注意:
+            1.此方法只能创建文件夹,不能创建文件
+            2.创建文件夹的路径必须存在,否则会抛出异常
+
+     */
+
+        String pathName = "aaa";		  // 相对于项目根路径
+        File file = new File(pathName);
+        if (!file.isDirectory()) {        // 判断文件夹是否存在然后再创建文件夹
+            System.out.println("file " + file.mkdir());            // true
+        }
+
+        String pathName2 = "1\\2\\3"; 	  // 创建多级目录
+        File file2 = new File(pathName2);
+        if (!file2.isDirectory()) {
+            System.out.println("file " + file2.mkdirs());          // true
+        }
+    }
+
+    public static void show3() {
+    /*
+        public boolean delete(); 删除由此File表示的文件或目录
+        返回值:boolean
+            true:文件/文件夹删除成功,返回true
+            false: 文件夹中由内容,不会直接删除 返回false,路径不能存在返回false
+        注意:
+            delete方法是直接在硬盘删除文件/文件夹,不走回收站,删除谨慎
+     */
+
+        File file = new File("test.txt");
+        if (file.exists()) {						 // 只有文件存在才删除
+            System.out.println(file.delete());       // true
+        }
+
+        File file2 = new File("1");
+        if (file2.isDirectory()) {
+            System.out.println(file2.delete());     // false 因为文件夹非空 所以删除不成功
+        }
+    }
+}
+
+```
+
+#### 1.5 目录的遍历
+
+* public String[] list(); 返回一个String数组,表示该File目录中的所有子文件或目录
+* public File[] listFiles(); 返回一个File数组,表示该File目录中的所有子文件或目录
+
+```java
+
+public class FileDemo5 {
+    public static void main(String[] args) throws IOException {
+     
+        show1();
+    }
+
+    public static void show1() throws IOException {
+    /*
+        public String[] list(); 返回一个String数组,表示该File目录中的所有子文件或目录 
+        public File[] listFiles(); 返回一个File数组,表示该File目录中的所有子文件或目录
+        注意:
+            1.list方法和listFiles方法遍历的是构造方法中给出的目录
+            2.如果构造方法中给出的目录路径不存在,会抛出空指针
+            3.如果构造方法中给出的不是一个目录, 也会抛出空指针
+            4.能遍历成隐藏的文件夹
+     */
+
+        String pathName="C:\\Users\\刘先生\\Desktop\\java-Md\\javaSE";
+        File file = new File(pathName);
+        String[] str = file.list();
+        System.out.println(Arrays.toString(str)); // [.idea, bug.txt, java基础.iml, lib, out, src, test2.txt]
+
+
+        String pathName2="C:\\Users\\刘先生\\Desktop\\java-Md\\javaSE";
+        File file2 = new File(pathName2);
+        File [] listFiles = file2.listFiles();
+        System.out.println(Arrays.toString(listFiles));  //[C:\Users\刘先生\Desktop\java-Md\javaSE\.idea,...]
+    }
+}
+
+```
+
+
+
+
+
 ### 1.集合
 
 ```java
@@ -764,6 +1217,139 @@ BufferedWriter bw = new BufferedWriter(new FileWriter(path, isAppend))
 
 
 ```
+
+## 4. 数据结构
+
+### 1. 递归
+
+概述:
+
+* 递归: 值在当前方法内调用自己
+* 递归的分类:
+  * 递归分为两种: **直接递归** 和 **间接递归**
+  * 直接递归: 方法自身调用自己
+  * 间接递归: 可以A方法调用B方法,B方法调用C方法,C方法调用A方法
+
+* 注意事项:
+
+  * 递归一定要有条件限定,保证递归能够停止下来,否则会发生栈内存溢出
+  * 在递归中虽然有限定条件,但是递归次数不能太多,否则也会发生栈内存溢出
+  * 构造方法禁止递归
+
+* 递归的使用前提
+
+  * 当方法调用的时候,方法的主体不变，每次调用方法的参数不同,可以使用递归
+
+  **1. 例子**
+
+```java
+public class recursionDemo1 {
+    public static void main(String[] args) {
+        a(5);
+        System.out.println("执行完毕");
+    }
+
+    public static void a(int i) {
+        // 递归一定要有限定条件 否则会发生栈内存溢出
+        System.out.println(i);
+        if (i <= 0) {
+            return;
+        }
+        a(--i);
+    }
+}
+// 5 4 3 2 1 执行完毕
+
+```
+
+**执行的内存图**
+
+![image-20220109195841990](\typora-user-images\image-20220109195841990.png)
+
+**2. 例子**
+
+```java
+package liuhui.com.数据结构.递归;
+
+/**
+ * 使用递归实现 1 - n 之间的和
+ * 比如 n=5  则 1+2+3+4+5
+ * n+(n-1)+(n-2)+(n-3)+(n-4)
+ */
+
+public class recursionDemo2 {
+    public static void main(String[] args) {
+
+    /*
+        已知:
+            最大值: n
+            最小值: 1
+        使用递归必须明确:
+            1.递归的结束条件
+                获取到1结束
+            2.递归的目的
+                获取下一个被加的数字(n-1)
+    */
+        System.out.println(a(5));
+    }
+
+    public static int a(int n) {
+        if (n == 1) return 1;
+        return n + a(n - 1);
+    }
+     public static int b(int n) {
+        // 要求: 5*4*3*2*1
+        if (n == 1) return 1;
+
+        return n * b(n - 1);
+    }
+}
+```
+
+**内存图**
+
+![image-20220109200358004](\typora-user-images\image-20220109200358004.png)
+
+**3. 例子**
+
+**递归打印多级目录**
+
+```java
+ public  void getAllFile(String str) {
+        File newFile = new File(str);
+        File[] files = newFile.listFiles();		// 获取文件的file集合
+        for (File file : files) {
+            if (file.isDirectory()) {			// 判断如果是文件夹 那么继续递归它 
+                System.out.println(file.getName());
+                getAllFile(file.getPath());		// 输入文件夹的名字
+            } else {
+                System.out.println(file.getName());
+            }
+        }
+    }
+
+```
+
+**4. 递归删除文件目录**
+
+```java
+public static void delLinked(File file) {
+
+    File[] chFiles = file.listFiles();
+    if (chFiles == null || chFiles.length == 0) {
+        file.delete();
+        return;
+    }
+
+    for (File chFile : chFiles) {
+        System.out.println(chFile);
+        delLinked(chFile);
+    }
+    file.delete();         // 如果文件夹为空 那么可以直接删除的
+}
+```
+
+
 
 
 

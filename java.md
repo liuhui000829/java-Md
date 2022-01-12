@@ -4382,7 +4382,7 @@ public class HelloContrlloer{
 
 ```
 
-## 4.SpringMVC获取请求参数
+## 4. SpringMVC获取请求参数
 
 **1. 通过servletApi获取**
 
@@ -4726,7 +4726,7 @@ springMVC.html中配置:
 
 ```
 
-## 7.restful
+## 7. restful
 
 **1.restful简介**
 
@@ -5056,7 +5056,7 @@ b> 通过axios和vue处理点击事件
 
 ResponseEntity用于控制器方法的返回值类型，该控制器方法的返回值就是响应到浏览器的响应报文
 
-## 9.文件的上传与下载
+## 9. 文件的上传与下载
 
 **1.文件下载**
 
@@ -5206,12 +5206,611 @@ preHandle()返回false和它之前的拦截器的preHandle()都会执行,postHan
 
 
 
-
-
-## 11.异常处理
+## 11. 异常处理
 
 **1. 基于配置的异常处理**
 
+SpringMVC提供了一个处理器方法执行过程中所出现的异常接口: HandlerExceptionResolver 
+
+HandlerExceptionResolver接口的实现类有: DefaultHandlerExceptionResolver  和SimpleMappingExceptionResolver
+
+SpringMVC提供了自定义的异常处理器 SimpleMappingExceptionResolver ,使用方式
+
+```xml
+springmvc中配置
+<!--    配置异常处理-->
+<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+    <property name="exceptionMappings">
+        <props>
+            <prop key="java.lang.ArithmeticException">error</prop>
+        </props>
+    </property>
+    <!--        设置将异常信息共享在请求域中的key-->
+    <property name="exceptionAttribute" value="ex"/>
+</bean>
+```
+
+**2. 基于注解的异常处理**
+
+```java
+@ControllerAdvice
+public class ExceptionController {
+
+    @ExceptionHandler(value = {ArithmeticException.class, NullPointerException.class})
+    public String testException(Exception ex, Model model) {
+        model.addAttribute("ex", ex);
+        return "error";
+    }
+}
+
+```
+
+## 12. 注解配置SpringMVC
+
+使用配置类和注解代替web.xml和SpringMVC配置文件中的功能
+
+**1. 创建初始化类,代替web.xml**
+
+在Servlet3.0环境中,容器会在类路径中查找实现javax.servlet.ServletContainerInitializer接口的类,如果找到的话就用它来配置Servlet容器.
+
+Spring提供了这个接口的实现，名为ServletContainerInitializer,这个类反过来又会查找实现WebApplicationInitializer的类并将配置任务交给他们来完成。Spring3.2引入了一个便利的WebApplicationInitializer基础实现,名为AbstractAnnotationConfigDispatcherServletInitializer,当我们的类扩展了AbstractAnnotationConfigDispatcherServletInitializer并将其部署到Servlet3.0容器的时候,容器会自动发现它,并且用它来配置Servlet上下文
+
+```java
+public class WebInit extends AbstractAnnotationConfigDispatcherServletInitializer {
+    /**
+     * 指定Spring的配置类
+     *
+     * @return
+     */
+    protected Class<?>[] getRootConfigClasses() {
+        return new Class[]{SpringConfig.class};
+    }
+
+    /**
+     * 指定SpringMVC的配置类
+     *
+     * @return
+     */
+    protected Class<?>[] getServletConfigClasses() {
+        return new Class[]{WebConfig.class};
+    }
+    /**
+     * 指定DispatcherServlet的映射规则,即url-pattern
+     *
+     * @return
+     */
+    protected String[] getServletMappings() {
+        return new String[]{"/"};
+    }
+
+    /**
+     * 注册过滤器
+     * @return
+     */
+
+    @Override
+    protected Filter[] getServletFilters() {
+        CharacterEncodingFilter characterEncodingFilter=new CharacterEncodingFilter();
+        characterEncodingFilter.setEncoding("utf-8");
+        characterEncodingFilter.setForceResponseEncoding(true);
+        HiddenHttpMethodFilter hiddenHttpMethodFilter=new HiddenHttpMethodFilter();
+        return new Filter[]{characterEncodingFilter,hiddenHttpMethodFilter};
+    }
+}
+
+```
+
+**2. 创建SpringConfig配置类,代替spring的配置文件**
+
+```java
+@Configuration
+public class SpringConfig {
+    // ssm整合之后,spring的配置信息写在此类中
+}
+```
+
+**3. 创建WebConfig配置类,代替springMVC的配置文件**
+
+```java
+/**
+ * 代替SpringMVC的配置文件
+ * 1.扫描组件       2.视图解析器         3.view-controller    4.default-servlet-handler
+ * 5.mvc注解驱动    6.文件上传解析器     7.异常处理             8.拦截器
+ */
+
+
+// 开启mvc的注解驱动
+@EnableWebMvc
+// 扫描组件
+@ComponentScan("com.liuhui")
+// 将当前类标识为一个配置类
+@Configuration
+@SuppressWarnings("all")
+public class WebConfig implements WebMvcConfigurer {
+
+
+    // 3.view-controller
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/hello").setViewName("hello");
+        registry.addViewController("/HTTPMessageConverter").setViewName("HTTPMessageConverter");
+    }
+
+    // 8.拦截器
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        TestInterceptor testInterceptor = new TestInterceptor();
+        registry.addInterceptor(testInterceptor).addPathPatterns("/**");  //拦截所有请求
+    }
+
+    //4. default-servlet-handler 默认的servlet
+    @Override
+    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+        configurer.enable();
+    }
+
+    //配置生成模板解析器
+    @Bean
+    public ITemplateResolver templateResolver() {
+        WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+        ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(
+                webApplicationContext.getServletContext());
+        templateResolver.setPrefix("/WEB-INF/templates/");
+        templateResolver.setSuffix(".html");
+        templateResolver.setCharacterEncoding("utf-8");
+        templateResolver.setTemplateMode(TemplateMode.HTML);
+        return templateResolver;
+    }
+
+    // 生成模板引擎并为模板引擎注入模板解析器
+    @Bean
+    public SpringTemplateEngine templateEngine(ITemplateResolver templateResolver) {
+        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver);
+        return templateEngine;
+    }
+
+    // 生成视图解析器并未解析器注入模板引擎
+    @Bean
+    public ViewResolver viewResolver(SpringTemplateEngine templateEngine) {
+        ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
+        viewResolver.setCharacterEncoding("utf-8");
+        viewResolver.setTemplateEngine(templateEngine);
+        return viewResolver;
+    }
+
+    // 6. 文件上传解析器
+    @Bean
+    public MultipartResolver multipartResolver() {
+        return new CommonsMultipartResolver();
+    }
+
+    // 7.异常处理
+    @Override
+    public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+        SimpleMappingExceptionResolver exceptionResolver = new SimpleMappingExceptionResolver();
+        Properties prop = new Properties();
+        prop.setProperty("java.lang.ArithmeticException", "error");
+        exceptionResolver.setExceptionMappings(prop);
+        exceptionResolver.setExceptionAttribute("ex");
+        resolvers.add(exceptionResolver);
+    }
+}
+```
+
+## 13. SpringMVC的执行流程
+
+### <span style="color:red">**1. SpringMVC常用组件**</span>
+
+* DispatcherServlet:==前端控制器,== 不需要工程师开发,由框架提供
+
+作用: 统一处理请求和响应,真个流程的控制中心,由它调用其他组件处理用户的请求
+
+* HandlerMapping: ==处理器映射器==，不需要工程师开发,由框架提供
+
+作用: 根据请求的url，method等信息查找Handler,即控制器方法
+
+* Handler：==处理器==,需要工程师开发
+
+作用: 在DispatcherServlet的控制下Handler对具体的用户请求进行处理
+
+* HandlerAdapter:==处理器适配器==，不需要工程师开发,由框架提供
+
+作用:通过HandlerAdapter对处理器(控制器方法)进行执行
+
+* ViewResolver: ==视图解析器==,不需要工程师开发,由框架提供
+
+作用: 进行视图解析,得到响应的视图,例如: ThymleafView, InternalResourceView RedirectView
+
+* View ==视图==，不需要工程师开发,由框架或视图技术提供
+
+作用:将模拟数据通过页面展示给用户
+
+### <span style="color:red">**2. DispatcherServlet初始化过程**</span>
+
+**DispatcherServlet本质上就是要给Servlet，所以天然的遵循Servlet的生命周期,所以宏观上是Servlet生命周期来进行调度**
+
+![image-20220111231555286](\typora-user-images\image-20220111231555286.png)![image-20220111231656842](\typora-user-images\image-20220111231656842.png)
+
+
+
+![image-20220111232142097](\typora-user-images\image-20220111232142097.png)
+
+![image-20220111232405480](\typora-user-images\image-20220111232405480.png)
+
+**a> 初始化WebApplicationContext**
+
+所在类: org.springframework.web.servlet.FrameworkServlet
+
+```java
+protected WebApplicationContext initWebApplicationContext() {
+        WebApplicationContext rootContext = 		            		WebApplicationContextUtils.getWebApplicationContext(this.getServletContext());
+        WebApplicationContext wac = null;
+        if (this.webApplicationContext != null) {
+            wac = this.webApplicationContext;
+            if (wac instanceof ConfigurableWebApplicationContext) {
+                ConfigurableWebApplicationContext cwac = (ConfigurableWebApplicationContext)wac;
+                if (!cwac.isActive()) {
+                    if (cwac.getParent() == null) {
+                        cwac.setParent(rootContext);
+                    }
+
+                    this.configureAndRefreshWebApplicationContext(cwac);
+                }
+            }
+        }
+
+        if (wac == null) {
+            wac = this.findWebApplicationContext();
+        }
+
+        if (wac == null) {
+            // 创建webApplicationContext
+            wac = this.createWebApplicationContext(rootContext);
+        }
+
+        if (!this.refreshEventReceived) {
+            synchronized(this.onRefreshMonitor) {
+                // 刷新WebApplicationContext
+                this.onRefresh(wac);
+            }
+        }
+
+        if (this.publishContext) {
+            String attrName = this.getServletContextAttributeName();
+            // 将IOC容器在应用中共享
+            this.getServletContext().setAttribute(attrName, wac);
+        }
+
+        return wac;
+    }
+```
+
+**b>创建WebApplicationContext**
+
+所在类:org.springframework.web.servlet.FrameworkServlet
+
+```java
+protected WebApplicationContext createWebApplicationContext(@Nullable ApplicationContext parent) {
+        Class<?> contextClass = this.getContextClass();
+        if (!ConfigurableWebApplicationContext.class.isAssignableFrom(contextClass)) {
+            throw new ApplicationContextException("Fatal initialization error in servlet with name '" + this.getServletName() + "': custom WebApplicationContext class [" + contextClass.getName() + "] is not of type ConfigurableWebApplicationContext");
+        } else {
+            // 通过反射创建 IOC容器对象
+            ConfigurableWebApplicationContext wac = (ConfigurableWebApplicationContext)BeanUtils.instantiateClass(contextClass);
+            wac.setEnvironment(this.getEnvironment());
+            // 设置父容器
+            wac.setParent(parent);
+            String configLocation = this.getContextConfigLocation();
+            if (configLocation != null) {
+                wac.setConfigLocation(configLocation);
+            }
+
+            this.configureAndRefreshWebApplicationContext(wac);
+            return wac;
+        }
+    }
+```
+
+**c>DispatcherServlet初始化策略**
+
+FrameworkServlet创建WebApplicationContext后,刷新容器,调用onRefresh(wac),此方法在DispatcherServlet中进行了重写,调用了
+
+initStrategies(context)方法,初始化策略,即初始化DispatcherServlet的各个组件
+
+所在类:org.springframework.web.servlet.DispatcherServlet
+
+```java
+ protected void onRefresh(ApplicationContext context) {
+        this.initStrategies(context);
+    }
+
+    protected void initStrategies(ApplicationContext context) {
+        this.initMultipartResolver(context);
+        this.initLocaleResolver(context);
+        this.initThemeResolver(context);
+        this.initHandlerMappings(context);
+        this.initHandlerAdapters(context);
+        this.initHandlerExceptionResolvers(context);
+        this.initRequestToViewNameTranslator(context);
+        this.initViewResolvers(context);
+        this.initFlashMapManager(context);
+    }
+
+
+```
+
+### <span style="color:red">**3. DispatcherServlet调用组件处理请求**</span>
+
+**a> processRequest()**
+
+FrameworkServlet重写HttpServlet中的service()和doXxx(),这些方法中调用了processRequest(request,response)
+
+所在类: org.springframework.web.servlet.FrameworkServlet
+
+```java
+protected final void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        long startTime = System.currentTimeMillis();
+        Throwable failureCause = null;
+        LocaleContext previousLocaleContext = LocaleContextHolder.getLocaleContext();
+        LocaleContext localeContext = this.buildLocaleContext(request);
+        RequestAttributes previousAttributes = RequestContextHolder.getRequestAttributes();
+        ServletRequestAttributes requestAttributes = this.buildRequestAttributes(request, response, previousAttributes);
+        WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
+        asyncManager.registerCallableInterceptor(FrameworkServlet.class.getName(), new FrameworkServlet.RequestBindingInterceptor());
+        this.initContextHolders(request, localeContext, requestAttributes);
+
+        try {
+            // 执行服务,doService()是一个抽象方法,在DispatcherServlet中进行了重写
+            this.doService(request, response);
+        } catch (IOException | ServletException var16) {
+            failureCause = var16;
+            throw var16;
+        } catch (Throwable var17) {
+            failureCause = var17;
+            throw new NestedServletException("Request processing failed", var17);
+        } finally {
+            this.resetContextHolders(request, previousLocaleContext, previousAttributes);
+            if (requestAttributes != null) {
+                requestAttributes.requestCompleted();
+            }
+
+            this.logResult(request, response, (Throwable)failureCause, asyncManager);
+            this.publishRequestHandledEvent(request, response, startTime, (Throwable)failureCause);
+        }
+
+    }
+
+```
+
+**b>doService()**
+
+所在类:org.springframework.web.servlet.DispatcherServlet
+
+```java
+
+protected void doService(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        this.logRequest(request);
+        Map<String, Object> attributesSnapshot = null;
+        if (WebUtils.isIncludeRequest(request)) {
+            attributesSnapshot = new HashMap();
+            Enumeration attrNames = request.getAttributeNames();
+
+            label120:
+            while(true) {
+                String attrName;
+                do {
+                    if (!attrNames.hasMoreElements()) {
+                        break label120;
+                    }
+
+                    attrName = (String)attrNames.nextElement();
+                } while(!this.cleanupAfterInclude && !attrName.startsWith("org.springframework.web.servlet"));
+
+                attributesSnapshot.put(attrName, request.getAttribute(attrName));
+            }
+        }
+
+        request.setAttribute(WEB_APPLICATION_CONTEXT_ATTRIBUTE, this.getWebApplicationContext());
+        request.setAttribute(LOCALE_RESOLVER_ATTRIBUTE, this.localeResolver);
+        request.setAttribute(THEME_RESOLVER_ATTRIBUTE, this.themeResolver);
+        request.setAttribute(THEME_SOURCE_ATTRIBUTE, this.getThemeSource());
+        if (this.flashMapManager != null) {
+            FlashMap inputFlashMap = this.flashMapManager.retrieveAndUpdate(request, response);
+            if (inputFlashMap != null) {
+                request.setAttribute(INPUT_FLASH_MAP_ATTRIBUTE, Collections.unmodifiableMap(inputFlashMap));
+            }
+
+            request.setAttribute(OUTPUT_FLASH_MAP_ATTRIBUTE, new FlashMap());
+            request.setAttribute(FLASH_MAP_MANAGER_ATTRIBUTE, this.flashMapManager);
+        }
+
+        RequestPath requestPath = null;
+        if (this.parseRequestPath && !ServletRequestPathUtils.hasParsedRequestPath(request)) {
+            requestPath = ServletRequestPathUtils.parseAndCache(request);
+        }
+
+        try {
+            //处理请求和响应
+            this.doDispatch(request, response);
+        } finally {
+            if (!WebAsyncUtils.getAsyncManager(request).isConcurrentHandlingStarted() && attributesSnapshot != null) {
+                this.restoreAttributesAfterInclude(request, attributesSnapshot);
+            }
+
+            if (requestPath != null) {
+                ServletRequestPathUtils.clearParsedRequestPath(request);
+            }
+
+        }
+
+    }
+```
+
+**c>doDispatch()**
+
+所在类:org.springframework.web.servlet.DispatcherServlet
+
+```java
+protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        HttpServletRequest processedRequest = request;
+        HandlerExecutionChain mappedHandler = null;
+        boolean multipartRequestParsed = false;
+        WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
+
+        try {
+            try {
+                ModelAndView mv = null;
+                Object dispatchException = null;
+
+                try {
+                    processedRequest = this.checkMultipart(request);
+                    multipartRequestParsed = processedRequest != request;
+                    /*
+                    	mappedHandler:调用链
+                    	包含handler、interceptorList、interceptorIndex
+                    	handler:浏览器发送请求所匹配的控制器方法
+                    	interceptorList: 处理控制器方法的所有拦截器集合
+                    	interceptorIndex:拦截器索引、控制拦截器afterCompletion()的执行
+                    
+                    */
+                    mappedHandler = this.getHandler(processedRequest);
+                    if (mappedHandler == null) {
+                        this.noHandlerFound(processedRequest, response);
+                        return;
+                    }
+					/*
+						通过控制器方法创建相应的处理器适配器,调用所对应的控制器方法
+					
+					*/
+                    
+                    HandlerAdapter ha = this.getHandlerAdapter(mappedHandler.getHandler());
+                    String method = request.getMethod();
+                    boolean isGet = "GET".equals(method);
+                    if (isGet || "HEAD".equals(method)) {
+                        long lastModified = ha.getLastModified(request, mappedHandler.getHandler());
+                        if ((new ServletWebRequest(request, response)).checkNotModified(lastModified) && isGet) {
+                            return;
+                        }
+                    }
+
+                    // 调用拦截器的preHandle()
+                    if (!mappedHandler.applyPreHandle(processedRequest, response)) {
+                        return;
+                    }
+					// 由处理器适配器调用具体的控制器方法,最终获得ModelAndview对象
+                    mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
+                    if (asyncManager.isConcurrentHandlingStarted()) {
+                        return;
+                    }
+				
+                    this.applyDefaultViewName(processedRequest, mv);
+                    // 调用拦截器的postHandle()
+                    mappedHandler.applyPostHandle(processedRequest, response, mv);
+                } catch (Exception var20) {
+                    dispatchException = var20;
+                } catch (Throwable var21) {
+                    dispatchException = new NestedServletException("Handler dispatch failed", var21);
+                }
+					// 后续处理,处理模型数据和渲染视图
+                this.processDispatchResult(processedRequest, response, mappedHandler, mv, (Exception)dispatchException);
+            } catch (Exception var22) {
+                this.triggerAfterCompletion(processedRequest, response, mappedHandler, var22);
+            } catch (Throwable var23) {
+                this.triggerAfterCompletion(processedRequest, response, mappedHandler, new NestedServletException("Handler processing failed", var23));
+            }
+
+        } finally {
+            if (asyncManager.isConcurrentHandlingStarted()) {
+                if (mappedHandler != null) {
+                    mappedHandler.applyAfterConcurrentHandlingStarted(processedRequest, response);
+                }
+            } else if (multipartRequestParsed) {
+                this.cleanupMultipart(processedRequest);
+            }
+
+        }
+    }
+
+
+```
+
+**d>processDispatcherResult()**
+
+```java
+private void processDispatchResult(HttpServletRequest request, HttpServletResponse response, @Nullable HandlerExecutionChain mappedHandler, @Nullable ModelAndView mv, @Nullable Exception exception) throws Exception {
+        boolean errorView = false;
+        if (exception != null) {
+            if (exception instanceof ModelAndViewDefiningException) {
+                this.logger.debug("ModelAndViewDefiningException encountered", exception);
+                mv = ((ModelAndViewDefiningException)exception).getModelAndView();
+            } else {
+                Object handler = mappedHandler != null ? mappedHandler.getHandler() : null;
+                mv = this.processHandlerException(request, response, handler, exception);
+                errorView = mv != null;
+            }
+        }
+
+        if (mv != null && !mv.wasCleared()) {
+            // 处理模型数据和渲染视图
+            this.render(mv, request, response);
+            if (errorView) {
+                WebUtils.clearErrorRequestAttributes(request);
+            }
+        } else if (this.logger.isTraceEnabled()) {
+            this.logger.trace("No view rendering, null ModelAndView returned.");
+        }
+
+        if (!WebAsyncUtils.getAsyncManager(request).isConcurrentHandlingStarted()) {
+            if (mappedHandler != null) {
+                // 调用拦截器的AfterCompletion
+                mappedHandler.triggerAfterCompletion(request, response, (Exception)null);
+            }
+
+        }
+    }
+
+```
+
+### <span style="color:red">**4. SpringMVC的执行流程**</span>
+
+1. 用户向服务器发送请求,请求被SpringMVC前端控制器DispatcherServlet捕获。
+
+2. DispatcherServlet对请求的URL进行解析,得到请求资源标识符(URL)，判断请求URL对应的映射:
+
+   a. <span style="color:red">**不存在**</span>
+
+   i.判断是否配置了mvc:default-servelt-handler
+
+   ii.如果没有配置,则控制台报映射查不到,客户端展示404错误.
+
+   iii.如果有配置,则访问目标资源(一般为静态资源,如: js html css),找不到客户端也会展示404错误
+
+   b.<span style="color:red">**存在则执行下列流程**</span>
+
+3. 根据该URL,调用handleMapping获得该Handler配置的所有相关的对象，(包括Handler对象以及Handelr对象对应的拦截器),最后以
+
+   HandlerExecutionChain执行链对向的形式返回
+
+4. DispatcherServlet根据获得的Handler，选择一个合适的HandlerAdapter.
+
+5. 如果成功获得HandlerAdapter,此时开始执行拦截器的preHandler(...)方法 【正向】
+
+6. 提取Request中的数据模型,填充Handler入参,开始执行Handler(Controller方法，处理请求，在填充Handler的入参过程中,根据你的配置 Spring将帮你做一些额外的工作)
+
+​		a. HttpMessageConveter:将请求信息(json，xml等数据)转换成一个对象,将对象转换为指定的响应信息
+
+​		b. 数据类型转换: 对请求消息进行数据转换,如String转换为Interage Double等
+
+​		c. 数据格式化: 对请求消息进行格式化,如将字符串转换为格式化数字或者格式化日期等
+
+​		d. 数据验证; 验证数据的有效性(长度,格式 等) 验证的结果存储到BindingResult或者Error中
+
+7. Handler执行完成后，向DispatcherServlet返回一个ModelAndView对象
+8. 此时开始执行拦截器的postHandle(...)方法【逆向】
+9. 根据返回的ModelAndView(此时会判断是否存在异常:如果存在异常,则执行HandlerExceptionResolver进行异常处理)选择一个合适的ViewResolver进行视图解析,根据Model和View，来渲染视图
+10. 渲染视图完毕执行拦截器的afterCompletion(...)方法【逆向】.
+11. 将渲染视图结果返回给客户端7
 
 
 
@@ -5220,7 +5819,230 @@ preHandle()返回false和它之前的拦截器的preHandle()都会执行,postHan
 
 
 
-# 七. Maven
+
+
+
+
+
+
+
+# 七. Mybatis
+
+![image-20220112152709111](\typora-user-images\image-20220112152709111.png)
+
+
+
+## 1. MyBatis的快速入门
+
+### 2.1 MyBatis的开发步骤
+
+1. 添加myBatis的坐标 也就依赖包
+
+2. 创建User表
+3. 编写user实体类
+4. 编写映射文件UserMapper.xml
+5. 编写核心文件SqlMapConfig.xml
+6. 编写测试类
+
+**1. 添加myBatis的坐标 也就依赖包**
+
+```xml
+pom.xml 的依赖
+
+<dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.19</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.4.6</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+```
+
+**2. 编写映射文件UserMapper.xml**
+
+```xml
+在 Resources 下创建一个包 com.liuhui.mapper
+
+User.xml
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="userMapper">
+    <!-- 查询所有 -->
+    <select id="findAll" resultType="com.liuhui.domain.User">
+		select *   from tab_user 
+    </select>
+
+    <!-- 增 -->
+    <insert id="add" parameterType="com.liuhui.domain.User">
+        insert into tab_user(username, password)
+        values (#{username}, #{password})
+    </insert>
+    
+    <!-- 删 -->
+    <delete id="del" parameterType="java.lang.Integer">
+        delete from  tab_user where uid = #{id}
+    </delete>
+    
+    <!-- 改 -->
+    <update id="modify" parameterType="com.liuhui.domain.User">
+        update tab_user set username=#{username },password=#{password} where uid=#{uid}
+    </update>
+
+</mapper>
+
+```
+
+**3. 编写核心文件SqlMapConfig.xml**
+
+```xml
+在 Resources下创建  名称为SqlMapConfig.xml
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+<!--    数据源的环境-->
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"></transactionManager>
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/db?autoReconnect=true&amp;useUnicode=true&amp;createDatabaseIfNotExist=true&amp;characterEncoding=utf8&amp;useSSL=true&amp;serverTimezone=UTC"/>
+                <property name="username" value="root"/>
+                <property name="password" value="root"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+<!--    加载映射文件-->
+<mappers>
+    <mapper resource="com.liuhui.mapper/User.xml"/>
+</mappers>
+</configuration>
+
+
+```
+
+**4. 编写测试类**
+
+```java
+
+public class MyBatisTest {
+    // 查询所有
+    @Test
+    public void test1() throws IOException {
+        // 获得核心配置文件
+        InputStream inputStream = Resources.getResourceAsStream("sqlMapConfig.xml");
+        // 获取sessionFactory工厂对象
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        // 获取session会话对象
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        //执行操作  参数 :命名空间 namespace + id
+        List<User> userList = sqlSession.selectList("userMapper.findAll");
+        // 打印数据
+        userList.forEach(v->{
+            System.out.println(v);
+        });
+        // 释放资源
+        sqlSession.close();
+    }
+
+    // 增加
+    @Test
+    public void test2() throws IOException{
+        User user = new User("11", "22");
+        // 获得核心配置文件
+        InputStream inputStream = Resources.getResourceAsStream("sqlMapConfig.xml");
+        // 获取sessionFactory工厂对象
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        // 获取session会话对象
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        //执行操作  参数 :命名空间 namespace + id
+        int query = sqlSession.insert("userMapper.add",user);
+        System.out.println(query);
+        sqlSession.commit();
+        // 释放资源
+        sqlSession.close();
+    }
+    // 删除
+    @Test
+    public void test3() throws IOException{
+
+        // 获得核心配置文件
+        InputStream inputStream = Resources.getResourceAsStream("sqlMapConfig.xml");
+        // 获取sessionFactory工厂对象
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        // 获取session会话对象
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        //执行操作  参数 :命名空间 namespace + id
+        int query = sqlSession.delete("userMapper.del",50);
+
+        System.out.println(query);
+        sqlSession.commit();
+        // 释放资源
+        sqlSession.close();
+    }
+
+    // 修改
+    @Test
+    public void test4() throws IOException{
+
+        User user = new User("777", "888");
+        user.setUid(19);
+
+        // 获得核心配置文件
+        InputStream inputStream = Resources.getResourceAsStream("sqlMapConfig.xml");
+        // 获取sessionFactory工厂对象
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        // 获取session会话对象
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        //执行操作  参数 :命名空间 namespace + id
+        int query = sqlSession.update("userMapper.modify", user);
+
+        System.out.println(query);
+        sqlSession.commit();
+        // 释放资源
+        sqlSession.close();
+    }
+}
+
+```
+
+![image-20220112173156844](\typora-user-images\image-20220112173156844.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# x. Maven
 
 <hr/>
 

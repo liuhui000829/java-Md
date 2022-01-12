@@ -9,7 +9,7 @@ public class InterceptorController {
 
     @RequestMapping("/testInterceptor")
     public String testInterceptor() {
-
+//        System.out.println(10/0);
         return "success";
     }
 }

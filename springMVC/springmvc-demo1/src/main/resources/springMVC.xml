@@ -65,10 +65,22 @@
             <mvc:mapping path="/**"/>
             <mvc:exclude-mapping path="/testInterceptor"/>
             <ref bean="firstInterceptor"/>
-<!--       以上配置方式可以通过ref或者bean标签设置拦截器 通过mvc:mapping设置需要拦截的请求,
-           通过mvc:exclude-mapping设置需要排除的请求,即不需要拦截请求    -->
+            <!--       以上配置方式可以通过ref或者bean标签设置拦截器 通过mvc:mapping设置需要拦截的请求,
+                       通过mvc:exclude-mapping设置需要排除的请求,即不需要拦截请求    -->
         </mvc:interceptor>
     </mvc:interceptors>
 
+<!--    &lt;!&ndash;    配置异常处理&ndash;&gt;-->
+<!--    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">-->
+<!--        <property name="exceptionMappings">-->
+<!--            <props>-->
+<!--                <prop key="java.lang.ArithmeticException">error</prop>-->
+<!--            </props>-->
+<!--        </property>-->
+<!--        &lt;!&ndash;        设置将异常信息共享在请求域中的key&ndash;&gt;-->
+<!--        <property name="exceptionAttribute" value="ex"/>-->
+
+
+<!--    </bean>-->
 
 </beans>

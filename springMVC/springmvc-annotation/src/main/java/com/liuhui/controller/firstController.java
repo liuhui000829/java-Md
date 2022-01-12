@@ -1,65 +1,35 @@
 package com.liuhui.controller;
 
-import com.liuhui.entity.Employee;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
-@RestController
+@Controller
 @SuppressWarnings("all")
-public class HTTPMessageController {
+public class firstController {
 
-    @RequestMapping("/testRequestBody")
-    public String testRequestBody(@RequestBody String requestBody) {
-        System.out.println(requestBody);
-        return "success";
+    @RequestMapping("/")
+    public String index() {
+        return "index";
     }
 
-
-    @RequestMapping("/testRequestEntity")
-    public String testRequestBody(RequestEntity<String> requestEntity) {
-        System.out.println(requestEntity);
-        System.out.println("============");
-        System.out.println(requestEntity.getHeaders());
-        System.out.println(requestEntity.getBody());
-        return "success";
+    @RequestMapping("/exception")
+    public String exception() {
+//        System.out.println(10/0);
+        return "hello";
     }
-
-
-    @RequestMapping("/testResponse")
-    public void testRequestBody(HttpServletResponse response) throws IOException {
-        response.setContentType("text/html;charset=utf-8");
-        response.getWriter().println("你的你的都是你的");
-
-    }
-
-    @RequestMapping("/testResponseBody")
-    public String testRequestBody() {
-        return "<h1 style='color:red'>我是一个文本</h1>";
-    }
-
-
-    @RequestMapping("/testResponseUser")
-    public Employee testRequestUser() {
-        return new Employee(1001, "aaa", "bbb");
-    }
-    // 浏览器响应中展示的结果为   {"id":"1001","username":"aaa","password":"bbb"}
-
-    @PostMapping("/testAxios")
-    public Employee testAxios(String username, String password) {
-        return new Employee(1001, username, password);
-    }
-
     // 下载文件
     @RequestMapping("/testResponseEntity")
     public ResponseEntity<byte[]> testResponseEntity(HttpSession httpSession) throws IOException {
@@ -67,7 +37,6 @@ public class HTTPMessageController {
         ServletContext servletContext = httpSession.getServletContext();
         // 获取服务器中文件的真实路径
         String realPath = servletContext.getRealPath("/static/image/1.jpg");
-        System.out.println(realPath);
         // 创建输入流
         InputStream inputStream = new FileInputStream(realPath);
         System.out.println(inputStream.available());
@@ -115,6 +84,6 @@ public class HTTPMessageController {
         photo.transferTo(new File(finalPath));  //把资源转移到服务器
 
 
-        return "success";
+        return "hello";
     }
 }

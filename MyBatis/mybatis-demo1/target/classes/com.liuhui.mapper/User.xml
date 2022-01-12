@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="userMapper">
+    <!--    查询所有-->
+    <select id="findAll" resultType="com.liuhui.domain.User">
+select *   from tab_user </select>
+
+    <!--增-->
+    <insert id="add" parameterType="com.liuhui.domain.User">
+        insert into tab_user(username, password)
+        values (#{username}, #{password})
+    </insert>
+    <!--删-->
+    <delete id="del" parameterType="java.lang.Integer">
+        delete from  tab_user where uid = #{id}
+
+    </delete>
+    <!--改-->
+    <update id="modify" parameterType="com.liuhui.domain.User">
+        update tab_user set username=#{username },password=#{password} where uid=#{uid}
+    </update>
+
+</mapper>
+
+
+

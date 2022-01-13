@@ -1,25 +1,79 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="userMapper">
+<mapper namespace="com.liuhui.dao.UserDao">
+    
+<!--    sql语句抽取-->
+    <sql id="selectUser"> select * from tab_user</sql>
+    
     <!--    查询所有-->
-    <select id="findAll" resultType="com.liuhui.domain.User">
-select *   from tab_user </select>
+    <select id="findAll" resultType="user">
+      <include refid="selectUser"/>
+    </select>
 
     <!--增-->
-    <insert id="add" parameterType="com.liuhui.domain.User">
+    <insert id="add" parameterType="user">
         insert into tab_user(username, password)
         values (#{username}, #{password})
     </insert>
+
+    <!--增2-->
+    <insert id="add2" parameterType="user">
+        insert into tab_user(username, password, birthday)
+        values (#{username}, #{password}, #{birthday})
+    </insert>
+
     <!--删-->
-    <delete id="del" parameterType="java.lang.Integer">
-        delete from  tab_user where uid = #{id}
+    <delete id="del" parameterType="int">
+        delete
+        from tab_user
+        where uid = #{id}
 
     </delete>
     <!--改-->
-    <update id="modify" parameterType="com.liuhui.domain.User">
-        update tab_user set username=#{username },password=#{password} where uid=#{uid}
+    <update id="modify" parameterType="user">
+        update tab_user
+        set username=#{username },
+            password=#{password}
+        where uid = #{uid}
     </update>
+    <!--    根据id查询信息-->
+    <select id="findById" resultType="user" parameterType="int">
+        select *
+        from tab_user
+        where uid = #{id}
+
+    </select>
+
+    <!--    根据条件查询 用户-->
+    <select id="findByCondition" parameterType="user" resultType="user">
+        <include refid="selectUser"/>
+        <where>
+            <if test="uid!=0">
+                and uid=#{uid}
+            </if>
+            <if test="username!=null">
+                and username=#{username}
+            </if>
+            <if test="password!=null">
+                and password=#{password}
+            </if>
+        </where>
+
+    </select>
+
+
+
+    <!--    根据条件查询 用户2-->
+    <select id="findByIds" parameterType="list" resultType="user">
+        <include refid="selectUser"/>
+        <where>
+           <foreach collection="list" item="uid" open="uid in(" close=")" separator=",">
+               #{uid}
+           </foreach>
+        </where>
+
+    </select>
 
 </mapper>
 

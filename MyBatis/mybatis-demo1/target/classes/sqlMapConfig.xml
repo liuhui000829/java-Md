@@ -3,22 +3,41 @@
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
+
 <configuration>
-<!--    数据源的环境-->
+    <!-- 加载外部的jdbc.properties-->
+    <properties resource="jdbc.properties"/>
+    <!--    自定义别名-->
+    <typeAliases>
+        <typeAlias type="com.liuhui.domain.User" alias="user"/>
+    </typeAliases>
+<!--    注册类型处理器-->
+    <typeHandlers>
+        <typeHandler handler="com.liuhui.handler.DateTypeHandler"/>
+    </typeHandlers>
+<!--    配置分页助手插件-->
+<plugins>
+    <plugin interceptor="com.github.pagehelper.PageHelper">
+<!--        指定方言-->
+        <property name="dialect" value="mysql"/>
+    </plugin>
+</plugins>
+
+    <!--    数据源的环境-->
     <environments default="development">
         <environment id="development">
-            <transactionManager type="JDBC"></transactionManager>
+            <transactionManager type="JDBC"/>
             <dataSource type="POOLED">
-                <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
-                <property name="url" value="jdbc:mysql://localhost:3306/db?autoReconnect=true&amp;useUnicode=true&amp;createDatabaseIfNotExist=true&amp;characterEncoding=utf8&amp;useSSL=true&amp;serverTimezone=UTC"/>
-                <property name="username" value="root"/>
-                <property name="password" value="root"/>
+                <property name="driver" value="${prop.driverClassName}"/>
+                <property name="url" value="${prop.url}"/>
+                <property name="username" value="${prop.username}"/>
+                <property name="password" value="${prop.password}"/>
             </dataSource>
         </environment>
     </environments>
 
-<!--    加载映射文件-->
-<mappers>
-    <mapper resource="com.liuhui.mapper/User.xml"/>
-</mappers>
+    <!--    加载映射文件-->
+    <mappers>
+        <mapper resource="com.liuhui.mapper/User.xml"/>
+    </mappers>
 </configuration>

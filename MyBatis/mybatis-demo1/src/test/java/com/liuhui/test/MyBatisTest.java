@@ -42,11 +42,11 @@ public class MyBatisTest {
         // 获取sessionFactory工厂对象
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
         // 获取session会话对象
-        SqlSession sqlSession = sqlSessionFactory.openSession();
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
         //执行操作  参数 :命名空间 namespace + id
         int query = sqlSession.insert("userMapper.add",user);
         System.out.println(query);
-        sqlSession.commit();
+//        sqlSession.commit();
         // 释放资源
         sqlSession.close();
     }
@@ -88,6 +88,26 @@ public class MyBatisTest {
         System.out.println(query);
         sqlSession.commit();
         // 释放资源
+        sqlSession.close();
+    }
+
+
+    //根据id查询信息
+    @Test
+    public void test5() throws IOException{
+
+
+
+        // 获得核心配置文件
+        InputStream inputStream = Resources.getResourceAsStream("sqlMapConfig.xml");
+        // 获取sessionFactory工厂对象
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        // 获取session会话对象
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        //执行操作  参数 :命名空间 namespace + id
+        User user = sqlSession.selectOne("userMapper.findById", 1);
+        System.out.println(user);
+
         sqlSession.close();
     }
 }

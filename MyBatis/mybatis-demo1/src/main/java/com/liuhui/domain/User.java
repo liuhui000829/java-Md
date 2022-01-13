@@ -1,12 +1,21 @@
 package com.liuhui.domain;
 
+import java.util.Date;
+
 public class User {
     private int uid;
     private String username;
     private String password;
+    private Date birthday;
 
     public User(){}
+
     public User( String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+    public User(int uid, String username, String password) {
+        this.uid=uid;
         this.username = username;
         this.password = password;
     }
@@ -35,12 +44,21 @@ public class User {
         this.password = password;
     }
 
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "uid=" + uid +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
+                ", birthday=" + birthday +
                 '}';
     }
 }

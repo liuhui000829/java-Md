@@ -1,8 +1,9 @@
 
 
-
+![image-20220112212501823](\typora-user-images\image-20220112212501823.png)
 
 # 一. java基础
+
 ## 1.  java基础文件内容
 
 ### 2. liuhui.com.oop.a1 a2 a3 day1
@@ -138,7 +139,7 @@ json的转换 引入 fastJson工具类 导入
 
 
 
-# 二. Java概念
+# 二. Java基础2
 
 ## 1.面向对象
 
@@ -904,6 +905,595 @@ public class FileDemo5 {
 }
 
 ```
+
+
+
+### 2. 线程
+
+#### 1. 线程简介
+
+<span style="color:red">**任务**</span>	<span style="color:red">**进程**</span>	<span style="color:red">**线程**</span>	<span style="color:red">**多线程**</span>
+
+**多任务**:
+
+* 现实中太多同时做多见事情的例子,看起来是多个任务都在做,其本质上我们的大脑同一时间依旧只能做一件事情
+
+**进程(Process):**
+
+* 一个进程可以有多个线程,如视频中同时听声音,看图像 看弹幕，等等
+
+1. 说起进程,就不得不说下**程序**。程序是指令和数据的有序集合，其本质没有任何运行的意义，是一个静态的概念
+
+2. 而**进程**则是执行程序的一次执行过程,他是一个动态的概念.是系统资源分配的单位
+
+3. 通常在一个进程中包含若干个**线程**,当然一个进程中至少有一个线程,不然没有存在的意义.线程是CPU调度和执行的单位
+
+==注意: 很多多线程是模拟出来的,真正的多线程是指有多个cpu，即多核,如服务器,如果是模拟出来的多线程,即在一个cup的情况下,在同一时间点,cup只能执行一个代码, 因为切换的很快,所以就有同时执行的错觉==
+
+**线程(Thread):**
+
+* 线程是独立的执行路径
+* 在程序运行时,即使自己没有创建线程，后台也会有多个线程，如主线程,gc线程；
+* main() 称之为主线程,为系统的入口，用于执行整个程序
+* 在一个进程中,如果开辟了多个线程,线程的运行由调度器安排调度，调度器是与操作系统紧密相关的,先后顺序是不能人为干预的
+
+* 对统一资源操作时,会存在资源抢夺的问题,需要加入并发控制
+* 线程会带来额外的开销,如cpu调度时间,并发控制开销
+* 每个线程在自己的工作内存交互,内存控制不当会造成数据不一致
+
+
+
+**多线程:**
+
+* 
+
+![image-20220112211716210](\typora-user-images\image-20220112211716210.png)
+
+#### 2. 线程实现 ( 重点 )
+
+**1. 继承Thread类**		 **2. 实现Runnable接口**		 **3. 实现Callable接口**
+
+##### 1. 继承Thread类
+
+
+
+![image-20220112214652654](\typora-user-images\image-20220112214652654.png)
+
+code实现:
+
+```java
+// 创建线程方式一:  继承Thread类,重写run方法,调用start开启线程
+public class TestThread1 extends Thread {
+    @Override
+    public void run() {
+        for (int i = 0; i < 200; i++) {
+            System.out.println("其他线程");
+        }
+    }
+
+    // main线程 主线程
+    public static void main(String[] args) {
+        // 创建一个线程对象
+        TestThread1 testThread1 = new TestThread1();
+        // 调用start方法 开启线程
+        testThread1.start();
+
+        for (int i = 0; i < 200; i++) {
+            System.out.println("main main main线程");
+        }
+    }
+}
+
+```
+
+##### 2. 多线程下载图片
+
+```java
+
+// 多线程同步下载多张图片
+public class TestThread2 extends Thread {
+    private final String url;     // 网络图片地址
+    private final String name;    // 保存的文件名
+
+    public TestThread2(String url, String name) {
+        this.url = url;
+        this.name = name;
+    }
+
+    // 下载图片线程的执行体
+    @Override
+    public void run() {
+        WebDownLoader webDownLoader = new WebDownLoader();
+        webDownLoader.downLoader(url, name);
+        System.out.println("下载了文件名称为:"+name);
+
+    }
+
+    // 主线程
+    public static void main(String[] args) {
+        String url1 = "https://img.alicdn.com/imgextra/i3/O1CN01ehZW7N1iOcbw8s5v3_!!6000000004403-2-tps-209-75.png";
+        String url2 = "https://img.alicdn.com/imgextra/i3/O1CN01i1Mqim1QPOBzu6eXo_!!6000000001968-2-tps-209-75.png";
+        String url3 = "https://img.alicdn.com/imgextra/i1/O1CN01fp595K2483pyve6ns_!!6000000007345-2-tps-209-75.png";
+        
+        TestThread2 t1 = new TestThread2(url1,"apache1.jpg");
+        TestThread2 t2 = new TestThread2(url2,"apache2.jpg");
+        TestThread2 t3 = new TestThread2(url3,"apache3.jpg");
+
+        t1.start();
+        t2.start();
+        t3.start();
+    }
+}
+
+// 下载器
+class WebDownLoader {
+    // 下载的方法
+    public void downLoader(String url, String name) {
+        try {
+            FileUtils.copyURLToFile(new URL(url),new File(name));
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Io异常,downLoader方法出现异常");
+        }
+    }
+}
+
+```
+
+##### 3. 实现Runnable接口
+
+![image-20220112231715078](\typora-user-images\image-20220112231715078.png)
+
+code实现：
+
+```java
+// 线程的实现方式二  实现Runnable接口
+
+public class TestThread3 implements Runnable {
+    @Override
+    public void run() {
+        for (int i = 0; i < 200; i++) {
+            System.out.println("Thread3333");
+        }
+    }
+
+    public static void main(String[] args) {
+        
+        // 创建Runnable接口的实现类对象
+        TestThread3 testThread3 = new TestThread3();
+        Thread1 thread1 = new Thread1();
+        Thread2 thread2 = new Thread2();
+
+        // 创建线程对象 并通过线程对象开启线程,代理
+        new Thread(testThread3).start();
+        new Thread(thread1).start();
+        new Thread(thread2).start();
+
+        for (int i = 0; i < 200; i++) {
+            System.out.println("main444 ");
+        }
+    }
+}
+
+class Thread1 implements Runnable {
+
+    @Override
+    public void run() {
+        for (int i = 0; i < 200; i++) {
+            System.out.println("Thread1111111111");
+        }
+    }
+}
+
+class Thread2 implements Runnable {
+
+    @Override
+    public void run() {
+        for (int i = 0; i < 200; i++) {
+            System.out.println("Thread2222222222222222222222222222");
+        }
+    }
+}
+
+```
+
+##### 4. 多个线程同时操作一个对象
+
+```java
+package liuhui.com.高级特性.线程.new线程;
+
+// 多个线程同时操作一个对象
+// 买火车票的例子
+
+
+// 发现一个问题: 多个线程同时操作一个资源的情况下,线程不安全,数据混乱
+public class TestThread4 implements Runnable {
+
+    // 票数
+    private int tickerNums = 10;
+
+    @Override
+    public void run() {
+        while (true) {
+            if (tickerNums <= 0) break;
+            try {
+                Thread.sleep(500);      // 模拟延迟 毫秒
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println(Thread.currentThread().getName()+ "拿到了第" + tickerNums-- + "张票");
+        }
+    }
+
+    public static void main(String[] args) {
+        TestThread4 testThread4 = new TestThread4();
+        new Thread(testThread4,"小明").start();
+        new Thread(testThread4,"老师").start();
+        new Thread(testThread4,"黄牛").start();
+
+    }
+}
+
+```
+
+##### 5. 龟兔赛跑
+
+```java
+package liuhui.com.高级特性.线程.new线程;
+
+// 模拟龟兔赛跑 - Race
+
+/**
+ * 1.首先来个赛道距离,然后要离终点越来越近
+ * 2.判断比赛是否结束
+ * 3.打印出胜利者
+ * 4.龟兔赛跑开始
+ * 5.故事中是乌龟赢的,兔子需要睡觉,所以我们来模拟兔子睡觉
+ * 6.终于乌龟赢了比赛
+ */
+
+
+public class TestThread5 implements Runnable {
+
+    // 胜利者
+    private static String winner;
+
+    @Override
+    public void run() {
+        for (int i = 0; i <= 100; i++) {
+
+            // 模拟兔子休息
+            if ("兔子".equals(Thread.currentThread().getName()) && i % 10 == 0) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            boolean flag = gameOver(i);
+            if (flag)  break;
+            System.out.println(Thread.currentThread().getName() + "--> 跑了" + i + "步");
+        }
+    }
+
+    // 是否完成比赛
+    private boolean gameOver(int steps) {
+        // 判断是否有胜利者
+        if (winner != null) return true;
+
+        // 看谁先到100步
+        if (steps >= 100) {
+            winner = Thread.currentThread().getName();
+            System.out.println("Winner is" + winner);
+            return true;
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+        TestThread5 testThread5 = new TestThread5();
+        new Thread(testThread5, "兔子").start();
+        new Thread(testThread5, "乌龟").start();
+
+    }
+}
+
+```
+
+##### 6. 实现Callable接口 ( 了解即可 )
+
+![image-20220113220338445](\typora-user-images\image-20220113220338445.png)
+
+code实现:
+
+```java
+package liuhui.com.高级特性.线程.new线程;
+
+/**
+ * 用callable接口改造图片下载
+ * callable好处
+ * 1. 可以定义返回值
+ * 2. 可以抛出异常
+ */
+
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.concurrent.*;
+
+// 多线程同步下载多张图片
+public class TestThread6 implements Callable<Boolean> {
+    private String url;     // 网络图片地址
+    private String name;    // 保存的文件名
+
+    public TestThread6(String url, String name) {
+        this.url = url;
+        this.name = name;
+    }
+
+
+    // 主线程
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        String url1 = "https://img.alicdn.com/imgextra/i3/O1CN01ehZW7N1iOcbw8s5v3_!!6000000004403-2-tps-209-75.png";
+        String url2 = "https://img.alicdn.com/imgextra/i3/O1CN01i1Mqim1QPOBzu6eXo_!!6000000001968-2-tps-209-75.png";
+        String url3 = "https://img.alicdn.com/imgextra/i1/O1CN01fp595K2483pyve6ns_!!6000000007345-2-tps-209-75.png";
+
+        TestThread6 t1 = new TestThread6(url1, "apache1.jpg");
+        TestThread6 t2 = new TestThread6(url2, "apache2.jpg");
+        TestThread6 t3 = new TestThread6(url3, "apache3.jpg");
+
+        // 创建执行服务
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
+        // 提交执行:
+        Future<Boolean> r1 = executorService.submit(t1);
+        Future<Boolean> r2 = executorService.submit(t2);
+        Future<Boolean> r3 = executorService.submit(t3);
+        // 获取结果
+        boolean rs1 = r1.get();
+        boolean rs2 = r2.get();
+        boolean rs3 = r3.get();
+        // 关闭服务
+        executorService.shutdownNow();
+    }
+
+    @Override
+    public Boolean call() throws IOException {
+        WebDownLoader2 webDownLoader = new WebDownLoader2();
+        webDownLoader.downLoader(url, name);
+        System.out.println("下载的文件名字为" + name);
+        return true;
+    }
+}
+
+// 下载器
+class WebDownLoader2 {
+    // 下载的方法
+    public void downLoader(String url, String name) throws IOException {
+        FileUtils.copyURLToFile(new URL(url), new File(name));
+
+    }
+}
+
+```
+
+##### 7. 静态代理
+
+![image-20220113225834905](\typora-user-images\image-20220113225834905.png)
+
+code:
+
+```java
+package liuhui.com.高级特性.线程.new线程2;
+
+/*
+ *  静态代理模式总结:
+ *  1. 真实对象 和 代理对象 都要实现同一个接口
+ *  2. 代理对象要代理真实角色
+ *  好处:
+ *   // 代理对象可以做很多真实对象做不了的事情
+ *   // 真实对象专注做自己的事情
+ *
+ * */
+public class _01StaticProxy {
+    public static void main(String[] args) {
+        You you = new You();
+
+        new Thread(()->System.out.println("我爱你")).start();  // lambda表达式
+
+        new WeddingCompany(you).happyMarry();   // 传入目标对象
+
+    }
+}
+
+// 结婚
+interface Merry {
+    void happyMarry();
+}
+
+// 真实角色: 你去结婚
+class You implements Merry {
+
+    @Override
+    public void happyMarry() {
+        System.out.println("结婚了");
+    }
+}
+
+// 代理角色: 帮助你结婚
+class WeddingCompany implements Merry {
+
+    private Merry target;
+
+    public WeddingCompany(Merry target) {
+        this.target = target;
+    }
+
+    @Override
+    public void happyMarry() {
+        this.before();
+        this.target.happyMarry();
+        this.after();
+    }
+
+    private void before() {
+        System.out.println("结婚之前喜气洋洋");
+    }
+
+    private void after() {
+        System.out.println("结婚之后愁眉苦脸");
+    }
+}
+// 我爱你
+// 结婚之前喜气洋洋
+// 结婚了
+// 结婚之后愁眉苦脸
+
+```
+
+##### 8. Lamda表达式
+
+![image-20220113230444508](\typora-user-images\image-20220113230444508.png)
+
+
+
+* **为什么要用lambda表达式**
+  * 避免匿名内部类定义过多
+  * 可以让你的代码看起来更简洁
+  * 去掉一堆没有意义的代码,只留下核心的逻辑
+
+* **理解Functional Interface (函数式接口) 是学习 java8 lambda表达式的关键所在**
+
+* **函数式接口的定义:**
+
+  * 任何接口: 如果只包含唯一一个抽象方法,那么它就是一个函数式接口
+
+    public interface Runnable{
+
+    ​			public abstract void run(); 
+
+    }
+
+  * 对于函数式接口,我们可以通过lambda表达式来创建该接口的对象
+
+code:
+
+```java
+package liuhui.com.高级特性.线程.new线程2;
+
+/*
+ * lambda表达式的初体验
+ *
+ *
+ *
+ * */
+
+public class _02LambdaDemo1 {
+    // 3. 静态内部类
+    static class Like2 implements ILike {
+        @Override
+        public void lambda() {
+            System.out.println("I like lambda 静态内部类");
+        }
+    }
+
+
+    public static void main(String[] args) {
+        // 4. 局部内部类
+        class Like3 implements ILike {
+            @Override
+            public void lambda() {
+                System.out.println("I like lambda 局部内部类");
+            }
+        }
+
+//        5. 匿名内部类 没有类的名称，必须借助接口或者接口
+//        ILike iLike = new ILike() {
+//            @Override
+//            public void lambda() {
+//                System.out.println("I like lambda 匿名内部类");
+//            }
+//        };
+//        iLike.lambda();
+
+        // 6. 用lambda简化
+        ILike iLike = () -> System.out.println("i like lambda 真正的表达式");
+        iLike.lambda();
+        
+        //经典: 因为Runnable接口只有一个方法, 中间的过程你细品
+        new Thread(()->System.out.println("我爱你")).start();  // lambda表达式
+
+    }
+}
+
+// 1. 定义一个函数式接口
+interface ILike {
+    void lambda();
+}
+
+// 2. 实现类
+class Like implements ILike {
+
+    @Override
+    public void lambda() {
+        System.out.println("I like lambda");
+    }
+}
+
+
+```
+
+
+
+#### 3. 线程状态 ( 5大状态 )
+
+![image-20220114003034121](\typora-user-images\image-20220114003034121.png)
+
+![image-20220114003303394](\typora-user-images\image-20220114003303394.png)
+
+##### 1. 线程方法
+
+| 方法                           | 说明                                       |
+| ------------------------------ | ------------------------------------------ |
+| setPriority(int newPriority)   | 更改线程优先级                             |
+| static void sleep(long millis) | 在指定的毫秒数内让当前正在执行的线程休眠   |
+| void join()                    | 等待该线程终止                             |
+| static void yield()            | 暂停当前正在执行的线程对象，并执行其他线程 |
+| void interrupt()   X           | 中断线程，别用这个方式                     |
+| boolean isAlive()              | 测试线程是否处于活动状态                   |
+
+
+
+#### 4. 线程同步(重点)
+
+#### 5. 线程通信问题
+
+#### 6. 高级主题
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5834,7 +6424,7 @@ private void processDispatchResult(HttpServletRequest request, HttpServletRespon
 
 ## 1. MyBatis的快速入门
 
-### 2.1 MyBatis的开发步骤
+<span style="color:red">**MyBatis的开发步骤**</span>
 
 1. 添加myBatis的坐标 也就依赖包
 
@@ -5849,7 +6439,7 @@ private void processDispatchResult(HttpServletRequest request, HttpServletRespon
 ```xml
 pom.xml 的依赖
 
-<dependency>
+		<dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.19</version>
@@ -5875,9 +6465,9 @@ pom.xml 的依赖
 **2. 编写映射文件UserMapper.xml**
 
 ```xml
-在 Resources 下创建一个包 com.liuhui.mapper
+在 Resources 下创建一个包 com.liuhui.mapper 名称为: User.xml
 
-User.xml
+
 
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -5919,25 +6509,42 @@ User.xml
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
-<!--    数据源的环境-->
-    <environments default="development">
+    <!-- 加载外部的jdbc.properties-->
+    <properties resource="jdbc.properties"/>
+    <!--    自定义别名-->
+    <typeAliases>
+        <typeAlias type="com.liuhui.domain.User" alias="user"/>
+    </typeAliases>
+
+    <!--    数据源的环境-->
+    <!--
+		default="development"   指定默认的环境名称
+		id="development"		指定当前环境名称
+		type="JDBC"				指定事务管理器类型是JDBC
+		type="POOLED"			指定当前数据源类型是连接池
+		...	数据库基本参数配置
+
+		environments标签 支持多环境配置 
+	
+
+	-->
+    <environments default="development">			
         <environment id="development">
-            <transactionManager type="JDBC"></transactionManager>
+            <transactionManager type="JDBC"/>
             <dataSource type="POOLED">
-                <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
-                <property name="url" value="jdbc:mysql://localhost:3306/db?autoReconnect=true&amp;useUnicode=true&amp;createDatabaseIfNotExist=true&amp;characterEncoding=utf8&amp;useSSL=true&amp;serverTimezone=UTC"/>
-                <property name="username" value="root"/>
-                <property name="password" value="root"/>
+                <property name="driver" value="${prop.driverClassName}"/>
+                <property name="url" value="${prop.url}"/>
+                <property name="username" value="${prop.username}"/>
+                <property name="password" value="${prop.password}"/>
             </dataSource>
         </environment>
     </environments>
 
-<!--    加载映射文件-->
-<mappers>
-    <mapper resource="com.liuhui.mapper/User.xml"/>
-</mappers>
+    <!--    加载映射文件-->
+    <mappers>
+        <mapper resource="com.liuhui.mapper/User.xml"/>
+    </mappers>
 </configuration>
-
 
 ```
 
@@ -5955,7 +6562,7 @@ public class MyBatisTest {
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
         // 获取session会话对象
         SqlSession sqlSession = sqlSessionFactory.openSession();
-        //执行操作  参数 :命名空间 namespace + id
+        // 执行操作  参数 :命名空间 namespace + id
         List<User> userList = sqlSession.selectList("userMapper.findAll");
         // 打印数据
         userList.forEach(v->{
@@ -5975,7 +6582,7 @@ public class MyBatisTest {
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
         // 获取session会话对象
         SqlSession sqlSession = sqlSessionFactory.openSession();
-        //执行操作  参数 :命名空间 namespace + id
+        // 执行操作  参数 :命名空间 namespace + id
         int query = sqlSession.insert("userMapper.add",user);
         System.out.println(query);
         sqlSession.commit();
@@ -5992,7 +6599,7 @@ public class MyBatisTest {
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
         // 获取session会话对象
         SqlSession sqlSession = sqlSessionFactory.openSession();
-        //执行操作  参数 :命名空间 namespace + id
+        // 执行操作  参数 :命名空间 namespace + id
         int query = sqlSession.delete("userMapper.del",50);
 
         System.out.println(query);
@@ -6014,7 +6621,7 @@ public class MyBatisTest {
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
         // 获取session会话对象
         SqlSession sqlSession = sqlSessionFactory.openSession();
-        //执行操作  参数 :命名空间 namespace + id
+        // 执行操作  参数 :命名空间 namespace + id
         int query = sqlSession.update("userMapper.modify", user);
 
         System.out.println(query);
@@ -6028,6 +6635,417 @@ public class MyBatisTest {
 
 ![image-20220112173156844](\typora-user-images\image-20220112173156844.png)
 
+## 2. MyBatis核心配置文件概述
+
+**1. MyBatis核心配置文件层级关系**
+
+* configuration 配置
+  * properties 属性
+  * setting 设置
+  * typeAliases 类型名称
+  * typeHandlers  类型处理器
+  * objectFactory 对象工厂
+  * plugins  插件
+  * environments  环境
+    * environment  环境变量
+      * transactionManager  事务管理器
+      * dataSource  数据源
+  
+  *  databaseIdProvieder 数据库厂商标识
+  * mappers  映射器
+
+**2. MyBatis常用配置解析**
+
+<span style="color:red">**1. environments 标签**</span>
+
+其中,事务管理器(transactionManager) 类型有两种 :
+
+		* JDBC：这个配置就是直接使用JDBC的提交和回滚设置,它依赖于从数据源得到的连接来管理事务作用域
+		* MANAGED: 这个配置几乎没做什么,它从来不提交或回滚一个连接,而是让容器来管理事务的整个生命周期(比如JEE应用服务器的上下文).默请情况下他会关闭连接,然而有一些容器并不希望这样,因此需要将closeConnection属性设置为false来阻止它的默认关闭行为。
+
+其中数据源有三种:
+
+* UNPOOLED: 这个数据源的实现只是每次被请求时打开和关闭连接。
+* POOLED: 这种数据源的实现利用"池"的概念将JDBC连接对象组织起来
+* JNDI: 这个数据源的实现是为了能在如 EJB 或应用服务器这类容器中使用,容器可以集中或在外部配置数据源,让后放一个JNDI上下文的引用
+
+<span style="color:red">**2. mappers 标签**</span>
+
+该标签的作用是加载映射的, 加载方式有如下几种：
+
+* 使用相对于类路径的资源引用，例如:<mapper resource="com.liuhui.mapper/User.xml"/>    ✔
+* 使用完全限定资源定位符(URL), 例如: <mapper url="file://xx.xx.xxxxx.xml"/>  
+
+* 使用映射器接口实现类的完全限定类名， 例如: <mapper class="com.liuhui.mapper.User"/>  ✔
+* 将包内的映射器接口全部注册为映射器, 例如<package name="com.liuhui.mapper"/>  ✔
+
+<span style="color:red">**3. Properties 标签**</span>
+
+实际开发中,习惯将数据源的配置信息单独的抽取成一个properties文件,该标签可以加载额外配置的properties文件
+
+<properties resource="jdbc.properties"/>
+
+<span style="color:red">**4. typeAliases标签**</span>
+
+类型别名是为java类型设置一个短的名字,原来的类型名称配置如下
+
+```xml
+User.xml
+<select id="findAll" resultType="user">  select * from tab_user </select>
+   
+
+sqlMapConfig.xml
+<!-- 自定义别名 -->
+<typeAliases>
+    <typeAlias type="com.liuhui.domain.User" alias="user"/>
+</typeAliases>
+```
+
+上面是我们自定义的别名, mybatis框架已经为我们设置好了一些常用的类型的别名
+
+| 别名          | 数据类型      |
+| ------------- | ------------- |
+| string        | String        |
+| long          | Long          |
+| int           | Integer       |
+| double        | Double        |
+| boolean  list | Boolean  List |
+| ... ...       | ... ...       |
+
+
+
+<span style="color:red">**5. environments标签: 数据源环境配置标签**</span>
+
+```xml
+<environments default="development">			
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${prop.driverClassName}"/>
+                <property name="url" value="${prop.url}"/>
+                <property name="username" value="${prop.username}"/>
+                <property name="password" value="${prop.password}"/>
+            </dataSource>
+        </environment>
+    	...
+    </environments>
+```
+
+
+
+<span style="color:red">**6. SqlSession工厂构建器SqlSessionFactorybuilder **</span>
+
+常用的API: SqlSessionFactory build(InputStream inputStream)
+
+通过加载mybatis的核心文件的输入流的形式构建一个SqlSessionFactory对象
+
+```java
+String resource="sqlMapConfig.xml"
+    
+InputStream inputStream = Resources.getResourceAsStream(resource);
+
+// 获取sessionFactory工厂对象
+SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+
+// 注意: Resources工具类， 这个类在org.apache.ibatis.io包中, Resources类帮助你从类路径下、文件系统或一个 web URL 中加载资源文件
+```
+
+
+
+ <span style="color:red">**7. SqlSession工厂对象SqlSessionFactory **</span>
+
+SqlSessionFactory 有多个方法创建SqlSession实例. 常用的有如下两个
+
+1. openSession(): 会默认开启一个事务，但事务不会自动提交,也就意味着需要手动提交该事务,更新操作才会持久化到数据库中
+
+2. openSession(boolean  autoCommit):  参数为是否自动提交，设置为true，那么不需要手动提交事务
+
+
+
+ <span style="color:red">**8. SqlSession会话对象 **</span>
+
+SqlSession 实例在 myBatis中是非常强大的一个类,在这里你会看到所有执行的语句、提交或回滚事务和获取映射器实例的方法.
+
+
+
+```java
+// 执行的语句主要有:
+
+	<T> T selectOne(String statement,Object parameter)
+
+    <E> List<E> selectList(String statement,Object parameter)
+    
+    int insert  (String statement,Object parameter)
+    
+    int update  (String statement,Object parameter)
+    
+    int delete  (String statement,Object parameter)
+
+// 操作事务主要有
+	void commit()
+    void rollback()
+
+```
+
+ <span style="color:red">**9. MyBatis的增删改查操作注意事项**</span>
+
+* 插入语句使用Insert标签
+* 在映射文件中使用parameterType属性指定要插入的数据类型
+* Sql语句中使用#{实体属性名}方式引用实体中的属性值
+* 插入操作使用的是API是sqlSession.insert("命名空间",实体对象);
+* 插入操作设计数据库数据变化,所以要使用sqlSession对象显示的提交事务 即sqlSession.commit()
+
+
+
+
+
+## 3. MyBatis的Dao层实现
+
+<h3>1. 传统开发方式</h3>
+
+   <span style="color:red">**编写UserDao接口**</span>
+
+```java
+public interface UserDao{
+	List<User> findAll() throws IOException;
+}
+```
+
+<h3>2. 代理开发方式</h3>
+
+ <span style="color:red">**代理开发方式介绍**</span>
+
+采用 Mybatis的代理开发方式实现DAO层的开发,这种方式是我们后面进入企业的主流
+
+Mapper接口开发方式只需要程序员编写Mapper接口(相当于Dao接口)，由Mybatis框架根据接口定义创建接口的动态代理对象,代理对象的方法体同上边Dao接口实现类方法
+
+Mapper接口开发需要遵循一下规范:
+
+1、Mapper.xml文件种的namespace与mapper接口的全限定名相同
+
+2、Mapper接口方法名和Mapper.xml种定义的每个statemen的id相同
+
+3、Mapper接口方法的输入参数类型和mapper.xml中定义的每个sql的parameterType类型相同
+
+4、Mapper接口方法的输出参数类型和mapper.xml中定义的每个sql的resultType类型相同
+
+![image-20220113155928932](\typora-user-images\image-20220113155928932.png)
+
+代码演示:
+
+```java
+public interface UserDao {
+    List<User> findAll () throws Exception;
+    User findById(int id) throws Exception;
+}
+
+		 // 获得核心配置文件
+        InputStream inputStream = Resources.getResourceAsStream("sqlMapConfig.xml");
+        // 获取sessionFactory工厂对象
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        // 获取session会话对象
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+		// 主要是这一行
+        UserDao userDao = sqlSession.getMapper(UserDao.class);
+
+        List<User> userList = userDao.findAll();  //获取所有的用户
+        User user = userDao.findById(1);  //根据id查询用户
+
+        userList.forEach(System.out::println);
+        System.out.println(user);
+        // 释放资源
+        sqlSession.close();
+
+
+```
+
+```xml
+<mapper namespace="com.liuhui.dao.UserDao">
+    <!--    查询所有-->
+    <select id="findAll" resultType="user">
+        select *   from tab_user
+    </select>
+
+<!--    根据id查询信息-->
+    <select id="findById" resultType="user" parameterType="int">
+        select * from tab_user where uid=#{id}
+
+    </select>
+
+</mapper>
+```
+
+<h3>3. Mybatis映射文件的深入</h3>
+
+**1. 动态sql语句**
+
+ <span style="color:red">**1. 动态sql语句之 if**</span>
+
+我们根据实体类的不同取值,使用不同的SQL语句来进行查询,比如在id如果不为空时可以根据id查询,如果username不同时为空时还要加入用户名作为条件,这种情况下在我们的多条件组合查询中经常会碰到
+
+```xml
+ <!--    根据条件查询 用户-->
+    <select id="findByCondition" parameterType="user" resultType="user">
+        select * from tab_user
+        <where>
+            <if test="uid!=0">
+                and uid=#{uid}
+            </if>
+            <if test="username!=null">
+                and username=#{username}
+            </if>
+            <if test="password!=null">
+                and password=#{password}
+            </if>
+        </where>
+
+    </select>
+```
+
+<span style="color:red">**2. 动态sql语句之 foreach**</span>
+
+循环执行sql拼接操作,例如： select * from User where uid in(1,2,3)。
+
+```xml
+ <!--    根据条件查询 用户2 -->
+ <!-- 
+	list: 标识集合
+	open ,close 条件拼接
+	separator: 分隔符
+ -->
+    <select id="findByIds" parameterType="list" resultType="user">
+        select * from tab_user
+        <where>
+           <foreach collection="list" item="uid" open="uid in(" close=")" separator=",">
+               #{uid}
+           </foreach>
+        </where>
+    </select>
+
+```
+
+<span style="color:red">**3. typeHandlers标签**</span>
+
+比如：数据库中字段birthday是long类型 ，而java中birthday是date类型 那么就需要转化 ,写上一个类 继承BaseTypeHandler,重写他的方法
+
+```java
+
+public class DateTypeHandler extends BaseTypeHandler<Date>{
+    // 将java类型转化成数据库需要的类型
+    @Override
+    public void setNonNullParameter(PreparedStatement preparedStatement, int i, Date date, JdbcType jdbcType) throws SQLException {
+        long dateTime = date.getTime();
+        preparedStatement.setLong(i, dateTime);
+    }
+
+    // 将数据库中类型转化成java类型
+    // String 参数 ,数据库中要转换的字段名称
+    // ResultSet: 查出的结果集
+    @Override
+    public Date getNullableResult(ResultSet resultSet, String s) throws SQLException {
+        // 获取结果集中需要的数据(long)转化成Date类型 返回
+        long along = resultSet.getLong(s);
+        return new Date(along);
+    }
+
+    // 将数据库中类型转化成java类型
+    @Override
+    public Date getNullableResult(ResultSet resultSet, int i) throws SQLException {
+        long along = resultSet.getLong(i);
+        return new Date(along);
+    }
+
+    // 将数据库中类型转化成java类型
+    @Override
+    public Date getNullableResult(CallableStatement callableStatement, int i) throws SQLException {
+        long along = callableStatement.getLong(i);
+        return new Date(along);
+    }
+}
+
+mybatis映射文件中加入
+
+<!--    注册类型处理器-->
+    <typeHandlers>
+        <typeHandler handler="com.liuhui.handler.DateTypeHandler"/>  // handler 全类名
+    </typeHandlers>
+
+```
+
+<span style="color:red">**4. plugins标签**</span>
+
+myBatis可以使用第三方的插件来对功能进行扩展,分页助手PageHelper是将分页的复杂操作进行封装,使用简单的方式 即可获得分页的相关数据
+
+开发步骤 :
+
+1. 导入通用 PageHelper的坐标
+2. 在mybatis核心配置文件PageHelper插件
+3. 测试分页数据获取
+
+```xml
+pom.xml
+		<dependency>
+            <groupId>com.GitHub.pagehelper</groupId>
+            <artifactId>pagehelper</artifactId>
+            <version>3.7.5</version>
+        </dependency>
+		<!-- 解析器 -->	
+        <dependency>
+            <groupId>com.GitHub.jsqlparser</groupId>
+            <artifactId>jsqlparser</artifactId>
+            <version>0.9.1</version>
+        </dependency>
+mybatis.xml
+        <!--    配置分页助手插件-->
+        <plugins>
+            <plugin interceptor="com.github.pagehelper.PageHelper">
+        <!--        指定方言-->
+                <property name="dialect" value="mysql"/>
+            </plugin>
+        </plugins>
+		
+```
+
+```java
+
+public class UserServiceImpl {
+
+
+    public static void main(String[] args) throws Exception {
+
+        // 获得核心配置文件
+        InputStream inputStream = Resources.getResourceAsStream("sqlMapConfig.xml");
+        // 获取sessionFactory工厂对象
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        // 获取session会话对象
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        UserDao userDao = sqlSession.getMapper(UserDao.class);
+
+        // 分页查询: 当前页 每页条数
+        PageHelper.startPage(5, 3);
+
+        List<User> userList = userDao.findAll();
+        userList.forEach(System.out::println);
+
+        // 获得与分页相关的参数
+        PageInfo<User> pageInfo = new PageInfo<>(userList);
+        System.out.println("当前页" + pageInfo.getPageNum());
+        System.out.println("每页显示条数" + pageInfo.getPageSize());
+        System.out.println("总条数" + pageInfo.getTotal());
+        System.out.println("总页数" + pageInfo.getPages());
+        System.out.println("上一页" + pageInfo.getPrePage());
+        System.out.println("下一页" + pageInfo.getNextPage());
+        System.out.println("是否是第一页" + pageInfo.isIsFirstPage());
+        System.out.println("是否是最后一夜" + pageInfo.isIsLastPage());
+
+        // 释放资源
+        sqlSession.close();
+    }
+}
+
+```
+
+## 4. mybatis多表操作
 
 
 
@@ -6042,7 +7060,12 @@ public class MyBatisTest {
 
 
 
-# x. Maven
+
+
+
+
+
+# 八. Maven
 
 <hr/>
 
@@ -6125,9 +7148,13 @@ mvn -v 配置环境变量之后 是否配置成功
 
 
 
+# 九. 第三方依赖
 
+commto-io  封装了io流
 
+```
 
+```
 
 
 

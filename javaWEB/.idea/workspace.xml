@@ -2,7 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="49a70c44-8dac-46dd-b5a5-05893923ab47" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../javaSE/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../javaSE/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/src/main/java/com/liuhui/dao/UserDao.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/src/main/java/com/liuhui/dao/UserDaoImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/src/main/java/com/liuhui/service/UserService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/src/main/java/com/liuhui/service/UserServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/src/main/resources/jdbc.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/src/main/resources/com.liuhui.mapper/User.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/src/main/resources/com.liuhui.mapper/User.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/src/main/resources/sqlMapConfig.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/src/main/resources/sqlMapConfig.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/src/test/java/com/liuhui/test/MyBatisTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/src/test/java/com/liuhui/test/MyBatisTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/target/classes/com.liuhui.mapper/User.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/target/classes/com.liuhui.mapper/User.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/target/classes/sqlMapConfig.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/target/classes/sqlMapConfig.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/target/test-classes/com/liuhui/test/MyBatisTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/../MyBatis/mybatis-demo1/target/test-classes/com/liuhui/test/MyBatisTest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../java.md" beforeDir="false" afterPath="$PROJECT_DIR$/../java.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,6 +44,7 @@
       <option name="presentableId" value="Default" />
       <updated>1641656273725</updated>
       <workItem from="1641656275610" duration="15000" />
+      <workItem from="1641995319781" duration="6000" />
     </task>
     <servers />
   </component>

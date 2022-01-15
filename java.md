@@ -371,7 +371,7 @@ Java中的接口
 
 ## 2 . 常用类
 
-### 1.Object
+### 1. Object
 
 ```java
 Object类被子类经常重写的方法
@@ -383,7 +383,7 @@ getClass()	获取当前对象所属的类信息，返回Class对象
 
 ```
 
-### 2.Arrays
+### 2. Arrays
 
 ```java
 Arrays 工具类的使用
@@ -1463,6 +1463,76 @@ class Like implements ILike {
 | void interrupt()   X           | 中断线程，别用这个方式                     |
 | boolean isAlive()              | 测试线程是否处于活动状态                   |
 
+##### 2. 线程停止
+
+* 不推荐使用JDK提供的stop() 、destroy() 方法。【已废弃】
+* 推荐线程自己停下来
+* 建议使用一个标志位进行终止变量 当flag=false,则终止线程运行
+
+```java
+package liuhui.com.高级特性.线程.new线程2;
+
+// 测试stop
+// 1. 建议线程正常停止-->利用次数,不建议死循环
+// 2. 建议使用标志位-->设置一个标志位
+// 3. 不要使用stop或者destroy等过时或者jdk不建议使用的方法
+
+public class _04ThreadStopDemo1 implements Runnable {
+
+    private static boolean flag = true;
+
+    @Override
+    public void run() {
+        int i = 0;
+        while (flag) {
+            System.out.println("run....Thread" + i++);
+        }
+    }
+
+    // 设置一个公开的方法停止线程,转换标志位
+    public void stop() {
+        flag = false;
+    }
+
+    public static void main(String[] args) {
+        _04ThreadStopDemo1 threadStopDemo1 = new _04ThreadStopDemo1();
+        new Thread(threadStopDemo1).start();
+
+        for (int i = 0; i < 1000; i++) {
+            System.out.println("main" + i);
+            if (i == 997) {
+                // 调用stop方法切换标志位,让线程停止
+                threadStopDemo1.stop();
+                System.out.println("线程停止了");
+            }
+        }
+    }
+}
+
+```
+
+##### 3. 线程休眠
+
+* sleep()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #### 4. 线程同步(重点)
@@ -1497,9 +1567,7 @@ class Like implements ILike {
 
 
 
-
-
-### 1.集合
+### 1. 集合
 
 ```java
 Java集合框架提供了一套性能优良、使用方便的接口和类，它们位于java.util包中
@@ -2389,6 +2457,18 @@ SQL分类
 		* 子查询的结果式多行单列的 可以使用 in
 		* 子查询的结果式多行多列的 可以作为一张虚拟表来参与查询
 	
+	4. 多对多如何 左外连接
+			三张表: user role  user_role   (两个连续的left join)
+    	例子:	select u.uid, u.username, r.rname
+				from tab_route r
+         			left join user_role ur on r.rid = ur.rid
+         			left join tab_user u on u.uid = ur.uid;
+       
+         
+	
+	
+	
+	
 ```
 
 ## 8. 事务
@@ -2403,8 +2483,19 @@ SQL分类
 		3. 提交: commit
 2. 事务的四大特征
 3. 事务的隔离级别(了解)
-
 ```
+
+
+
+## 9. 额外
+
+```mysql
+1. mysql dos 中清屏
+
+system.cls;
+```
+
+
 
 
 
@@ -2713,8 +2804,6 @@ HTTP协议:
 					hello, response
 				</body>
 			</html>
-			
-			
 			
 	
 
@@ -7006,10 +7095,11 @@ mybatis.xml
 		
 ```
 
+test：
+
 ```java
 
 public class UserServiceImpl {
-
 
     public static void main(String[] args) throws Exception {
 
@@ -7046,6 +7136,495 @@ public class UserServiceImpl {
 ```
 
 ## 4. mybatis多表操作
+
+### 1. 一对一
+
+比如: 一个员工(employee)对应一个部门(department)
+
+```java
+public class Employee {
+    private int id;
+    private String name;
+    private int age;
+    
+    // 当前员工属于哪个部门
+    private Department department;
+}
+
+public class Department {
+    private int id;
+    private String dep_name;
+    private String dep_location;  // 地址
+}
+
+public interface EmployeeMapper {
+    List<Employee> findAll();
+}
+
+测试略 参考上...
+
+
+```
+
+EmployeeMapper.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.liuhui.dao.EmployeeMapper">
+
+
+    <resultMap id="employeeMap" type="employee"> // 这是简称 在mybatis中配置了全称
+        <!--        手动指定字段与实体属性的映射关系-->
+        <!--
+            column: 数据表的字段名称
+            property: 实体的属性名称
+        -->
+        <id column="eid" property="id"/>
+        <result column="did" property="department.id"/>
+        <result column="dep_name" property="department.dep_name"/>
+        <result column="dep_location" property="department.dep_location"/>
+    </resultMap>
+
+    <!--    查询所有-->
+    <select id="findAll" resultMap="employeeMap"> 
+        select e.id eid,
+               e.NAME,
+               e.age,
+               d.dep_name,
+               d.dep_location,
+               d.id did
+        from department d
+                 join employee e
+                      on d.id = e.dep_id
+    </select>
+</mapper>
+
+```
+
+### 2. 一对多
+
+继上个例子: 反过来 一个部门 (Department) 对应多个员工 (Employee)
+
+```java
+public class Employee {
+    private int id;
+    private String name;
+    private int age;
+  
+}
+
+public class Department {
+    private int id;
+    private String dep_name;
+    private String dep_location;  // 地址
+    
+    private List<Employee> employeeList; // 拥有的员工是个集合
+}
+
+public interface DepartmentMapper {
+    List<Department> findAll();
+}
+
+...
+```
+
+DepartmentMapper.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.liuhui.dao.DepartmentMapper">
+    
+    <resultMap id="departmentMap" type="department">		// 全称在mybatis中有配置 这个简称
+        <!--        手动指定字段与实体属性的映射关系-->
+        <!--
+            column: 数据表的字段名称
+            property: 实体的属性名称
+        -->
+        <id column="did" property="id"/>
+        <result column="dep_name" property="dep_name"/>
+        <result column="dep_location" property="dep_location"/>
+
+        <!--        配置当前集合
+                    property: 集合名称
+                    ofType: 当前集合中数据类型
+        -->
+        <collection property="employeeList" ofType="Employee">	//在mybatis中有配置 这是简称
+        <!--        封装employee的数据-->
+        <result column="eid" property="id"/>
+        <result column="name" property="name"/>
+        <result column="age" property="age"/>
+        </collection>
+
+    </resultMap>
+
+    <!--    查询所有-->
+    <select id="findAll" resultMap="departmentMap">
+        select e.id eid,
+               e.NAME,
+               e.age,
+               d.dep_name,
+               d.dep_location,
+               d.id did
+        from department d
+                 join employee e
+                      on d.id = e.dep_id
+    </select>
+</mapper>
+
+```
+
+### 3. 多对多
+
+比如用户(User)跟角色(route) 中间表是 tab_favorite
+
+```java
+public class User {
+    private int uid;
+    private String username;
+    private String password;
+    private Date birthday;
+
+    // 描述的是当前用户具备的角色
+    private List<Route> routeList;
+}
+
+public class Route {
+    private int rid;
+    private String rname;
+    。。。
+}
+
+
+public interface UserDao {
+    List<User> finAllUserAndRoute();
+}
+
+
+```
+
+User.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.liuhui.dao.UserDao">
+
+    <resultMap id="userAndRoute" type="user">
+        <id column="uid" property="uid"/>
+        <result column="username" property="username"/>
+
+        <collection property="routeList" ofType="routes">  // 这个在mybatis中有配置
+            <!-- 封装employee的数据-->
+            <result column="rid" property="rid"/>
+            <result column="rname" property="rname"/>
+        </collection>
+
+    </resultMap>
+
+    <!--    多表查询-->
+    <select id="finAllUserAndRoute" resultMap="userAndRoute">
+        select u.uid, u.username, r.rid, r.rname
+        from tab_user u,
+             tab_route r,
+             tab_favorite ru
+        where u.uid = ru.uid
+          and r.rid = ru.rid;
+    </select>
+</mapper>
+
+
+```
+
+## 5. Mybatis的注解开发
+
+```xml
+mybatis-demo1-anno 所有的注解案列
+
+
+注解开发只需要在 mybatis核心文件中把 Mappers  改成扫描包的形式,
+  <!-- 指定接口所在的包 -->
+   <mappers>
+       <package name="com.liuhui.dao"/>
+   </mappers>
+
+
+
+```
+
+
+
+
+
+
+
+<span style="color:red">**1. Mybatis的常用注解**</span>
+
+| @Insert      | 实现新增                                |
+| ------------ | --------------------------------------- |
+| **@UPdate**  | 更新                                    |
+| **@Delete**  | 删除                                    |
+| **@Select**  | 查询                                    |
+| **@Result**  | 封装结果集                              |
+| **@Results** | 可以和@Result一起使用,封装多个结果集    |
+| **@One**     | 实现一对一 结果集封装  (返回单个对象)   |
+| **@Many**    | 实现一对多 结果集分装  (返回对象的集合) |
+
+简单查询;
+
+```java
+	@Select("select *   from tab_user")
+    List<User> findAll();
+
+    @Select("select * from tab_user  where uid = #{id}")
+    User findById(int id);
+
+
+    @Select("select * from tab_user where uid in (#{list})  ")
+    List<User> findByIds(List<Integer> list);
+
+
+    @Insert("insert into tab_user(username, password)values (#{username}, #{password})")
+    void add2(User user);
+
+
+    @Insert("delete  from tab_user where uid = #{id}")
+    void del(int i);
+
+    @Update("update tab_user  set username=#{username }, password=#{password}  where uid = #{uid}")
+    void modify(User user);
+
+
+    @Select("select * from tab_user where  uid=#{uid}  and username=#{username} and password=#{password}")
+    List<User> findByCondition(User user);
+
+
+
+```
+
+
+
+<span style="color:red">**2. MyBatis注解实现复杂查询**</span>
+
+实现复杂关系映射之前我们可以在映射文件中配置<resultMap>来实现,使用注解开发后,我们可以使用@Results注解 ,@Result注解,
+
+@One, @Many 注解组合完成复杂关系的配置
+
+#### 1. 一对一
+
+员工表(employee)对应部门表 一个员工对应一个部门
+
+```java
+ public class Employee {
+    private int id;
+    private String name;
+    private int age;
+
+    // 当前员工属于哪个部门
+    private Department department;
+ }
+
+public class Department {
+    private int id;
+    private String dep_name;
+    private String dep_location;  // 地址
+   
+}
+
+public interface EmployeeMapper {
+
+// 方式一  两个表一起查
+//    @Select("select *,e.id eid  from department d  join employee e  on d.id = e.dep_id")
+//    @Results({
+//            @Result(column = "eid", property = "id"),     //...省略三个属性依然可以
+//            @Result(column = "dep_id", property = "department.id"),
+//            @Result(column = "dep_name", property = "department.dep_name"),
+//            @Result(column = "dep_location", property = "department.dep_location"),
+//    })
+
+
+ //方式二
+    @Select("select * from employee") :x
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(
+                    property = "department",        // 要封装的属性名称
+                    column = "dep_id",              // 要根据 x 查询的结果哪个字段(也就是外键)去查询department表中的字段												   //  这个参数要给下方的方法
+                
+                    javaType = Department.class,    // 要封装的实体类型
+                    // select属性,代表查询哪个接口的方法获得数据
+                    one = @One(select = "com.liuhui.dao.DepartmentMapper.getDepartmentById") // 方法的全类名
+            )		
+    })
+
+    List<Employee> findAllJoinDepartment();
+
+}
+
+public interface DepartmentMapper {
+
+    @Select("select * from Department where id=#{id}")  
+    Department getDepartmentById(int id);
+}
+
+```
+
+#### 2. 一对多
+
+上个例子反过来: 
+
+```java
+ public class Employee {
+    private int id;
+    private String name;
+    private int age;
+ }
+
+public class Department {
+    private int id;
+    private String dep_name;
+    private String dep_location;  // 地址
+    private List<Employee> employeeList;
+}
+
+
+public interface DepartmentMapper {
+    
+    @Select("select * from Department")
+    @Results({
+            @Result(id = true, column = "id", property = "id"),
+            @Result(
+                    property = "employeeList",
+                    column = "id",
+                    javaType = List.class,  //这里是list集合
+                    many = @Many(select = "com.liuhui.dao.EmployeeMapper.getEmployeeByDep_id")
+            )
+    })
+    List<Department> getDepartmentFindAll();
+
+}
+
+public interface EmployeeMapper{
+    @Select("select * from employee where dep_id= #{id}")
+    Employee getEmployeeByDep_id(int id);
+}
+
+
+```
+
+#### 3. 多对多查询:
+
+用户( user)  	角色(route)  一个用户多角色，一个角色可以有多个用户 需要一个中间表 user_route
+
+用户根据uid 到中间表中查找 rid  中间表的根据这个rid 在去route中去查找 对应的信息，这样user跟route就关联起来了
+
+```java
+public class User {
+    private int uid;
+    private String username;
+    private String password;
+    private Date birthday;
+
+    // 描述的是当前用户具备的角色
+    private List<Route> routeList;
+
+}
+
+public class Route {
+    private int rid;
+    private String rname;
+
+    // 一个角色有多个用户
+    private List<User> userList;
+
+}
+
+
+public interface UserDao {
+    
+    @Select("select * from tab_user ")
+    @Results({
+            @Result(column = "uid", property = "uid"),
+            @Result(
+                    property = "routeList",         // 要封装的属性名称
+                    column = "uid",                 // 根据哪个字段去route表中查询中去查询
+                    javaType = List.class,    		//要封装的实体类型
+                    // select属性,代表查询哪个接口的方法获得数据
+                    many = @Many(select = "com.liuhui.dao.RouteMapper.getRouteByUid") // 方法的全类名
+            )
+    })
+    List<User> finAllUserAndRoute();
+
+    
+    @Select("select * from tab_user u,tab_favorite ur where #{x}=ur.rid and u.uid = ur.uid")
+    // 根据User表的 uid 在 中间表中查询 uid 然后让中间表关联 Route表
+    List<User> getUserByRid(int rid);
+
+}
+
+
+public interface RouteMapper {
+    
+    // 注意了这个y参数2个意思 如果直接调用下面的方法 那么参数就是方法的参数 ，如果被其他查询引用 那么就是引用的查询的column
+    @Select("select * from tab_route r,tab_favorite ur where r.rid=ur.rid and #{y} = ur.uid")
+    List<Route> getRouteByUid(int id);
+
+
+    @Select("select * from tab_route")
+    @Results({
+            @Result(property = "rid", column = "rid"),
+            @Result(
+                    property = "userList",
+                    column = "rid",
+                    javaType = List.class,
+                    many = @Many(select = "com.liuhui.dao.UserDao.getUserByRid")
+            )
+    })
+    List<Route> getRouteMapperUser();
+
+}
+
+
+
+
+```
+
+#### 4. Test: 测试
+
+```java
+test: 测试 ******************************************************
+
+public class UserTest {
+
+    private UserDao userDao;
+
+    @Before   // 相当于代码块 会提前执行
+    public void before() throws IOException {
+        InputStream resourceAsStream = Resources.getResourceAsStream("sqlMapConfig.xml");
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        userDao = sqlSession.getMapper(UserDao.class);
+    }
+
+    @Test
+    public void finAllUserAndRoute(){
+        userDao.finAllUserAndRoute().forEach(System.out::println);
+    }
+}
+
+```
+
+
+
+
+
+
+
+
 
 
 
@@ -7156,25 +7735,25 @@ commto-io  封装了io流
 
 ```
 
+# 
+
+# 
+
+# 
 
 
 
+# 
 
 
 
+# 
+
+# 
 
 
 
-
-
-
-
-
-
-
-
-
-
+# 
 
 
 

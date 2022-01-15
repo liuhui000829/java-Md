@@ -27,9 +27,11 @@ public class firstController {
 
     @RequestMapping("/exception")
     public String exception() {
-//        System.out.println(10/0);
+    //  System.out.println(10/0);
         return "hello";
     }
+
+
     // 下载文件
     @RequestMapping("/testResponseEntity")
     public ResponseEntity<byte[]> testResponseEntity(HttpSession httpSession) throws IOException {

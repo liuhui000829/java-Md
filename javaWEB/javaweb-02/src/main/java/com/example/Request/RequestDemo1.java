@@ -82,7 +82,7 @@ public class RequestDemo1 extends HttpServlet {
         BufferedReader br = request.getReader();
         //2. 读取数据
         String line = br.readLine();
-        while (line  != null) {
+        while (line != null) {
             System.out.println(line);
         }
     }

@@ -10,6 +10,10 @@
     <!--    自定义别名-->
     <typeAliases>
         <typeAlias type="com.liuhui.domain.User" alias="user"/>
+        <typeAlias type="com.liuhui.domain.Department" alias="department"/>
+        <typeAlias type="com.liuhui.domain.Employee" alias="employee"/>
+        <typeAlias type="com.liuhui.domain.Route" alias="routes"/>
+
     </typeAliases>
 <!--    注册类型处理器-->
     <typeHandlers>
@@ -39,5 +43,7 @@
     <!--    加载映射文件-->
     <mappers>
         <mapper resource="com.liuhui.mapper/User.xml"/>
+        <mapper resource="com.liuhui.mapper/EmployeeMapper.xml"/>
+        <mapper resource="com.liuhui.mapper/DepartmentMapper.xml"/>
     </mappers>
 </configuration>

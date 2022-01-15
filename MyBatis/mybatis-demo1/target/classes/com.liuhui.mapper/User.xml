@@ -2,13 +2,14 @@
 <!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.liuhui.dao.UserDao">
-    
-<!--    sql语句抽取-->
-    <sql id="selectUser"> select * from tab_user</sql>
-    
+
+    <!--    sql语句抽取-->
+    <sql id="selectUser"> select *
+                          from tab_user</sql>
+
     <!--    查询所有-->
     <select id="findAll" resultType="user">
-      <include refid="selectUser"/>
+        <include refid="selectUser"/>
     </select>
 
     <!--增-->
@@ -24,7 +25,9 @@
     </insert>
 
     <!--删-->
-    <delete id="del" parameterType="int">
+    <delete id="del" parameterType="int"
+
+    >
         delete
         from tab_user
         where uid = #{id}
@@ -63,15 +66,39 @@
     </select>
 
 
-
     <!--    根据条件查询 用户2-->
     <select id="findByIds" parameterType="list" resultType="user">
         <include refid="selectUser"/>
         <where>
-           <foreach collection="list" item="uid" open="uid in(" close=")" separator=",">
-               #{uid}
-           </foreach>
+            <foreach collection="list" item="uid" open="uid in(" close=")" separator=",">
+                #{uid}
+            </foreach>
         </where>
+
+    </select>
+
+    <resultMap id="userAndRoute" type="user">
+        <id column="uid" property="uid"/>
+        <result column="username" property="username"/>
+
+        <collection property="routeList" ofType="routes">
+            <!--            封装employee的数据-->
+            <result column="rid" property="rid"/>
+            <result column="rname" property="rname"/>
+
+        </collection>
+
+
+    </resultMap>
+
+    <!--    多表查询-->
+    <select id="finAllUserAndRoute" resultMap="userAndRoute">
+        select u.uid, u.username, r.rid, r.rname
+        from tab_user u,
+             tab_route r,
+             tab_favorite ru
+        where u.uid = ru.uid
+          and r.rid = ru.rid;
 
     </select>
 

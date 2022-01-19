@@ -1,5 +1,0 @@
-com\liuhui\annotation\SpringConfig.class
-com\liuhui\annotation\WebConfig.class
-com\liuhui\annotation\WebInit.class
-com\liuhui\controller\firstController.class
-com\liuhui\interceptors\TestInterceptor.class

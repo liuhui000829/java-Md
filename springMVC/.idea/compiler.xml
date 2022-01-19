@@ -12,7 +12,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="springmvc-annotation" target="6" />
-      <module name="springmvc-demo1" target="1.5" />
+      <module name="springmvc-demo1" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -1,8 +1,0 @@
-com\liuhui\boot\controllelr\FormTestController.class
-com\liuhui\boot\domain\Pet.class
-META-INF\spring-configuration-metadata.json
-com\liuhui\boot\config\AdminWebConfig.class
-com\liuhui\boot\SpringbootDemo5WebApplication.class
-com\liuhui\boot\controllelr\IndexController.class
-com\liuhui\boot\domain\User.class
-com\liuhui\boot\interceptor\LoginInterceptor.class

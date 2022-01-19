@@ -1,0 +1,5 @@
+com\liuhui\service\impl\UserServiceImpl.class
+com\liuhui\controller\UserController.class
+com\liuhui\mapper\UserMapper.class
+com\liuhui\service\UserService.class
+com\liuhui\domain\User.class

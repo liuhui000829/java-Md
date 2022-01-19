@@ -494,10 +494,10 @@ xxx.equalsIgnoreCase(xxx): 忽略大小写
 ```java
 
 /**
- * 相对路径: 是一个完整的路径
+ * 绝对路径: 是一个完整的路径
  * 		以盘符(c: d:)开始的路径	C:\Users\刘先生\Desktop\java-Md\testDirectory\aa.txt
  * 		
- * 绝对路径: 是一个简化的路径
+ * 相对路径: 是一个简化的路径
  * 		相当于当前项目的根目录(.\testDirectory\aa.txt)
  * 注意:
  * 1. 路径不区分大小写
@@ -1513,15 +1513,169 @@ public class _04ThreadStopDemo1 implements Runnable {
 
 ##### 3. 线程休眠
 
-* sleep()
+* sleep ( 时间 ) 指定当前线程阻塞的毫秒数
+* sleep 存在异常 interruptedException;
+* sleep时间达到后线程进入就绪状态
+* sleep可以模拟网络延迟,倒计时等
+* <span style="color:red">**每一个对象都有一个锁,sleep不会释放锁**</span>
+
+```java
+
+/**
+ * sleep ,
+ * (1)模拟网路延迟  (比如买火车票那个问题)
+ * (2) 模拟倒计时
+ */
+public class _05ThreadSleep {
+
+    public static void main(String[] args) throws InterruptedException {
+        timer();
+
+    }
+
+    // 模拟倒计时
+    public static void tenDown() throws InterruptedException {
+        int num = 10;
+        while (true) {
+            Thread.sleep(1000);
+            System.out.println(num--);
+            if (num <= 0) {
+                break;
+            }
+        }
+    }
+
+    // 打印当前时间
+    public static void timer() throws InterruptedException {
+        Date startTime = new Date(System.currentTimeMillis()); //获取系统当前时间
+
+        while (true) {
+            Thread.sleep(1000);
+            System.out.println(new SimpleDateFormat("HH:mm:ss").format(startTime));
+            startTime = new Date(System.currentTimeMillis()); //更新系统当前时间
+
+        }
+    }
+}
+
+```
+
+
+
+##### 4. 线程礼让
+
+* 礼让线程,让当前正在执行的线程停止,但不阻塞
+* 将线程从运行状态转为就绪状态
+* **让cpu重新调度,礼让不一定成功! 看cpu心情**
+
+```java
+
+/*
+ *  线程礼让 yield
+ *
+ * */
+public class _06ThreadYield {
+
+    public static void main(String[] args) {
+        MyYield myYield = new MyYield();
+        new Thread(myYield, "a").start();
+        new Thread(myYield, "b").start();
+    }
+}
+
+class MyYield implements Runnable {
+
+    @Override
+    public void run() {
+        System.out.println(Thread.currentThread().getName() + "线程开始执行");
+        Thread.yield();//礼让
+        System.out.println(Thread.currentThread().getName() + "线程停止执行");
+    }
+}
+
+```
+
+##### 5. 线程合并
+
+* Join合并线程,待此线程执行完成后,在执行其他线程,其他线程阻塞
+* 可以想象成插队
+
+```java
+
+/*
+* join  线程插队
+*
+*
+
+* */
+public class _07ThreadJoin implements Runnable {
+    @Override
+    public void run() {
+        for (int i = 0; i < 1000; i++) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("主线程vip来了"+i);
+        }
+
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        _07ThreadJoin threadJoin = new _07ThreadJoin();
+        Thread thread = new Thread(threadJoin);
+        thread.start();
+
+        // 主线程
+        for (int i = 0; i < 500; i++) {
+            Thread.sleep(1);
+            if(i==200){
+                thread.join();
+            }
+            System.out.println("main线程"+i);
+        }
+    }
+}
+
+```
+
+##### 6. 线程状态观测
+
+* Thread.State
+
+  - ```
+    public static enum Thread.State
+    extends Enum<Thread.State>
+    ```
+
+    线程状态。线程可以处于以下状态之一：
+
+    - [`NEW`](../../java/lang/Thread.State.html#NEW)  
+      尚未启动的线程处于此状态。 
+    - [`RUNNABLE`](../../java/lang/Thread.State.html#RUNNABLE)  
+      在Java虚拟机中执行的线程处于此状态。 
+    - [`BLOCKED`](../../java/lang/Thread.State.html#BLOCKED)  
+      被阻塞等待监视器锁定的线程处于此状态。 
+    - [`WAITING`](../../java/lang/Thread.State.html#WAITING)  
+      正在等待另一个线程执行特定动作的线程处于此状态。 
+    - [`TIMED_WAITING`](../../java/lang/Thread.State.html#TIMED_WAITING)  
+      正在等待另一个线程执行动作达到指定等待时间的线程处于此状态。 
+    - [`TERMINATED`](../../java/lang/Thread.State.html#TERMINATED)  
+      已退出的线程处于此状态。 
+
+    <span style="color:red">**一个线程可以在给定时间点处于一个状态。 这些状态是不反映任何操作系统线程状态的虚拟机状态。 **</span>
+
+​		code:
+
+```java
 
 
 
 
 
 
-
-
+```
 
 
 
@@ -6493,6 +6647,8 @@ private void processDispatchResult(HttpServletRequest request, HttpServletRespon
 
 
 
+## 14.ssm整合
+
 
 
 
@@ -7735,6 +7891,813 @@ commto-io  封装了io流
 
 ```
 
+
+
+
+
+
+
+# 十. SprintBoot
+
+## 1. SpringBoot2入门
+
+**简介、HelloWorld 、分析原理**
+
+**1. 简介**
+
+SpringBoot来简化Spring应用开发,约定大于配置,去繁从简,just run 就能创建一个独立的,产品级别的应用
+
+==背景==: J2EE笨重的开发,繁多的配置,底下的开发效率,复杂的部署流程,第三方基础集成难度大
+
+==解决==: "Spring全家桶" 时代.
+
+​			Spring Boot -> J2EE 一站式解决方案
+
+​			Spring Colud -> 分布式整体解决方案
+
+==优点:==
+
+1. 快速创建独立运行的Spring项目以及与主流框架集成
+
+		2. 使用嵌入式的Servlet容器,应用无需打成WAR包
+		2. starters自动依赖与版本控制
+		2. 大量的自动配置,简化开发,也可修改默认值
+		2. 无需配置xml，无代码生成,开箱即用
+		2. 准生产环境的运行时应用监控
+		2. 与云计算天然继承
+
+## 2. 第一个HelloWorld
+
+一个功能:
+
+**浏览器发送hello请求,服务器接受请求并处理，响应Hello World字符串:**
+
+
+
+### 1. 创建一个maven工程:(jar)
+
+### 2. 导入依赖spring-boot相关的依赖
+
+```xml
+<parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.6.2</version>
+    </parent>
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+
+    </dependency>
+</dependencies>
+```
+
+### 3. 编写一个主程序
+
+```java
+/**
+ * @SpringBootApplication 说明这是一个springboot应用
+ *
+ */
+@SpringBootApplication
+public class HelloWorldMainApplication {
+    public static void main(String[] args) {
+        // spring应用启动起来
+        SpringApplication.run(HelloWorldMainApplication.class,args);
+    }
+}
+
+```
+
+### 4. 编写相应的Controller 、Service
+
+```java
+@Controller
+public class HelloController {
+    @RequestMapping("/hello")
+    @ResponseBody
+    public String hello() {
+    	return "helloWorld";
+    }
+}
+
+
+```
+
+### 5. 运行主程序测试
+
+​	直接运行main方法
+
+### 6. 简化部署
+
+```xml
+pom.xml中导入真个包
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+    </plugins>
+</build>
+
+```
+
+将这个应用打成jar包，直接使用java -jar的命令进行执行:
+
+![image-20220117150434795](\typora-user-images\image-20220117150434795.png)
+
+## 3. Hello World一探究竟
+
+### 1. POM文件
+
+### 1. 父项目
+
+```xml
+ 
+<parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId> :x
+    <version>2.3.4.RELEASE</version>
+ </parent>
+
+这是它的父项目: 点击x查看 
+<parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-dependencies</artifactId>
+    <version>2.3.4.RELEASE</version>
+    <relativePath>../../spring-boot-dependencies</relativePath>
+</parent>
+
+它是真正管理Spring Boot应用里面的所有依赖的版本
+```
+
+这是 SpringBoot版本仲裁中心
+
+以后我们导入依赖默认是不需要写版本: ( 没有在dependencies里面管理的依赖自然需要声明版本号 )
+
+### 2. 导入的依赖(启动器)
+
+```xml
+ <dependency>
+     <groupId>org.springframework.boot</groupId>
+     <artifactId>spring-boot-starter-web</artifactId>
+ </dependency>
+
+```
+
+**spring-boot-starter-web** :
+
+​	**spring-boot-starter**:  spring-boot 场景启动器: 帮助我们导入了web模块正常运行所依赖的组件
+
+spring Boot将所有的功能场景都抽取抽来, 做成一个个的starter ( 启动器 ), 只需要在项目中引入这些starter相关场景的依赖都会导入进来
+
+要用什么功能就导入什么样的启动器
+
+
+
+### 2. 主程序, 主入口类
+
+```java
+/**
+ * @SpringBootApplication 说明这是一个springboot应用
+ *
+ */
+@SpringBootApplication
+public class HelloWorldMainApplication {
+    public static void main(String[] args) {
+        // spring应用启动起来
+        SpringApplication.run(HelloWorldMainApplication.class,args);
+    }
+}
+
+```
+
+**@SpringBootApplication**: SpringBoot应用标注在某个类上说明这个类是SpringBoot的主配置类,SpringBoot就应该运行这个类的main方法来启动SpringBoot应用 ;
+
+```java
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan(
+    excludeFilters = {@Filter(
+    type = FilterType.CUSTOM,
+    classes = {TypeExcludeFilter.class}
+), @Filter(
+    type = FilterType.CUSTOM,
+    classes = {AutoConfigurationExcludeFilter.class}
+)}
+)
+public @interface SpringBootApplication {...}
+```
+
+**@SpringBootConfiguration**: SpringBoot的配置类
+
+​			标注在某个类上,表示这是一个SpringBoot的配置类
+
+​			**@Configuration**：一般在配置类上, 来标注这个注解
+
+​					配置类 ------配置文件: 配置类也是容器中的一个组件: **@Component**
+
+
+
+
+
+**@EnableAutoConfiguration**：开启自动配置功能:
+
+​			以后我们需要配置的东西,SpringBoot帮助我们自动配置；**@EnableAutoConfiguration**告诉SpringBoot开启自动配置功能; 这样自动配置才能生效
+
+```java
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@AutoConfigurationPackage
+@Import({EnableAutoConfigurationImportSelector.class})
+public @interface EnableAutoConfiguration {
+
+```
+
+​			**@AutoConfigurationPackage**: 自动配置包
+
+​						@Import({EnableAutoConfigurationImportSelector.class})
+
+
+
+## 4. Spring Initializer快速创建
+
+作用: 快速创建SpringBoot项目的
+
+选择我们需要的模块, 向导会联网创建SpringBoot项目 ；
+
+默认生成的SpringBoot项目:
+
+* 主程序已经创建好了,我们只需要关注逻辑
+* resources 文件中目录结构
+  * static：保存所有的静态资源 js css html image
+  * templates: 保存所有的模板页面: (Spring Boot默认jar包使用嵌入式的Tomcat)，默认不支持jsp页面
+  * application.properties; Springboot应用的配置文件
+
+## 5. SpringBoot配置文件
+
+配置文件、加载顺序、配置原理
+
+### 1. 配置文件
+
+springBoot使用一个全局的配置文件,配置文件名是固定的
+
+* application.properties
+* application.yml
+
+配置文件的作用, 修改SpringBoot自动配置的默认值，SpringBoot在地层都给我们自动配置好
+
+```yaml
+server:
+  port: 8081
+  
+```
+
+### 2. YAML语法
+
+**1. yaml基本语法**
+
+* 使用 **空格** 缩进表示层级关系
+* 缩进时不允许使用Tab键,只允许使用空格
+* 缩进的空格数目不重要,只要相同层级的元素左侧对齐即可
+
+**2. yaml 支持的三种数据结构**
+
+* 对象: 键值的集合
+* 数组: 一组按次序排列的值
+* 字面量: 单个的,不可再分的值
+
+```yaml
+server:
+  port: 8081
+```
+
+属性和值也是大小写敏感 :
+
+**3. 值的写法**
+
+**字面量: 普通的值 ( 数字 , 字符串 , 布尔 )**
+
+​		k : v	字面量直接来写
+
+​				字符串默认不用加上单引号或者双引号
+
+​				”“: 双引号； 不会转义里面的特殊字符;特殊字符会作为本身向表示的意思
+
+​						name:	"zhangsan \n list"		输出: zhangsan 换行 list
+
+​				'': 单引号;	 会转义特殊字符, 特殊字符最终只是一个普通的字符串数据
+
+​						name: 	'zhangsan \n list';		输出: zhangsan \n list
+
+**对象 、Map( 属性和值 ) ( 键值对 )**:
+
+​		k : v 	在下一行来写对象的属性和值的关系; 注意缩进
+
+​					对象还是K:V的方式 
+
+```yaml
+friends:
+  lastName:zhangsan
+  age:20
+
+```
+
+行内写法:
+
+```yaml
+friends:{lastName:zhansan,age:20}
+```
+
+
+
+**数组 ( LIis、Set)**
+
+用 - 值表示数组中的一个元素
+
+```yaml
+pets:
+- cat,
+- dog,
+- pig
+
+```
+
+行内写法
+
+```yaml
+pets:[cat,dag,pig]
+```
+
+**yaml语法不提示问题**
+
+```xml
+<!--        导入配置文件处理器,配置文件进行绑定后就会有提示-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+```
+
+
+
+## 3. 自动配置原理
+
+
+
+<h3>1、SpringBoot特点</h3>
+
+
+
+### 1.1. 依赖管理
+
+```xml
+依赖管理
+<parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.6.2</version>
+    <relativePath/> <!-- lookup parent from repository -->
+</parent>
+
+他的父项目
+<parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-dependencies</artifactId>
+    <version>2.6.2</version>
+</parent>
+
+几乎声明了所有开发中常用的依赖版本号,自动版本仲裁机制
+```
+
+* 开发导入starter场景启动器
+
+```xml
+1. 见到很多	sprint-boot-starter-*	*就代表某种仲裁
+2. 只要引入starter，这个场景的所有常规需要的依赖都会自动导入
+3. springboot所有场景都支持
+4. 见到 *-sprint-boot-starter，都是第三方为我们提供的场景启动器
+5. 所有场景启动器最底层的依赖
+   <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+      <version>2.6.2</version>
+      <scope>compile</scope>
+    </dependency>
+
+```
+
+* 无需关注版本号 ,自动版本仲裁
+
+因为springboot 中dependences都帮我们引入了大部分依赖
+
+* 可以修改版本号
+
+```xml
+    <properties>
+        <java.version>1.8</java.version>
+        <mysql.version>5.1.43</mysql.version>
+    </properties>
+
+```
+
+### 1.2. 自动配置
+
+* 自动配置好Tomcat
+
+  * 引入了Tomcat依赖
+
+  * 配置Tomcat
+
+    ```xml
+    <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-tomcat</artifactId>
+          <version>2.6.2</version>
+          <scope>compile</scope>
+    </dependency>
+    
+    ```
+
+* 自动配置好springMVC
+
+  * 引入了springMVC的全套组件
+  * 自动配好了springmvc常用功能 (  ) 
+
+  ```xml
+   <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>5.3.14</version>
+        <scope>compile</scope>
+   </dependency>
+  ```
+
+  
+
+* 自动配置好Web常见功能,如字符编码问题
+
+  * springBoot帮我们配置好了所有web开发的常见场景
+
+* 默认的包结构
+
+  * 主程序所在的包及其下面所有子包里面的组件都会被扫描到
+  * 无需以前的包扫描配置
+  * 想要改变路径，@SpringBootApplication(scanBasePackage="com.liuhui")
+    * 或者@ComponentScan 指定扫描路径
+
+  ```java
+  @SpringBootApplication
+  等同于
+  @SpringBootConfiguration
+  @EnableAutoConfiguration
+  @ComponentScan("com.liuhui.boot")
+  
+  ```
+
+* 各种配置拥有的默认值
+
+  * 默认配置最终都是映射到MultipartProperties
+  * 配置文件的值最终会绑定到每个类上,这个类会在容器中创建对象
+
+* 按需加载所有的自动配置项
+
+  * 非常多的starter
+  * 引入了哪些场景 这个场景会自动配置开启
+  * springBoot所有的自动配置功能都在 spring-boot-autoconfigure
+
+* ... ....
+
+
+
+### 2. 容器功能
+
+### 2.1 组件添加
+
+**1. @Configuration**
+
+* 基本使用
+* Full模式与Lite模式
+  * 实例
+  * 最佳实战
+    * 配置类组件之间无依赖关系用Lite模式加速容器启动过程,减少判断
+    * 配置类之间有依赖关系,方法会被调用得到之前单实例组件,用Full模式
+
+```java
+
+/*
+ *  1. 配置类里面使用@Bean标注在方法上给容器注册组件,默认是单实例
+ *  2. 配置类本身也是组件
+ *  3. proxyBeanMethods 代理bean的方法
+ *       Full(proxyBeanMethods = true)
+ *       Lite(proxyBeanMethods = false)
+ *       组件依赖
+ * */
+
+@SuppressWarnings("all")
+@Configuration(proxyBeanMethods = false)  // 告诉springboot这是一个配置类
+public class MyConfig {
+
+    @Bean // 给容器中添加组件, 方法名作为组件的id,返回值类型为组件类型，返回值为组件类型的实例
+    public User user01() {
+        User user = new User("张三", 18);
+        user.setPet(tomcatPet());
+        return user;
+    }
+
+    @Bean("tom")
+    public Pet tomcatPet() {
+        return new Pet("二哈");
+    }
+}
+
+
+
+
+@SpringBootApplication
+public class SpringApplication {
+
+    public static void main(String[] args) {
+
+        // 1. 返回我们的IOC容器
+        ConfigurableApplicationContext run = org.springframework.boot.SpringApplication.run(SpringApplication.class, args);
+        // 2. 查看容器里面的组件
+//        for (String beanDefinitionName : run.getBeanDefinitionNames()) {
+//            System.out.println(beanDefinitionName);
+//        }
+
+        // 3. 从容器中获取组件
+
+        Pet tom = run.getBean("tom", Pet.class);
+        Pet tom2 = run.getBean("tom", Pet.class);
+        System.out.println(tom == tom2);      // true
+
+        // 4. 配置类也是一个组件
+        MyConfig myConfig = run.getBean(MyConfig.class);
+        System.out.println(myConfig); //com.liuhui.config.MyConfig$$EnhancerBySpringCGLIB$$634f2f75@5a9800f8
+
+        // 5. 如果@Configuration(proxyBeanMethods = true)代理对象调用方法 springboot总会检查这个组件在容器中是否存在
+        // 	  保持组件单实例
+        //    如果@Configuration(proxyBeanMethods = false)代理对象调用方法 springboot总会检查这个组件在容器中是否存在
+        User user = myConfig.user01();
+        User user1 = myConfig.user01();
+        System.out.println(user == user1);    // true/false
+
+        System.out.println(myConfig.user01().getPet() == myConfig.tomcatPet());
+
+    }
+}
+
+```
+
+**2. @Impoert**
+
+```java
+/*
+
+ *  4. @Import({User.class,EventLogger.class})
+ *       给容器中自动创建出这两个类型的组件,默认组件的名字就是全类名
+ *
+ * */
+
+@Import({User.class, EventLogger.class})
+public class MyConfig {}
+
+
+
+@SpringBootApplication
+public class SpringApplication {
+
+    public static void main(String[] args) {
+
+        // 1. 返回我们的IOC容器
+        ConfigurableApplicationContext run = SpringApplication.run(SpringApplication.class, args);
+ 
+        for (String s : run.getBeanNamesForType(User.class)) {
+            System.out.println(s);
+        }
+        System.out.println(run.getBean(EventLogger.class));
+
+//        com.liuhui.domain.User
+//        user01
+//        org.apache.logging.log4j.EventLogger@60e9c3a5
+
+    }
+}
+
+
+```
+
+**3. @Conditional**
+
+条件装配，满足Conditional指定的条件, 则进行组件注入
+
+![image-20220118164653428](\typora-user-images\image-20220118164653428.png)
+
+
+
+有些问题
+
+**2.2  原生配置文件引入**
+
+**1. @ImportResource**
+
+```java
+@ImportResource("classpath:bean1.xml")		// 导入xml文件 让他生效
+public class MyConfig {
+```
+
+**2.3 配置绑定**
+
+```java
+@Component
+@ConfigurationProperties(prefix = "my-pet")
+public class Pet{ }
+```
+
+
+
+## 4. 开发小技巧
+
+### 4.1 Lombok
+
+简化javabean的开发
+
+```xml
+引入 lombok的依赖	 idea还得下载插件LomboK
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+</dependency>
+
+
+
+```
+
+```java
+
+@ToString  // 编译的时候生成toString()
+@Data
+public class User {
+    private String username;
+    private int age;
+    private Pet pet;
+
+
+```
+
+## 5. web开发
+
+### 1.引入Thymeleaf
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
+
+```
+
+
+
+### 2. 拦截器练习
+
+
+
+## 6.WEB原生组件注入
+
+**( Servlet、Filter、Listener )**
+
+@
+
+
+
+## 7. 数据访问
+
+### 1. SQL
+
+**1. 数据源的自动配置**
+
+**1. 导入jdbc场景**
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jdbc</artifactId>
+</dependency>
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 十一. springColud`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 十二. 
+
+
+
+# 
+
+
+
+#  
+
+# 
+
+
+
 # 
 
 # 
@@ -7749,11 +8712,47 @@ commto-io  封装了io流
 
 # 
 
+
+
 # 
 
 
 
 # 
+
+
+
+
+
+# 
+
+
+
+# 
+
+
+
+# 
+
+
+
+# 
+
+
+
+# 
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

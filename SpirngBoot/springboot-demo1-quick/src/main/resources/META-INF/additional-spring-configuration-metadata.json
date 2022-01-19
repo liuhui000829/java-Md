@@ -1,0 +1,13 @@
+{
+  "properties": [
+    {
+      "name": "myuser.age",
+      "type": "java.lang.String",
+      "description": "Description for myuser.age."
+    },
+    {
+      "name": "mypet.name",
+      "type": "java.lang.String",
+      "description": "Description for mypet.name."
+    }
+  ] }

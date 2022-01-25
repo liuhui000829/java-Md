@@ -1,0 +1,28 @@
+{
+  "groups": [
+    {
+      "name": "my-pet",
+      "type": "com.liuhui.boot.domain.Pet",
+      "sourceType": "com.liuhui.boot.domain.Pet"
+    },
+    {
+      "name": "spring.datasource",
+      "type": "javax.sql.DataSource",
+      "sourceType": "com.liuhui.boot.config.MyDataSourceConfig",
+      "sourceMethod": "dataSource()"
+    }
+  ],
+  "properties": [
+    {
+      "name": "my-pet.name",
+      "type": "java.lang.String",
+      "sourceType": "com.liuhui.boot.domain.Pet"
+    },
+    {
+      "name": "spring.servlet.multipart.max-file-size.max-request-size",
+      "type": "java.lang.String",
+      "description": "Description for spring.servlet.multipart.max-file-size.max-request-size."
+    }
+  ],
+  "hints": []
+}

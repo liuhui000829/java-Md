@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "spring.servlet.multipart.max-file-size.max-request-size",
+      "type": "java.lang.String",
+      "description": "Description for spring.servlet.multipart.max-file-size.max-request-size."
+  }
+] }

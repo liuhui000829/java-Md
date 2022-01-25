@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/SpirngBoot.iml" filepath="$PROJECT_DIR$/.idea/SpirngBoot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/demo2Template/demo2Template.iml" filepath="$PROJECT_DIR$/demo2Template/demo2Template.iml" />
       <module fileurl="file://$PROJECT_DIR$/springboot-demo1/springboot-demo1.iml" filepath="$PROJECT_DIR$/springboot-demo1/springboot-demo1.iml" />
       <module fileurl="file://$PROJECT_DIR$/springboot-demo1-quick/springboot-demo1-quick.iml" filepath="$PROJECT_DIR$/springboot-demo1-quick/springboot-demo1-quick.iml" />
       <module fileurl="file://$PROJECT_DIR$/springboot-demo5-web/springboot-demo5-web.iml" filepath="$PROJECT_DIR$/springboot-demo5-web/springboot-demo5-web.iml" />

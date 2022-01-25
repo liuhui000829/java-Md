@@ -1,0 +1,40 @@
+
+
+# ????????/res??
+#spring:
+#  mvc:
+#    static-path-pattern: /res/**
+
+
+# 设置单文件上传大小为10mb 总体上传大小为100mb
+spring:
+#  servlet:
+#    multipart:
+#      max-file-size: 10MB
+#        max-request-size: 100MB
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/db?autoReconnect=true&useUnicode=true&createDatabaseIfNotExist=true&characterEncoding=utf8&useSSL=true&serverTimezone=UTC
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+#    druid:
+#      stat-view-servlet:
+#        enabled: true
+#        login-username: root
+#        login-password: root
+#        reset-enable: fasle
+#      web-stat-filter:
+#        enabled: true
+#        url-pattern: /**
+#        exclusions: '*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*'
+
+
+
+
+#  jdbc:
+#    template:
+#      query-timeout: 3
+server:
+  port: 80

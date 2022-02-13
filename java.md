@@ -1,6 +1,12 @@
 
 
+
+
 ![image-20220112212501823](\typora-user-images\image-20220112212501823.png)
+
+![image-20220127210354856](\typora-user-images\image-20220127210354856.png)
+
+
 
 # 一. java基础
 
@@ -42,7 +48,7 @@ Student StudentServer Test
 Animal Dog Cat Test 简单的实现继承
 ```
 
-### 5.liuhui.com.oop.static内容
+### 5. liuhui.com.oop.static内容
 
 ```
 1.satic 修饰属性, 代码块, 方法问题 各种情况的简单练习
@@ -70,7 +76,7 @@ Animal Dog Cat Test 简单的实现继承
 3. Master 模拟多态
 ```
 
-9. ### liuhui.com.oop.抽象类和接口
+### 9. liuhui.com.oop.抽象类和接口
 
 ```
 1. 抽象类和接口
@@ -129,7 +135,7 @@ Runable 接口  简单的练习
 八大类型的一些方法  random date 等等
 ```
 
-### 16 . liuhui.com.高级特性.Json
+### 16. liuhui.com.高级特性.Json
 
 ```
 json的转换 引入 fastJson工具类 导入
@@ -139,13 +145,13 @@ json的转换 引入 fastJson工具类 导入
 
 
 
-# 二. Java基础2
+# 二. Java基础
 
 ## 1.面向对象
 
 ### 1.继承
 
-**继承是Java中实现代码重用的重要手段之一。Java中只支持单根继承，即一个类只能有一个直接父类**
+**继承是Java中实现代码重用的重要手段之一。Java中只支持单继承，即一个类只能有一个直接父类**
 
 ```java
 		一 .子类访问父类的问题?
@@ -922,11 +928,11 @@ public class FileDemo5 {
 
 * 一个进程可以有多个线程,如视频中同时听声音,看图像 看弹幕，等等
 
-1. 说起进程,就不得不说下**程序**。程序是指令和数据的有序集合，其本质没有任何运行的意义，是一个静态的概念
+1. 说起进程,就不得不说下 **程序**。程序是指令和数据的有序集合，其本质没有任何运行的意义，是一个静态的概念
 
-2. 而**进程**则是执行程序的一次执行过程,他是一个动态的概念.是系统资源分配的单位
+2. 而 **进程** 则是执行程序的一次执行过程,他是一个动态的概念.是系统资源分配的单位
 
-3. 通常在一个进程中包含若干个**线程**,当然一个进程中至少有一个线程,不然没有存在的意义.线程是CPU调度和执行的单位
+3. 通常在一个进程中包含若干个 **线程** ,当然一个进程中至少有一个线程,不然没有存在的意义.线程是CPU调度和执行的单位
 
 ==注意: 很多多线程是模拟出来的,真正的多线程是指有多个cpu，即多核,如服务器,如果是模拟出来的多线程,即在一个cup的情况下,在同一时间点,cup只能执行一个代码, 因为切换的很快,所以就有同时执行的错觉==
 
@@ -944,8 +950,6 @@ public class FileDemo5 {
 
 
 **多线程:**
-
-* 
 
 ![image-20220112211716210](\typora-user-images\image-20220112211716210.png)
 
@@ -1040,6 +1044,8 @@ class WebDownLoader {
 
 ```
 
+
+
 ##### 3. 实现Runnable接口
 
 ![image-20220112231715078](\typora-user-images\image-20220112231715078.png)
@@ -1097,10 +1103,11 @@ class Thread2 implements Runnable {
 
 ```
 
+
+
 ##### 4. 多个线程同时操作一个对象
 
 ```java
-package liuhui.com.高级特性.线程.new线程;
 
 // 多个线程同时操作一个对象
 // 买火车票的例子
@@ -1115,7 +1122,7 @@ public class TestThread4 implements Runnable {
     @Override
     public void run() {
         while (true) {
-            if (tickerNums <= 0) break;
+            if (tickerNums <= 0)break; 
             try {
                 Thread.sleep(500);      // 模拟延迟 毫秒
             } catch (InterruptedException e) {
@@ -1139,7 +1146,6 @@ public class TestThread4 implements Runnable {
 ##### 5. 龟兔赛跑
 
 ```java
-package liuhui.com.高级特性.线程.new线程;
 
 // 模拟龟兔赛跑 - Race
 
@@ -1160,6 +1166,7 @@ public class TestThread5 implements Runnable {
 
     @Override
     public void run() {
+      
         for (int i = 0; i <= 100; i++) {
 
             // 模拟兔子休息
@@ -1170,12 +1177,12 @@ public class TestThread5 implements Runnable {
                     e.printStackTrace();
                 }
             }
-            boolean flag = gameOver(i);
-            if (flag)  break;
-            System.out.println(Thread.currentThread().getName() + "--> 跑了" + i + "步");
-        }
+           
+            if (gameOver(i))break;
+           		 System.out.println(Thread.currentThread().getName() + "--> 跑了" + i + "步");	     						 
+    	}
     }
-
+        
     // 是否完成比赛
     private boolean gameOver(int steps) {
         // 判断是否有胜利者
@@ -1198,7 +1205,135 @@ public class TestThread5 implements Runnable {
     }
 }
 
+
+
+
+
+package liuhui.com.高级特性.线程.new线程;
+
+// 模拟龟兔赛跑 - Race
+
+/**
+ * 1.首先来个赛道距离,然后要离终点越来越近
+ * 2.判断比赛是否结束
+ * 3.打印出胜利者
+ * 4.龟兔赛跑开始
+ * 5.故事中是乌龟赢的,兔子需要睡觉,所以我们来模拟兔子睡觉
+ * 6.终于乌龟赢了比赛
+ */
+
+
+public class _05RacePet implements Runnable {
+
+    private String winner;
+    private int loser;
+    @Override
+    public void run() {
+        boolean flag;
+
+        for (int i = 1; i <= 10000; i++) {
+            if ("兔子".equals(Thread.currentThread().getName()) && i % 3000 == 0) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            if("兔子".equals(Thread.currentThread().getName())){
+                loser = i;
+            }
+            flag = gaveOver(i);
+            if (flag) return;
+            System.out.println(Thread.currentThread().getName() + "跑了" + i + "步");
+        }
+
+    }
+
+    public static void main(String[] args) {
+        _05RacePet racePet = new _05RacePet();
+        new Thread(racePet, "兔子").start();
+        new Thread(racePet, "胖子").start();
+    }
+
+    private boolean gaveOver(int steps) {
+        if (winner != null) return true;
+        if (steps >= 10000) {
+            winner = Thread.currentThread().getName();
+            System.out.println("获胜者" + winner);
+            System.out.println("失败者跑了"+loser);
+
+            return true;
+        }
+        return false;
+    }
+
+
+    
+改版的:
+package liuhui.com.高级特性.线程.new线程;
+
+// 模拟龟兔赛跑 - Race
+
+/**
+ * 1.首先来个赛道距离,然后要离终点越来越近
+ * 2.判断比赛是否结束
+ * 3.打印出胜利者
+ * 4.龟兔赛跑开始
+ * 5.故事中是乌龟赢的,兔子需要睡觉,所以我们来模拟兔子睡觉
+ * 6.终于乌龟赢了比赛
+ */
+
+
+public class _05RacePet implements Runnable {
+
+    private String winner;
+    private int loser;
+    @Override
+    public void run() {
+        boolean flag;
+
+        for (int i = 1; i <= 10000; i++) {
+            if ("兔子".equals(Thread.currentThread().getName()) && i % 3000 == 0) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            if("兔子".equals(Thread.currentThread().getName())){
+                loser = i;
+            }
+            flag = gaveOver(i);
+            if (flag) return;
+            System.out.println(Thread.currentThread().getName() + "跑了" + i + "步");
+        }
+
+    }
+
+    public static void main(String[] args) {
+        _05RacePet racePet = new _05RacePet();
+        new Thread(racePet, "兔子").start();
+        new Thread(racePet, "胖子").start();
+    }
+
+    private boolean gaveOver(int steps) {
+        if (winner != null) return true;
+        if (steps >= 10000) {
+            winner = Thread.currentThread().getName();
+            System.out.println("获胜者" + winner);
+            System.out.println("失败者跑了"+loser);
+
+            return true;
+        }
+        return false;
+    }
+    
+}
+
+
 ```
+
+
 
 ##### 6. 实现Callable接口 ( 了解即可 )
 
@@ -1272,7 +1407,6 @@ class WebDownLoader2 {
     // 下载的方法
     public void downLoader(String url, String name) throws IOException {
         FileUtils.copyURLToFile(new URL(url), new File(name));
-
     }
 }
 
@@ -1300,7 +1434,7 @@ public class _01StaticProxy {
     public static void main(String[] args) {
         You you = new You();
 
-        new Thread(()->System.out.println("我爱你")).start();  // lambda表达式
+        // new Thread(()->System.out.println("我爱你")).start();  // lambda表达式 跟本案例没关系
 
         new WeddingCompany(you).happyMarry();   // 传入目标对象
 
@@ -1351,6 +1485,8 @@ class WeddingCompany implements Merry {
 // 结婚之后愁眉苦脸
 
 ```
+
+
 
 ##### 8. Lamda表达式
 
@@ -1427,6 +1563,8 @@ public class _02LambdaDemo1 {
     }
 }
 
+
+
 // 1. 定义一个函数式接口
 interface ILike {
     void lambda();
@@ -1452,6 +1590,8 @@ class Like implements ILike {
 
 ![image-20220114003303394](\typora-user-images\image-20220114003303394.png)
 
+
+
 ##### 1. 线程方法
 
 | 方法                           | 说明                                       |
@@ -1463,11 +1603,13 @@ class Like implements ILike {
 | void interrupt()   X           | 中断线程，别用这个方式                     |
 | boolean isAlive()              | 测试线程是否处于活动状态                   |
 
+
+
 ##### 2. 线程停止
 
 * 不推荐使用JDK提供的stop() 、destroy() 方法。【已废弃】
 * 推荐线程自己停下来
-* 建议使用一个标志位进行终止变量 当flag=false,则终止线程运行
+* 建议使用一个标志位进行终止变量 当flag = false,则终止线程运行
 
 ```java
 package liuhui.com.高级特性.线程.new线程2;
@@ -1523,7 +1665,7 @@ public class _04ThreadStopDemo1 implements Runnable {
 
 /**
  * sleep ,
- * (1)模拟网路延迟  (比如买火车票那个问题)
+ * (1) 模拟网路延迟  (比如买火车票那个问题)
  * (2) 模拟倒计时
  */
 public class _05ThreadSleep {
@@ -1564,8 +1706,8 @@ public class _05ThreadSleep {
 
 ##### 4. 线程礼让
 
-* 礼让线程,让当前正在执行的线程停止,但不阻塞
-* 将线程从运行状态转为就绪状态
+* **礼让线程,让当前正在执行的线程停止,但不阻塞**
+* **将线程从运行状态转为就绪状态**
 * **让cpu重新调度,礼让不一定成功! 看cpu心情**
 
 ```java
@@ -1595,9 +1737,11 @@ class MyYield implements Runnable {
 
 ```
 
+
+
 ##### 5. 线程合并
 
-* Join合并线程,待此线程执行完成后,在执行其他线程,其他线程阻塞
+* Join合并线程, 待此线程执行完成后, 在执行其他线程,其他线程阻塞
 * 可以想象成插队
 
 ```java
@@ -1638,43 +1782,669 @@ public class _07ThreadJoin implements Runnable {
     }
 }
 
+
+扩展: 线程插队
+
+    主线程到200,子线程执行 ，其实执行的是孙线程 因为子线程中 也让子线程插了队
+
+
+public class _07ThreadJoin implements Runnable {
+    @Override
+    public void run() {
+        for (int i = 0; i < 1000; i++) {
+
+            if(i==200){
+                Thread thread = new Thread(() -> {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    for (int i1 = 0; i1 < 300; i1++) {
+                        System.out.println("第三线程来了" + i1);
+                    }
+                });
+                thread.start();
+
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("主线程vip来了"+i);
+        }
+
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        _07ThreadJoin threadJoin = new _07ThreadJoin();
+        Thread thread = new Thread(threadJoin);
+        thread.start();
+
+
+        // 主线程
+        for (int i = 0; i < 500; i++) {
+            Thread.sleep(1);
+            if(i==200){
+                thread.join();
+            }
+            System.out.println("main线程"+i);
+        }
+    }
+}
+
 ```
+
+
 
 ##### 6. 线程状态观测
 
 * Thread.State
 
-  - ```
-    public static enum Thread.State
-    extends Enum<Thread.State>
-    ```
+  ```
+  public static enum Thread.State
+  extends Enum<Thread.State>
+  ```
 
-    线程状态。线程可以处于以下状态之一：
+  线程状态。线程可以处于以下状态之一：
 
-    - [`NEW`](../../java/lang/Thread.State.html#NEW)  
-      尚未启动的线程处于此状态。 
-    - [`RUNNABLE`](../../java/lang/Thread.State.html#RUNNABLE)  
-      在Java虚拟机中执行的线程处于此状态。 
-    - [`BLOCKED`](../../java/lang/Thread.State.html#BLOCKED)  
-      被阻塞等待监视器锁定的线程处于此状态。 
-    - [`WAITING`](../../java/lang/Thread.State.html#WAITING)  
-      正在等待另一个线程执行特定动作的线程处于此状态。 
-    - [`TIMED_WAITING`](../../java/lang/Thread.State.html#TIMED_WAITING)  
-      正在等待另一个线程执行动作达到指定等待时间的线程处于此状态。 
-    - [`TERMINATED`](../../java/lang/Thread.State.html#TERMINATED)  
-      已退出的线程处于此状态。 
+  - [`NEW`](../../java/lang/Thread.State.html#NEW)  
+    尚未启动的线程处于此状态。 
+  - [`RUNNABLE`](../../java/lang/Thread.State.html#RUNNABLE)  
+    在Java虚拟机中执行的线程处于此状态。 
+  - [`BLOCKED`](../../java/lang/Thread.State.html#BLOCKED)  
+    被阻塞等待监视器锁定的线程处于此状态。 
+  - [`WAITING`](../../java/lang/Thread.State.html#WAITING)  
+    正在等待另一个线程执行特定动作的线程处于此状态。 
+  - [`TIMED_WAITING`](../../java/lang/Thread.State.html#TIMED_WAITING)  
+    正在等待另一个线程执行动作达到指定等待时间的线程处于此状态。 
+  - [`TERMINATED`](../../java/lang/Thread.State.html#TERMINATED)  
+    已退出的线程处于此状态。 
 
-    <span style="color:red">**一个线程可以在给定时间点处于一个状态。 这些状态是不反映任何操作系统线程状态的虚拟机状态。 **</span>
+  <span style="color:red">**一个线程可以在给定时间点处于一个状态。 这些状态是不反映任何操作系统线程状态的虚拟机状态。 **</span>
 
-​		code:
+**code :**
+
+```java
+
+/*
+ * 测试线程状态
+ *
+ **/
+
+public class _08ThreadState {
+
+    public static void main(String[] args) throws InterruptedException {
+
+        Thread thread = new Thread(() -> {
+            for (int i = 0; i < 5; i++) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(Thread.currentThread().getName());
+            } 
+        }, "线程一");
+
+        // 观察线程状态
+        Thread.State state = ;
+        System.out.println(state);		// NEW
+
+        // 观察启动后
+        thread.start();
+        state = thread.getState();		// RUNNABLE 
+
+        while (state != Thread.State.TERMINATED) { // 只要线程不终止 就一直执行
+            Thread.sleep(100);
+            // 更新线程状态
+            state = thread.getState();
+            System.out.println(state);	
+
+        }
+
+    }
+
+}
+
+NEW
+线程一
+TIMED_WAITING		// 线程等待
+线程一
+RUNNABLE
+线程一
+RUNNABLE
+TIMED_WAITING
+线程一
+线程一
+RUNNABLE
+TERMINATED
+
+
+```
+
+
+
+#### 4. 线程优先级
+
+* java提供了一个线程调度器来监控程序中启动后进入就绪状态的所有线程,线程调度器按照优先级决定应该调度哪个线程来执行.
+* 线程优先级用数字表示, 范围 1～10
+  * Thread.MIN_PRIORITY = 1;
+  * Thread.MAX_PRIORITY = 10;
+  * Thread.NORM_PRIORITY = 5;
+* 可以使用以下方式改变或获取优先级
+  * getPriority().	setPriority(int xxx)
+
+<span style="color:red">**注意 : 优先级低并不意味着获得调度的概率低,并不是优先级低就不会被调用,这都是看cpu调度**</span>
+
+**code : **
+
+```java
+
+public class _09ThreadPriority {
+    public static void main(String[] args) {
+        // 主线程默认优先级  5
+        System.out.println(Thread.currentThread().getName() + "   ->" + 			 Thread.currentThread().getPriority());
+
+        MyPriority myPriority = new MyPriority();
+
+        Thread t1 = new Thread(myPriority,"t1");
+        Thread t2 = new Thread(myPriority,"t2");
+        Thread t3 = new Thread(myPriority,"t3");
+        Thread t4 = new Thread(myPriority,"t4");
+        Thread t5 = new Thread(myPriority,"t5");
+        Thread t6 = new Thread(myPriority,"t6");
+
+        t1.start();
+
+        t2.setPriority(2);
+        t2.start();
+
+        t3.setPriority(3);
+        t3.start();
+
+        t4.setPriority(4);
+        t4.start();
+
+        t5.setPriority(5);
+        t5.start();
+
+        t6.setPriority(Thread.MAX_PRIORITY);
+        t6.start();
+
+
+    }
+}
+
+class MyPriority implements Runnable {
+
+    @Override
+    public void run() {
+       
+        System.out.println(Thread.currentThread().getName() + "   ->" + Thread.currentThread().getPriority());
+    }
+}
+
+
+main   ->5
+t1   ->5
+t2   ->2
+t5   ->5
+t6   ->10
+t3   ->3
+t4   ->4
+
+    
+```
+
+
+
+#### 5. 守护( daemon )线程
+
+* 线程分为 <span style="color:red">**用户线程**</span> 和 <span style="color:red">**守护线程**</span> 
+* 虚拟机必须保证用户线程执行完毕
+* 虚拟机不用等待守护线程执行完毕
+* 如,后台记录操作日志,监控内存,垃圾回收等待 ...
+
+**code : **
+
+```java
+
+
+public class _01ThreadDaemon {
+    public static void main(String[] args) {
+        // 上帝 守护线程
+        Thread god = new Thread(() -> {
+            while (true) {
+                System.out.println("上帝保佑着你");
+            }
+        });
+        god.setDaemon(true);        // false表示是用户线程 true表示守护线程 正常的线程都是用户线程
+        god.start();
+
+        
+        // 你 用户线程
+        new Thread(() -> {
+            for (int i = 0; i < 100; i++) {
+                System.out.println("你开心的活着");
+            }
+            System.out.println("good bye");
+        }).start();
+    }
+}
+
+
+```
+
+#### 6. 线程同步
+
+**并发** : <span style="color:red">**同一个对象 **</span>被 <span style="color:red">**多个线程 **</span><span style="color:blue">**同时操作**</span>
+
+
+
+现实生活中,我们都会遇到"同一个资源,多个人都想使用"的问题,比如，食堂排队打饭,每个人都想吃饭,最天然的解决办法就是,排队一个一个来。
+
+
+
+处理多线程问题时,多个线程访问同一个对象，并且某些线程还想修改这个对象,这时候我们就需要线程同步,线程同步其实就是一种等待机制,多个需要同时访问此对象的线程进入这个<span style="color:red">**对象的等待池** </span> 形成队列,等待前面线程使用完毕,下一个线程再使用
+
+
+
+由于同一进程的多个线程共享同一块存储空间,再带来方便的同时，也带来了访问冲突问题,为了保证数据在方法种被访问时的正确性,再访问时加入 <span style="color:red">**锁机制 synchronized**</span> ,当一个线程获得对象的排他锁,独占资源,其他线程必须等待, 使用后释放锁即可，存在以下问题:
+
+* 一个线程持有锁会导致其他所有需要此锁的线程挂起；
+* 在多线程竞争下,加锁，释放锁会导致比较多的上下文切换和 调度延迟,引起性能问题;
+* 如果一个优先级高的线程等待一个优先级低的线程释放锁,会导致优先级倒置,引起性能问题.
+
+**队列和锁**
+
+![image-20220130175829727](\typora-user-images\image-20220130175829727.png)
+
+**三大不安全案列**
+
+##### 1. Arraaylist
+
+```java
+package liuhui.com.高级特性.线程.线程同步;
+
+import java.util.ArrayList;
+
+public class _01UnsafeArrayList {
+    public static void main(String[] args)  {
+        ArrayList<String> list = new ArrayList<>();
+        for (int i = 0; i < 10000; i++) {
+            new Thread(()->{
+                list.add(Thread.currentThread().getName());
+            }).start();
+
+//            try {
+//                Thread.sleep(1);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+        }
+        System.out.println(list.size());
+        list.forEach(System.out::println);
+
+    }
+}
+
+// 不是10000个
+```
+
+
+
+##### 2. 买火车票
+
+```java
+package liuhui.com.高级特性.线程.线程同步;
+
+// 不安全的买票
+// 线程不安全,有负数
+public class _02UnsafeTicket {
+
+    public static void main(String[] args) {
+        buyTicket unsafeTicket = new buyTicket();
+
+        new Thread(unsafeTicket, "老师").start();
+        new Thread(unsafeTicket, "我").start();
+        new Thread(unsafeTicket, "黄牛党").start();
+
+    }
+
+}
+
+class buyTicket implements Runnable {
+    int ticketNums = 10;
+    boolean flag = true;
+
+    @Override
+    public void run() {
+        while (flag) buy();
+    }
+
+    public void buy() {
+        if (ticketNums < 0) {
+            flag = false;
+            return;
+        }
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println(Thread.currentThread().getName() + "拿到了第" + ticketNums-- + "张票");
+    }
+}
+
+```
+
+**同步方法**
+
+```java
+package liuhui.com.高级特性.线程.线程同步;
+
+
+// 线程同步 不管多少个线程 最后总票数不变
+public class _02UnsafeTicket {
+
+    public static void main(String[] args) {
+        buyTicket unsafeTicket = new buyTicket();
+
+        new Thread(unsafeTicket, "老师").start();
+        new Thread(unsafeTicket, "我").start();
+        new Thread(unsafeTicket, "黄牛党").start();
+        new Thread(unsafeTicket, "同事").start();
+        new Thread(unsafeTicket, "老板").start();
+        new Thread(unsafeTicket, "鲁迅").start();
+
+    }
+
+}
+
+class buyTicket implements Runnable {
+    int ticketNums = 10000;
+    boolean flag = true;
+
+    int a,b,c,d,e,f;
+
+    @Override
+    public void run() {
+        while (flag) buy();
+    }
+
+    // synchronized 同步方法 锁的是this
+    public synchronized void buy() {
+        if (ticketNums <= 0) {
+            flag = false;
+            System.out.println("老师"+a);
+            System.out.println("我"+b);
+            System.out.println("黄牛党"+c);
+            System.out.println("同时"+d);
+            System.out.println("老板"+e);
+            System.out.println("鲁迅"+f);
+            return;
+        }
+        if(Thread.currentThread().getName().equals("老师")){
+            a++;
+        }
+        if(Thread.currentThread().getName().equals("我")){
+            b++;
+        }
+        if(Thread.currentThread().getName().equals("黄牛党")){
+            c++;
+        }
+        if(Thread.currentThread().getName().equals("同事")){
+            d++;
+        }
+        if(Thread.currentThread().getName().equals("老板")){
+            e++;
+        }
+        if(Thread.currentThread().getName().equals("鲁迅")){
+            f++;
+        }
+
+        try {
+            Thread.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println(Thread.currentThread().getName() + "拿到了第" + ticketNums-- + "张票");
+
+    }
+}
+
+```
+
+
+
+##### 3. 取钱
+
+```java
+package liuhui.com.高级特性.线程.线程同步;
+
+// 不安全的取钱
+// 两个人去银行取钱,账户
+
+public class _03UnSafeBank {
+    public static void main(String[] args) {
+        Account account = new Account(100,"结婚基金");
+        Drawing you = new Drawing(account,50,"you");
+        Drawing girlFriend = new Drawing(account,100,"girlFriend");
+
+        you.start();
+        girlFriend.start();
+
+    }
+}
+
+// 账户
+class Account {
+    int money; //余额
+    String name; // 卡名
+
+    public Account(int money, String name) {
+        this.money = money;
+        this.name = name;
+    }
+}
+
+// 银行: 模拟
+class Drawing extends Thread {
+
+    Account account;
+    int drawingMoney;   // 取的钱
+    int nowMoney;       // 现在的钱
+
+    public Drawing(Account account, int drawingMoney, String name) {
+        super(name);
+        this.account = account;
+        this.drawingMoney = drawingMoney;
+    }
+
+    // 取钱
+    @Override
+    public void run() {
+        // 判断有没有钱
+        if (account.money - drawingMoney < 0) {
+            System.out.println(this.getName() + "钱不够，取不了");
+            return;
+        }
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        // 卡内余额
+        account.money = account.money - drawingMoney;
+        // 你手里的钱
+        nowMoney = nowMoney + drawingMoney;
+        System.out.println(account.name + "余额为" + account.money);
+        // 因为继承了thread 所以相当于 Thread.currentThread().getName()
+        System.out.println(this.getName() + "手里的钱为" + nowMoney);  
+    }
+}
+
+
+```
+
+**同步方法**
+
+```java
+package liuhui.com.高级特性.线程.线程同步;
+
+// 锁的是银行中账户
+
+public class _03UnSafeBank {
+    public static void main(String[] args) {
+        Account account = new Account(1000, "结婚基金");
+        Drawing you = new Drawing(account, 50, "you");
+        Drawing girlFriend = new Drawing(account, 100, "girlFriend");
+
+        you.start();
+        girlFriend.start();
+
+    }
+}
+
+// 账户
+class Account {
+    int money; //余额
+    String name; // 卡名
+
+    public Account(int money, String name) {
+        this.money = money;
+        this.name = name;
+    }
+}
+
+// 银行: 模拟
+class Drawing extends Thread {
+
+    Account account;
+    int drawingMoney;   // 取的钱
+    int nowMoney;       // 现在的钱
+
+    public Drawing(Account account, int drawingMoney, String name) {
+        super(name);
+        this.account = account;
+        this.drawingMoney = drawingMoney;
+    }
+
+    // 取钱
+    @Override
+    public void run() {
+        synchronized (account) {
+            // 判断有没有钱
+            if (account.money - drawingMoney < 0) {
+                System.out.println(this.getName() + "钱不够，取不了");
+                return;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            // 卡内余额
+            account.money = account.money - drawingMoney;
+            // 你手里的钱
+            nowMoney = nowMoney + drawingMoney;
+             // 因为继承了thread 所以相当于有Thread.currentThread().getName()
+            System.out.println(this.getName() + "手里的钱为" + nowMoney); 
+            System.out.println(account.name + "余额为" + account.money);
+        }
+    }
+}
+
+```
+
+
+
+##### 4. 同步方法
+
+* 由于我们可以通过private 关键字来保证数据对象只能被方法访问,所以我们只需要针对方法提出一套机制,这套机制就是synchronized
+
+​		关键字，它包括两种用法: synchronized 方法 和synchronized 块.
+
+​		**同步方法: public synchronized void method(int args){}**
+
+* synchronized 方法控制"对象"的访问,每个对象对应一把锁,每个synchronized方法都必须获得调用该方法的对象的锁才能执行,否则线程会阻塞，方法一旦执行,就独占该锁,直到该方法返回才能释放锁,后面被阻塞的线程才能获得这个锁，继续执行
+
+​		**缺陷: 若将一个大的方法申明为synchronized 将会影响效率**
+
+
+
+##### 5. 同步块
+
+* 同步块 ：synchronized (Obj){}
+* <span style="color:red">**OBj**</span> 称之为 **同步监视器**
+  * **obj** 可以是任何对象 ,但是推荐使用共享资源作为同步监视器
+  * 同步方法中无需指定同步监视器, 因为同步方法的同步监视器就是this，就是这个对象本身,或者是 class [反射中讲解]
+
+* 同步监视器的执行过程
+
+  1. 第一个线程访问, 锁定同步监视器,执行其中代码
+
+  2. 第二个线程访问，发现同步监视器被锁定，无法访问。
+
+  3. 第一个线程访问完毕，解锁同步监视器
+
+  4. 第二个线程访问，发现同步监视器没有锁，然后锁定访问
+
+     
+
+##### 6. CopyOnWriteArrayList
+
+```java
+CopyOnWriteArrayList 线程安全的类*-
+
+import java.util.concurrent.CopyOnWriteArrayList;
+
+public class _04JUCArraylist {
+    public static void main(String[] args) {
+
+
+        CopyOnWriteArrayList<String> list = new CopyOnWriteArrayList<>();
+        for (int i = 0; i < 10000; i++) {
+            new Thread(()->{
+                list.add(Thread.currentThread().getName());
+            }).start();
+        }
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println(list.size());
+    }
+}
+
+```
+
+#### 7. 死锁
+
+* 多个线程各自占有一些共享资源，并且互相等待其他线程占有的资源才能运行，而导致两个或者多个线程都在等待对方释放资源，都停止执行的情形，某一个同步块同时拥有"**两个以上对象的锁**"时，就可能发生 死锁 的问题
+
+**死锁避免的方法**
+
+* 产生死锁的四个必要条件
+  1. 互斥条件，一个资源只能被一个进程使用。
+  2. 请求与保持条件: 一个进程因请求资源而阻塞时，对已获得的资源保持开发。
+  3. 不剥夺条件: 进程已经获得资源，在未使用完之前，不能强行剥夺
+  4. 循环等待条件: 若干个进程之间形成一种头尾相接的循环等待资源关系
 
 ```java
 
 
 
 
-
-
 ```
 
 
@@ -1689,11 +2459,6 @@ public class _07ThreadJoin implements Runnable {
 
 
 
-#### 4. 线程同步(重点)
-
-#### 5. 线程通信问题
-
-#### 6. 高级主题
 
 
 
@@ -1702,26 +2467,7 @@ public class _07ThreadJoin implements Runnable {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### 1. 集合
+### 3. 集合
 
 ```java
 Java集合框架提供了一套性能优良、使用方便的接口和类，它们位于java.util包中
@@ -1822,11 +2568,9 @@ Collections类可以对集合进行排序、查找和替换操作
 
 ```
 
-### 2. IO
 
 
-
-
+### 4. IO
 
 ```java
 文件的读写
@@ -1870,7 +2614,7 @@ BufferedWriter bw = new BufferedWriter(new FileWriter(path, isAppend))
 
 ```
 
-### 3. 反射
+### 5. 反射
 
 ```
 /**
@@ -1948,7 +2692,7 @@ BufferedWriter bw = new BufferedWriter(new FileWriter(path, isAppend))
 
 
 
-### 4. 注解
+### 6. 注解
 
 ```
 /**
@@ -2021,7 +2765,7 @@ BufferedWriter bw = new BufferedWriter(new FileWriter(path, isAppend))
  */
 ```
 
-### 5. JDBC
+### 7. JDBC
 
 ```
 * 概念 : 数据库连接的操作语言
@@ -2041,18 +2785,17 @@ BufferedWriter bw = new BufferedWriter(new FileWriter(path, isAppend))
   * 递归分为两种: **直接递归** 和 **间接递归**
   * 直接递归: 方法自身调用自己
   * 间接递归: 可以A方法调用B方法,B方法调用C方法,C方法调用A方法
-
 * 注意事项:
 
   * 递归一定要有条件限定,保证递归能够停止下来,否则会发生栈内存溢出
   * 在递归中虽然有限定条件,但是递归次数不能太多,否则也会发生栈内存溢出
   * 构造方法禁止递归
-
 * 递归的使用前提
 
   * 当方法调用的时候,方法的主体不变，每次调用方法的参数不同,可以使用递归
 
-  **1. 例子**
+
+#### 1. n - -
 
 ```java
 public class recursionDemo1 {
@@ -2078,7 +2821,9 @@ public class recursionDemo1 {
 
 ![image-20220109195841990](\typora-user-images\image-20220109195841990.png)
 
-**2. 例子**
+
+
+#### 2. 1 - n 之间的和
 
 ```java
 package liuhui.com.数据结构.递归;
@@ -2122,9 +2867,9 @@ public class recursionDemo2 {
 
 ![image-20220109200358004](\typora-user-images\image-20220109200358004.png)
 
-**3. 例子**
 
-**递归打印多级目录**
+
+#### 3. 递归打印多级目录
 
 ```java
  public  void getAllFile(String str) {
@@ -2142,7 +2887,9 @@ public class recursionDemo2 {
 
 ```
 
-**4. 递归删除文件目录**
+
+
+#### 4. 递归删除文件目录
 
 ```java
 public static void delLinked(File file) {
@@ -4452,9 +5199,11 @@ public static void main(String[] args) {
 
 ```
 
+
+
 ## 7. IOC操作bean管理(xml自动装配)
 
-```xml
+```jdbc
 1. 什么是自动装配
 	* 根据指定装配规则 (属性名称或者属性类型) spring自动将匹配的属性值进行注入
 	* autowire值的设置:
@@ -4510,7 +5259,6 @@ public class Emp {
 
 
 2. 引入外部属性文件配置数据库连接池(创建jdbc.properties文件)
-
 prop.driverClassName=com.mysql.jdbc.Driver
 prop.url=jdbc:mysql://localhost:3306/db
 prop.username=root
@@ -4532,6 +5280,8 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
         <property name="password" value="${prop.password}"/>
     </bean>
 ```
+
+
 
 ## 9. 基于注解方式的bean管理操作
 

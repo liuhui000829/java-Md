@@ -15,7 +15,7 @@ public class TestThread4 implements Runnable {
         while (true) {
             if (tickerNums <= 0) break;
             try {
-                Thread.sleep(500);      // 模拟延迟 毫秒
+                Thread.sleep(100);      // 模拟延迟 毫秒
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
